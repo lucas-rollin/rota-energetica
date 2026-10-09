@@ -1,0 +1,20 @@
+# VS Code
+*.code-workspace
+
+# Temporary
+*.tmp
+*.tmp.*
+
+# Data
+data/raw/
+
+# Python
+.venv/
+__pycache__/
+.pytest_cache/
+*.egg-info/
+
+# Node
+node_modules/
+dist/
+.astro/
