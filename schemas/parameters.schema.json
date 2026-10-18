@@ -1,0 +1,195 @@
+{
+  "$defs": {
+    "GeneralParameters": {
+      "additionalProperties": false,
+      "description": "Operational and macroeconomic baseline parameters.",
+      "properties": {
+        "annual_distance_km": {
+          "$ref": "#/$defs/ParameterItem",
+          "description": "Quilometragem média percorrida por ano (km/ano).",
+          "title": "Annual Distance (km)"
+        },
+        "horizon_years": {
+          "$ref": "#/$defs/ParameterItem",
+          "description": "Horizonte de tempo para cálculo do TCO (anos).",
+          "title": "Horizon (years)"
+        },
+        "discount_rate": {
+          "$ref": "#/$defs/ParameterItem",
+          "description": "Taxa de desconto anual para valor presente do TCO (fração decimal).",
+          "title": "Discount Rate"
+        },
+        "biodiesel_blend": {
+          "$ref": "#/$defs/ParameterItem",
+          "description": "Teor de biodiesel no diesel B (fração decimal).",
+          "title": "Biodiesel Blend"
+        }
+      },
+      "required": [
+        "annual_distance_km",
+        "horizon_years",
+        "discount_rate",
+        "biodiesel_blend"
+      ],
+      "title": "GeneralParameters",
+      "type": "object"
+    },
+    "ParameterItem": {
+      "additionalProperties": false,
+      "description": "A numerical simulation parameter paired with provenance and quality badge.",
+      "properties": {
+        "value": {
+          "description": "Valor numérico do parâmetro.",
+          "title": "Value",
+          "type": "number"
+        },
+        "unit": {
+          "description": "Unidade de medida (ex: R$/L, km/L, gCO2eq/MJ).",
+          "minLength": 1,
+          "title": "Unit",
+          "type": "string"
+        },
+        "source_id": {
+          "description": "ID da fonte em docs/fontes.md (ex: P01, E01, V01).",
+          "pattern": "^[A-Z][0-9]{2}$",
+          "title": "Source Id",
+          "type": "string"
+        },
+        "badge": {
+          "description": "Selo de qualidade do dado: 'Primária', 'Adaptada' ou 'Ilustrativa'.",
+          "enum": [
+            "Primária",
+            "Adaptada",
+            "Ilustrativa"
+          ],
+          "title": "Badge",
+          "type": "string"
+        },
+        "notes": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Nota explicativa ou justificativa da premissa adotada.",
+          "title": "Notes"
+        }
+      },
+      "required": [
+        "value",
+        "unit",
+        "source_id",
+        "badge"
+      ],
+      "title": "ParameterItem",
+      "type": "object"
+    },
+    "VehicleParameters": {
+      "additionalProperties": false,
+      "description": "Technical and economic specifications for an energy powertrain.",
+      "properties": {
+        "label": {
+          "description": "Nome de exibição da alternativa energética.",
+          "title": "Label",
+          "type": "string"
+        },
+        "energy_price": {
+          "$ref": "#/$defs/ParameterItem",
+          "description": "Preço de referência da energia (R$/L, R$/m³ ou R$/kWh).",
+          "title": "Energy Price"
+        },
+        "consumption": {
+          "$ref": "#/$defs/ParameterItem",
+          "description": "Eficiência de consumo de combustível ou eletricidade (km/L, km/m³ ou km/kWh).",
+          "title": "Consumption"
+        },
+        "energy_density": {
+          "$ref": "#/$defs/ParameterItem",
+          "description": "Conteúdo energético (MJ por unidade de combustível/energia).",
+          "title": "Energy Density"
+        },
+        "carbon_intensity": {
+          "$ref": "#/$defs/ParameterItem",
+          "description": "Intensidade de carbono do ciclo poço à roda (gCO2eq/MJ).",
+          "title": "Carbon Intensity"
+        },
+        "vehicle_purchase_price": {
+          "$ref": "#/$defs/ParameterItem",
+          "description": "Preço total estimado de aquisição do cavalo mecânico (R$).",
+          "title": "Vehicle Purchase Price"
+        },
+        "vehicle_overprice": {
+          "$ref": "#/$defs/ParameterItem",
+          "description": "Sobrepreço de aquisição em relação ao cavalo mecânico diesel base (R$).",
+          "title": "Vehicle Overprice"
+        },
+        "maintenance_cost_per_km": {
+          "$ref": "#/$defs/ParameterItem",
+          "description": "Custo operacional de manutenção e desgaste de pneus (R$/km).",
+          "title": "Maintenance Cost Per Km"
+        }
+      },
+      "required": [
+        "label",
+        "energy_price",
+        "consumption",
+        "energy_density",
+        "carbon_intensity",
+        "vehicle_purchase_price",
+        "vehicle_overprice",
+        "maintenance_cost_per_km"
+      ],
+      "title": "VehicleParameters",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Full schema for default simulation parameters.",
+  "properties": {
+    "$schema": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": "../schemas/parameters.schema.json",
+      "title": "$schema"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "generated_at": {
+      "description": "Data de geração ou última revisão dos parâmetros (AAAA-MM-DD).",
+      "title": "Generated At",
+      "type": "string"
+    },
+    "general": {
+      "$ref": "#/$defs/GeneralParameters",
+      "title": "General Parameters"
+    },
+    "vehicles": {
+      "additionalProperties": {
+        "$ref": "#/$defs/VehicleParameters"
+      },
+      "title": "Vehicles",
+      "type": "object"
+    }
+  },
+  "required": [
+    "generated_at",
+    "general",
+    "vehicles"
+  ],
+  "title": "SimulationParameters",
+  "type": "object"
+}

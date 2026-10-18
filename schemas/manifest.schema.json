@@ -1,0 +1,139 @@
+{
+  "$defs": {
+    "Entry": {
+      "additionalProperties": false,
+      "description": "Um arquivo baixado para data/raw/.",
+      "properties": {
+        "source_id": {
+          "description": "ID da fonte em docs/fontes.md (ex.: P01).",
+          "pattern": "^[A-Z][0-9]{2}$",
+          "title": "Source Id",
+          "type": "string"
+        },
+        "file": {
+          "description": "Caminho do arquivo, relativo à raiz do repositório, com '/'.",
+          "title": "File",
+          "type": "string"
+        },
+        "origin_url": {
+          "description": "Página ou endereço do arquivo de onde veio.",
+          "minLength": 1,
+          "title": "Origin Url",
+          "type": "string"
+        },
+        "acquisition": {
+          "description": "'manual' (baixado à mão) ou 'auto' (baixado pelo pipeline).",
+          "enum": [
+            "manual",
+            "auto"
+          ],
+          "title": "Acquisition",
+          "type": "string"
+        },
+        "retrieved_at": {
+          "description": "Data do download (AAAA-MM-DD).",
+          "format": "date",
+          "title": "Retrieved At",
+          "type": "string"
+        },
+        "sha256": {
+          "description": "Impressão digital (SHA-256) do conteúdo do arquivo.",
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        },
+        "rows": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Linhas de dados, sem o cabeçalho (arquivos tabulares).",
+          "title": "Rows"
+        },
+        "date_range": {
+          "anyOf": [
+            {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "format": "date",
+                  "type": "string"
+                }
+              ],
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Primeira e última data presentes nos dados.",
+          "title": "Date Range"
+        },
+        "notes": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Observação livre.",
+          "title": "Notes"
+        }
+      },
+      "required": [
+        "source_id",
+        "file",
+        "origin_url",
+        "acquisition",
+        "retrieved_at",
+        "sha256"
+      ],
+      "title": "Entry",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Registro de tudo o que foi baixado para data/raw/.",
+  "properties": {
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "generated_at": {
+      "description": "Data da última alteração do manifest.",
+      "format": "date",
+      "title": "Generated At",
+      "type": "string"
+    },
+    "entries": {
+      "items": {
+        "$ref": "#/$defs/Entry"
+      },
+      "title": "Entries",
+      "type": "array"
+    }
+  },
+  "required": [
+    "generated_at"
+  ],
+  "title": "Rota Energética: manifest de aquisição de dados",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

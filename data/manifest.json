@@ -1,0 +1,367 @@
+{
+  "$schema": "../schemas/manifest.schema.json",
+  "schema_version": 1,
+  "generated_at": "2026-10-18T12:30:51.041300-03:00",
+  "entries": [
+    {
+      "source_id": "P01",
+      "file": "data/raw/anp/ca-2020-01.csv",
+      "origin_url": "https://www.gov.br/anp/pt-br/centrais-de-conteudo/dados-abertos/serie-historica-de-precos-de-combustiveis",
+      "acquisition": "manual",
+      "retrieved_at": "2026-10-09",
+      "sha256": "9396bd96e243d59d7aa4472590ddc0e2f6ce449a14b8073a1def2e016b551539",
+      "rows": 496663,
+      "date_range": [
+        "2020-01-01",
+        "2020-06-30"
+      ]
+    },
+    {
+      "source_id": "P01",
+      "file": "data/raw/anp/ca-2020-02.csv",
+      "origin_url": "https://www.gov.br/anp/pt-br/centrais-de-conteudo/dados-abertos/serie-historica-de-precos-de-combustiveis",
+      "acquisition": "manual",
+      "retrieved_at": "2026-10-09",
+      "sha256": "ee9fbc39e4d2abb1f344eb482758eacb175b7ae82e893fc2bde725a82ccf4157",
+      "rows": 222637,
+      "date_range": [
+        "2020-07-01",
+        "2020-12-31"
+      ]
+    },
+    {
+      "source_id": "P01",
+      "file": "data/raw/anp/ca-2021-01.csv",
+      "origin_url": "https://www.gov.br/anp/pt-br/centrais-de-conteudo/dados-abertos/serie-historica-de-precos-de-combustiveis",
+      "acquisition": "manual",
+      "retrieved_at": "2026-10-09",
+      "sha256": "57c786452743fd36a77654abe248303d220614f8115d08ca6f2724131480b62b",
+      "rows": 334681,
+      "date_range": [
+        "2021-01-01",
+        "2021-06-30"
+      ]
+    },
+    {
+      "source_id": "P01",
+      "file": "data/raw/anp/ca-2021-02.csv",
+      "origin_url": "https://www.gov.br/anp/pt-br/centrais-de-conteudo/dados-abertos/serie-historica-de-precos-de-combustiveis",
+      "acquisition": "manual",
+      "retrieved_at": "2026-10-09",
+      "sha256": "4fae51c8cf5191b2e32dc3000511f0a5925f2c3cbbf3d8d50fccbbb5f3718414",
+      "rows": 472856,
+      "date_range": [
+        "2021-07-01",
+        "2021-12-31"
+      ]
+    },
+    {
+      "source_id": "P01",
+      "file": "data/raw/anp/ca-2022-01.csv",
+      "origin_url": "https://www.gov.br/anp/pt-br/centrais-de-conteudo/dados-abertos/serie-historica-de-precos-de-combustiveis",
+      "acquisition": "manual",
+      "retrieved_at": "2026-10-09",
+      "sha256": "ca5327bff4e751215704d93d37dfe3c2c8314a941871d207cd2a477d6b4e8ac3",
+      "rows": 529424,
+      "date_range": [
+        "2022-01-03",
+        "2022-06-30"
+      ]
+    },
+    {
+      "source_id": "P01",
+      "file": "data/raw/anp/ca-2022-02.csv",
+      "origin_url": "https://www.gov.br/anp/pt-br/centrais-de-conteudo/dados-abertos/serie-historica-de-precos-de-combustiveis",
+      "acquisition": "manual",
+      "retrieved_at": "2026-10-09",
+      "sha256": "a4d26dd9c75372ee67462ec52f971952964062ccbedec9080466a0dca82af9d9",
+      "rows": 378078,
+      "date_range": [
+        "2022-07-01",
+        "2022-12-30"
+      ]
+    },
+    {
+      "source_id": "P01",
+      "file": "data/raw/anp/ca-2023-01.csv",
+      "origin_url": "https://www.gov.br/anp/pt-br/centrais-de-conteudo/dados-abertos/serie-historica-de-precos-de-combustiveis",
+      "acquisition": "manual",
+      "retrieved_at": "2026-10-09",
+      "sha256": "56b54c4b5091d2e89182c6723ad77e8a796126a8688d8b6a66d0fd1184994ba3",
+      "rows": 431576,
+      "date_range": [
+        "2023-01-02",
+        "2023-06-30"
+      ]
+    },
+    {
+      "source_id": "P01",
+      "file": "data/raw/anp/ca-2023-02.csv",
+      "origin_url": "https://www.gov.br/anp/pt-br/centrais-de-conteudo/dados-abertos/serie-historica-de-precos-de-combustiveis",
+      "acquisition": "manual",
+      "retrieved_at": "2026-10-09",
+      "sha256": "d0682f87dcd4be6c90816024f9e43079f1ea61f56626b59ce9fec5f0f5569c84",
+      "rows": 472424,
+      "date_range": [
+        "2023-07-03",
+        "2023-12-29"
+      ]
+    },
+    {
+      "source_id": "P01",
+      "file": "data/raw/anp/ca-2024-01.csv",
+      "origin_url": "https://www.gov.br/anp/pt-br/centrais-de-conteudo/dados-abertos/serie-historica-de-precos-de-combustiveis",
+      "acquisition": "manual",
+      "retrieved_at": "2026-10-09",
+      "sha256": "eb439dc323b082201039bd5404d1d7376e44485881cb0fdc4f23ef9016772870",
+      "rows": 477154,
+      "date_range": [
+        "2024-01-01",
+        "2024-06-28"
+      ]
+    },
+    {
+      "source_id": "P01",
+      "file": "data/raw/anp/ca-2024-02.csv",
+      "origin_url": "https://www.gov.br/anp/pt-br/centrais-de-conteudo/dados-abertos/serie-historica-de-precos-de-combustiveis",
+      "acquisition": "manual",
+      "retrieved_at": "2026-10-09",
+      "sha256": "fe3296f9de5977eb95a2f859f68b80f8336e446494d3be6d07de99ebf7e775ae",
+      "rows": 421382,
+      "date_range": [
+        "2024-07-01",
+        "2024-12-31"
+      ]
+    },
+    {
+      "source_id": "P01",
+      "file": "data/raw/anp/ca-2025-01.csv",
+      "origin_url": "https://www.gov.br/anp/pt-br/centrais-de-conteudo/dados-abertos/serie-historica-de-precos-de-combustiveis",
+      "acquisition": "manual",
+      "retrieved_at": "2026-10-09",
+      "sha256": "d308b91e79d112262253e66c84610254b6df8f9f5bfd7c76ecd6c79fd82fb4fa",
+      "rows": 429523,
+      "date_range": [
+        "2025-01-01",
+        "2025-06-30"
+      ]
+    },
+    {
+      "source_id": "P01",
+      "file": "data/raw/anp/ca-2025-02.csv",
+      "origin_url": "https://www.gov.br/anp/pt-br/centrais-de-conteudo/dados-abertos/serie-historica-de-precos-de-combustiveis",
+      "acquisition": "manual",
+      "retrieved_at": "2026-10-09",
+      "sha256": "206cc66333ebacb3e33b3f6294a5aaeb3415f1579d35f7f28e25351826ae7745",
+      "rows": 384208,
+      "date_range": [
+        "2025-07-01",
+        "2025-12-31"
+      ]
+    },
+    {
+      "source_id": "P01",
+      "file": "data/raw/anp/ca-2026-01.csv",
+      "origin_url": "https://www.gov.br/anp/pt-br/centrais-de-conteudo/dados-abertos/serie-historica-de-precos-de-combustiveis",
+      "acquisition": "manual",
+      "retrieved_at": "2026-10-09",
+      "sha256": "04406f4e411380c07fff0343a746bcc5ef693bd4b26a267101ab0698c44b76a9",
+      "rows": 422418,
+      "date_range": [
+        "2026-01-01",
+        "2026-06-30"
+      ]
+    },
+    {
+      "source_id": "P02",
+      "file": "data/raw/eia/brent-weekly.csv",
+      "origin_url": "https://datahub.io/core/oil-prices",
+      "acquisition": "manual",
+      "retrieved_at": "2026-10-09",
+      "sha256": "f8f6b0c3b2b7b3a14085a8b3ff6f09cfbebee4038f6367f8200a64f9f28d01fd",
+      "rows": 2052,
+      "date_range": [
+        "1987-05-15",
+        "2026-09-25"
+      ]
+    },
+    {
+      "source_id": "P06",
+      "file": "data/raw/aneel/tarifas-homologadas-distribuidoras-energia-eletrica.csv",
+      "origin_url": "https://dadosabertos.aneel.gov.br/dataset/tarifas-distribuidoras-energia-eletrica",
+      "acquisition": "manual",
+      "retrieved_at": "2026-10-18",
+      "sha256": "140062392e44e7aec910a598db4e149341774a945272e88702c42db20ff60c80",
+      "rows": 655289
+    },
+    {
+      "source_id": "P07",
+      "file": "data/raw/ccee/preco_semanal-2020-01.csv",
+      "origin_url": "https://www.ccee.org.br/precos/painel-precos",
+      "acquisition": "manual",
+      "retrieved_at": "2026-10-18",
+      "sha256": "bf6797d82b4adf78edf4f90ed238115c0168358368dbf0c75a2a53d7d5c50cdb",
+      "rows": 27,
+      "date_range": [
+        "2019-12-28",
+        "2020-06-27"
+      ]
+    },
+    {
+      "source_id": "P07",
+      "file": "data/raw/ccee/preco_semanal-2020-02.csv",
+      "origin_url": "https://www.ccee.org.br/precos/painel-precos",
+      "acquisition": "manual",
+      "retrieved_at": "2026-10-18",
+      "sha256": "a7b04225d6b02ea0c26b67ae50cdfc1f547c5e6f4fc068f74c891e3667c9acfa",
+      "rows": 27,
+      "date_range": [
+        "2020-06-27",
+        "2020-12-26"
+      ]
+    },
+    {
+      "source_id": "P07",
+      "file": "data/raw/ccee/preco_semanal-2021-01.csv",
+      "origin_url": "https://www.ccee.org.br/precos/painel-precos",
+      "acquisition": "manual",
+      "retrieved_at": "2026-10-18",
+      "sha256": "eab50f849befe25477290eea03a604679a37d0e36622a47067a284983d4bc141",
+      "rows": 27,
+      "date_range": [
+        "2020-12-26",
+        "2021-06-26"
+      ]
+    },
+    {
+      "source_id": "P07",
+      "file": "data/raw/ccee/preco_semanal-2021-02.csv",
+      "origin_url": "https://www.ccee.org.br/precos/painel-precos",
+      "acquisition": "manual",
+      "retrieved_at": "2026-10-18",
+      "sha256": "2614249baff0de5fc616f6ad9824d89d6aef9b36c105c97db1b905a005c9faa0",
+      "rows": 27,
+      "date_range": [
+        "2021-06-26",
+        "2021-12-25"
+      ]
+    },
+    {
+      "source_id": "P07",
+      "file": "data/raw/ccee/preco_semanal-2022-01.csv",
+      "origin_url": "https://www.ccee.org.br/precos/painel-precos",
+      "acquisition": "manual",
+      "retrieved_at": "2026-10-18",
+      "sha256": "5dfb53cc02db38ef96cad8684f62add6ad22f02598dfc95207511b13f8a4e00d",
+      "rows": 26,
+      "date_range": [
+        "2022-01-01",
+        "2022-06-25"
+      ]
+    },
+    {
+      "source_id": "P07",
+      "file": "data/raw/ccee/preco_semanal-2022-02.csv",
+      "origin_url": "https://www.ccee.org.br/precos/painel-precos",
+      "acquisition": "manual",
+      "retrieved_at": "2026-10-18",
+      "sha256": "40001bb89160d63e62eee813509ac227d6b716cbe07d2457f01eb41456874022",
+      "rows": 28,
+      "date_range": [
+        "2022-06-25",
+        "2022-12-31"
+      ]
+    },
+    {
+      "source_id": "P07",
+      "file": "data/raw/ccee/preco_semanal-2023-01.csv",
+      "origin_url": "https://www.ccee.org.br/precos/painel-precos",
+      "acquisition": "manual",
+      "retrieved_at": "2026-10-18",
+      "sha256": "d72b8e37afc0bf56f95b863e8eece79cfd50ed90cfae1a3f081fb5c853b58d56",
+      "rows": 26,
+      "date_range": [
+        "2022-12-31",
+        "2023-06-24"
+      ]
+    },
+    {
+      "source_id": "P07",
+      "file": "data/raw/ccee/preco_semanal-2023-02.csv",
+      "origin_url": "https://www.ccee.org.br/precos/painel-precos",
+      "acquisition": "manual",
+      "retrieved_at": "2026-10-18",
+      "sha256": "5c2ede08c1d7a6860b627ef47fe24bf5457bd12580af4df9c86feea1f3edf6b8",
+      "rows": 27,
+      "date_range": [
+        "2023-07-01",
+        "2023-12-30"
+      ]
+    },
+    {
+      "source_id": "P07",
+      "file": "data/raw/ccee/preco_semanal-2024-01.csv",
+      "origin_url": "https://www.ccee.org.br/precos/painel-precos",
+      "acquisition": "manual",
+      "retrieved_at": "2026-10-18",
+      "sha256": "e3675be18a45a6fb7b1517e63b231c9acef7c43b6d56474753bc01a77fb5a2a3",
+      "rows": 27,
+      "date_range": [
+        "2023-12-30",
+        "2024-06-29"
+      ]
+    },
+    {
+      "source_id": "P07",
+      "file": "data/raw/ccee/preco_semanal-2024-02.csv",
+      "origin_url": "https://www.ccee.org.br/precos/painel-precos",
+      "acquisition": "manual",
+      "retrieved_at": "2026-10-18",
+      "sha256": "bab18a089f2bbbf1a097773616eeca82da114273de9bf99c61724e4e1a95165f",
+      "rows": 27,
+      "date_range": [
+        "2024-06-29",
+        "2024-12-28"
+      ]
+    },
+    {
+      "source_id": "P07",
+      "file": "data/raw/ccee/preco_semanal-2025-01.csv",
+      "origin_url": "https://www.ccee.org.br/precos/painel-precos",
+      "acquisition": "manual",
+      "retrieved_at": "2026-10-18",
+      "sha256": "b1c4a4f16316ccc1e3b6e8faeacbc256c40f7af4ff81338799cfb90f84b5f989",
+      "rows": 27,
+      "date_range": [
+        "2024-12-28",
+        "2025-06-28"
+      ]
+    },
+    {
+      "source_id": "P07",
+      "file": "data/raw/ccee/preco_semanal-2025-02.csv",
+      "origin_url": "https://www.ccee.org.br/precos/painel-precos",
+      "acquisition": "manual",
+      "retrieved_at": "2026-10-18",
+      "sha256": "bb307d7bf200fe1a4c999ffca33c5cf08525dbe91f16c21beffb0653ff66487c",
+      "rows": 27,
+      "date_range": [
+        "2025-06-28",
+        "2025-12-27"
+      ]
+    },
+    {
+      "source_id": "P07",
+      "file": "data/raw/ccee/preco_semanal-2026-01.csv",
+      "origin_url": "https://www.ccee.org.br/precos/painel-precos",
+      "acquisition": "manual",
+      "retrieved_at": "2026-10-18",
+      "sha256": "dd54d26c69a07f578b66a0c866a85dbfa206f61cfcb69de307581af821561f00",
+      "rows": 27,
+      "date_range": [
+        "2025-12-27",
+        "2026-06-27"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,245 @@
+{
+  "$schema": "../schemas/parameters.schema.json",
+  "schema_version": 1,
+  "generated_at": "2026-10-09",
+  "general": {
+    "annual_distance_km": {
+      "value": 120000.0,
+      "unit": "km/ano",
+      "source_id": "V01",
+      "badge": "Adaptada",
+      "notes": "Média anual típica de operação rodoviária pesada em rotas de longa distância (ANTT/CNT)"
+    },
+    "horizon_years": {
+      "value": 5.0,
+      "unit": "anos",
+      "source_id": "V05",
+      "badge": "Ilustrativa",
+      "notes": "Horizonte padrão de renovação de frota e análise de TCO"
+    },
+    "discount_rate": {
+      "value": 0.1,
+      "unit": "% a.a.",
+      "source_id": "V05",
+      "badge": "Ilustrativa",
+      "notes": "Taxa de desconto anual para valor presente dos custos operacionais"
+    },
+    "biodiesel_blend": {
+      "value": 0.14,
+      "unit": "% v/v",
+      "source_id": "E06",
+      "badge": "Primária",
+      "notes": "Mandato de biodiesel B14 no diesel comercial (Lei 14.993/2024)"
+    }
+  },
+  "vehicles": {
+    "diesel": {
+      "label": "Diesel B",
+      "energy_price": {
+        "value": 6.89,
+        "unit": "R$/L",
+        "source_id": "P03",
+        "badge": "Adaptada",
+        "notes": "Média nacional SUROC/ANTT e levantamento semanal ANP"
+      },
+      "consumption": {
+        "value": 2.5,
+        "unit": "km/L",
+        "source_id": "V02",
+        "badge": "Ilustrativa",
+        "notes": "Consumo médio típico de cavalo mecânico 6x2/6x4 carregado"
+      },
+      "energy_density": {
+        "value": 35.8,
+        "unit": "MJ/L",
+        "source_id": "E03",
+        "badge": "Primária",
+        "notes": "Poder calorífico inferior de referência (BEN/EPE)"
+      },
+      "carbon_intensity": {
+        "value": 75.5,
+        "unit": "gCO2eq/MJ",
+        "source_id": "E04",
+        "badge": "Adaptada",
+        "notes": "Fator de emissão de poço à roda baseado em RenovaBio e GHG Protocol"
+      },
+      "vehicle_purchase_price": {
+        "value": 850000.0,
+        "unit": "R$",
+        "source_id": "V02",
+        "badge": "Ilustrativa",
+        "notes": "Preço médio de aquisição de cavalo mecânico diesel Euro 6"
+      },
+      "vehicle_overprice": {
+        "value": 0.0,
+        "unit": "R$",
+        "source_id": "V02",
+        "badge": "Ilustrativa",
+        "notes": "Linha de base (sobrepreço zero)"
+      },
+      "maintenance_cost_per_km": {
+        "value": 0.85,
+        "unit": "R$/km",
+        "source_id": "V05",
+        "badge": "Adaptada",
+        "notes": "Manutenção corretiva, preventiva e pneus (dados NTC/CNT)"
+      }
+    },
+    "gnv": {
+      "label": "GNV / GNC",
+      "energy_price": {
+        "value": 4.75,
+        "unit": "R$/m³",
+        "source_id": "P01",
+        "badge": "Primária",
+        "notes": "Preço médio de bomba da pesquisa semanal da ANP"
+      },
+      "consumption": {
+        "value": 2.2,
+        "unit": "km/m³",
+        "source_id": "V02",
+        "badge": "Ilustrativa",
+        "notes": "Ficha técnica de modelo rodoviário a gás"
+      },
+      "energy_density": {
+        "value": 38.0,
+        "unit": "MJ/m³",
+        "source_id": "E03",
+        "badge": "Primária",
+        "notes": "Poder calorífico do gás natural (BEN/EPE)"
+      },
+      "carbon_intensity": {
+        "value": 76.85,
+        "unit": "gCO2eq/MJ",
+        "source_id": "E01",
+        "badge": "Primária",
+        "notes": "Intensidade de carbono regulatória oficial (Resolução CNPE nº 4/2026)"
+      },
+      "vehicle_purchase_price": {
+        "value": 1020000.0,
+        "unit": "R$",
+        "source_id": "V04",
+        "badge": "Ilustrativa",
+        "notes": "Sobrepreço estimado de ~20% em relação ao diesel"
+      },
+      "vehicle_overprice": {
+        "value": 170000.0,
+        "unit": "R$",
+        "source_id": "V04",
+        "badge": "Ilustrativa",
+        "notes": "Diferencial de investimento em cilindros e motor ciclo Otto a gás"
+      },
+      "maintenance_cost_per_km": {
+        "value": 0.9,
+        "unit": "R$/km",
+        "source_id": "V05",
+        "badge": "Ilustrativa",
+        "notes": "Manutenção incluindo inspeção periódica de cilindros de alta pressão"
+      }
+    },
+    "biometano": {
+      "label": "Biometano",
+      "energy_price": {
+        "value": 4.6,
+        "unit": "R$/m³",
+        "source_id": "P05",
+        "badge": "Ilustrativa",
+        "notes": "Estudo Copersucar 2025 via AutoData (sem série oficial em bomba)"
+      },
+      "consumption": {
+        "value": 2.2,
+        "unit": "km/m³",
+        "source_id": "V02",
+        "badge": "Ilustrativa",
+        "notes": "Mesmo rendimento volumétrico do motor a gás natural"
+      },
+      "energy_density": {
+        "value": 36.0,
+        "unit": "MJ/m³",
+        "source_id": "E03",
+        "badge": "Primária",
+        "notes": "Poder calorífico de referência do biometano purificado"
+      },
+      "carbon_intensity": {
+        "value": 8.55,
+        "unit": "gCO2eq/MJ",
+        "source_id": "E01",
+        "badge": "Primária",
+        "notes": "Intensidade de carbono regulatória oficial (Resolução CNPE nº 4/2026)"
+      },
+      "vehicle_purchase_price": {
+        "value": 1020000.0,
+        "unit": "R$",
+        "source_id": "V04",
+        "badge": "Ilustrativa",
+        "notes": "Mesmo veículo do cenário GNV"
+      },
+      "vehicle_overprice": {
+        "value": 170000.0,
+        "unit": "R$",
+        "source_id": "V04",
+        "badge": "Ilustrativa",
+        "notes": "Mesmo sobrepreço do veículo a gás"
+      },
+      "maintenance_cost_per_km": {
+        "value": 0.9,
+        "unit": "R$/km",
+        "source_id": "V05",
+        "badge": "Ilustrativa",
+        "notes": "Similar ao GNV"
+      }
+    },
+    "eletrico": {
+      "label": "Elétrico (BEV)",
+      "energy_price": {
+        "value": 0.82,
+        "unit": "R$/kWh",
+        "source_id": "P06",
+        "badge": "Adaptada",
+        "notes": "Tarifa média de energia elétrica industrial/comercial homologada (ANEEL)"
+      },
+      "consumption": {
+        "value": 0.8,
+        "unit": "km/kWh",
+        "source_id": "V02",
+        "badge": "Ilustrativa",
+        "notes": "Equivalente a 1.25 kWh/km para cavalo mecânico rodoviário"
+      },
+      "energy_density": {
+        "value": 3.6,
+        "unit": "MJ/kWh",
+        "source_id": "E03",
+        "badge": "Primária",
+        "notes": "Equivalência física exata (1 kWh = 3.6 MJ)"
+      },
+      "carbon_intensity": {
+        "value": 8.03,
+        "unit": "gCO2eq/MJ",
+        "source_id": "E02",
+        "badge": "Primária",
+        "notes": "Fator médio do SIN (MCTI/SIRENE: ~28.9 kg CO2/MWh convertido para gCO2eq/MJ)"
+      },
+      "vehicle_purchase_price": {
+        "value": 2125000.0,
+        "unit": "R$",
+        "source_id": "V03",
+        "badge": "Ilustrativa",
+        "notes": "Custo inicial estimado em 2.5x o caminhão a diesel (estudo Mirow & Co)"
+      },
+      "vehicle_overprice": {
+        "value": 1275000.0,
+        "unit": "R$",
+        "source_id": "V03",
+        "badge": "Ilustrativa",
+        "notes": "Sobrepreço de aquisição devido ao custo das baterias de grande capacidade"
+      },
+      "maintenance_cost_per_km": {
+        "value": 0.5,
+        "unit": "R$/km",
+        "source_id": "V05",
+        "badge": "Ilustrativa",
+        "notes": "Menor desgaste de freios (regeneração) e menor complexidade motriz mecânica"
+      }
+    }
+  }
+}
