@@ -11,8 +11,107 @@ from zoneinfo import ZoneInfo
 from pydantic import BaseModel, ConfigDict, Field, StringConstraints
 
 QualityBadge = Literal["Primária", "Adaptada", "Ilustrativa"]
+SourceCategory = Literal["A", "B", "C", "D"]
 
 TODAY = datetime.now(ZoneInfo("America/Sao_Paulo"))
+
+
+class Source(BaseModel):
+    """Metadata and provenance for a project data source."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    id: Annotated[str, StringConstraints(pattern=r"^[A-Z][0-9]{2}$")] = Field(
+        ...,
+        description="ID unívoco da fonte (ex.: P01, E01, V01, I01).",
+        title="Id",
+    )
+    name: str = Field(
+        ...,
+        min_length=1,
+        description="Nome formal do conjunto de dados, publicação ou norma.",
+        title="Name",
+    )
+    publisher: str = Field(
+        ...,
+        min_length=1,
+        description="Órgão, entidade, empresa ou fabricante responsável.",
+        title="Publisher",
+    )
+    description: str = Field(
+        ...,
+        min_length=1,
+        description="Descrição sucinta do dado utilizado no simulador.",
+        title="Description",
+    )
+    url: str | None = Field(
+        default=None,
+        description="Página oficial ou link institucional de referência.",
+        title="Url",
+    )
+    badge: QualityBadge = Field(
+        ...,
+        description="Selo de qualidade técnica do dado no simulador.",
+        title="Badge",
+    )
+    category: SourceCategory = Field(
+        ...,
+        description="Classificação jurídica (A: ato oficial, B: dado aberto, C: privado/setorial, D: imprensa/ficha).",
+        title="Category",
+    )
+    terms: str | None = Field(
+        default=None,
+        description="Licença ou termos de uso aplicáveis.",
+        title="Terms",
+    )
+    terms_url: str | None = Field(
+        default=None,
+        description="Link oficial para os termos de uso ou licença.",
+        title="Terms Url",
+    )
+    attribution: str | None = Field(
+        default=None,
+        description="Texto sugerido para atribuição de autoria.",
+        title="Attribution",
+    )
+    notes: str | None = Field(
+        default=None,
+        description="Notas metodológicas, conversões ou ressalvas técnicas.",
+        title="Notes",
+    )
+
+
+class SourcesCatalog(BaseModel):
+    """Catalog of all data sources used across the project."""
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+    dollar_schema: str | None = Field(
+        default="../schemas/sources.schema.json",
+        alias="$schema",
+        title="$schema",
+    )
+    schema_version: Literal[1] = Field(
+        default=1,
+        title="Schema Version",
+    )
+    sources: list[Source] = Field(
+        default_factory=list,
+        title="Sources",
+    )
+
+    @classmethod
+    def load(cls, path: Path) -> SourcesCatalog:
+        content = path.read_text(encoding="utf-8")
+        data = json.loads(content)
+        return cls.model_validate(data)
+
+    def save(self, path: Path) -> None:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        dump = self.model_dump(exclude_none=True, by_alias=True)
+        path.write_text(
+            json.dumps(dump, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
+        )
 
 class Entry(BaseModel):
     """Metadata for a raw downloaded file registered in the manifest."""
