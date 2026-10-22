@@ -29,14 +29,14 @@
       "unit": "% v/v",
       "source_id": "E06",
       "badge": "Primária",
-      "notes": "Mandato de biodiesel B14 no diesel comercial (Lei 14.993/2024)"
+      "notes": "Mandato de biodiesel B15 no diesel comercial (Lei 14.993/2024)"
     }
   },
   "vehicles": {
     "diesel": {
       "label": "Diesel B",
       "energy_price": {
-        "value": 6.89,
+        "value": 6.11,
         "unit": "R$/L",
         "source_id": "P03",
         "badge": "Adaptada",

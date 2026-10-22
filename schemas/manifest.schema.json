@@ -1,4 +1,31 @@
 {
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Rota Energética: manifest de aquisição de dados",
+  "description": "Registro de tudo o que foi baixado para data/raw/.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["generated_at"],
+  "properties": {
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "generated_at": {
+      "description": "Data da última alteração do manifest.",
+      "format": "date-time",
+      "title": "Generated At",
+      "type": "string"
+    },
+    "entries": {
+      "items": {
+        "$ref": "#/$defs/Entry"
+      },
+      "title": "Entries",
+      "type": "array"
+    }
+  },
   "$defs": {
     "Entry": {
       "additionalProperties": false,
@@ -106,34 +133,5 @@
       "title": "Entry",
       "type": "object"
     }
-  },
-  "additionalProperties": false,
-  "description": "Registro de tudo o que foi baixado para data/raw/.",
-  "properties": {
-    "schema_version": {
-      "const": 1,
-      "default": 1,
-      "title": "Schema Version",
-      "type": "integer"
-    },
-    "generated_at": {
-      "description": "Data da última alteração do manifest.",
-      "format": "date",
-      "title": "Generated At",
-      "type": "string"
-    },
-    "entries": {
-      "items": {
-        "$ref": "#/$defs/Entry"
-      },
-      "title": "Entries",
-      "type": "array"
-    }
-  },
-  "required": [
-    "generated_at"
-  ],
-  "title": "Rota Energética: manifest de aquisição de dados",
-  "type": "object",
-  "$schema": "https://json-schema.org/draft/2020-12/schema"
+  }
 }

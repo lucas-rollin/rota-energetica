@@ -1,4 +1,50 @@
 {
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SimulationParameters",
+  "description": "Full schema for default simulation parameters.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "generated_at",
+    "general",
+    "vehicles"
+  ],
+  "properties": {
+    "$schema": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": "../schemas/parameters.schema.json",
+      "title": "$schema"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "generated_at": {
+      "description": "Data de geração ou última revisão dos parâmetros (AAAA-MM-DD).",
+      "title": "Generated At",
+      "type": "string"
+    },
+    "general": {
+      "$ref": "#/$defs/GeneralParameters",
+      "title": "General Parameters"
+    },
+    "vehicles": {
+      "additionalProperties": {
+        "$ref": "#/$defs/VehicleParameters"
+      },
+      "title": "Vehicles",
+      "type": "object"
+    }
+  },
   "$defs": {
     "GeneralParameters": {
       "additionalProperties": false,
@@ -146,50 +192,5 @@
       "title": "VehicleParameters",
       "type": "object"
     }
-  },
-  "additionalProperties": false,
-  "description": "Full schema for default simulation parameters.",
-  "properties": {
-    "$schema": {
-      "anyOf": [
-        {
-          "type": "string"
-        },
-        {
-          "type": "null"
-        }
-      ],
-      "default": "../schemas/parameters.schema.json",
-      "title": "$schema"
-    },
-    "schema_version": {
-      "const": 1,
-      "default": 1,
-      "title": "Schema Version",
-      "type": "integer"
-    },
-    "generated_at": {
-      "description": "Data de geração ou última revisão dos parâmetros (AAAA-MM-DD).",
-      "title": "Generated At",
-      "type": "string"
-    },
-    "general": {
-      "$ref": "#/$defs/GeneralParameters",
-      "title": "General Parameters"
-    },
-    "vehicles": {
-      "additionalProperties": {
-        "$ref": "#/$defs/VehicleParameters"
-      },
-      "title": "Vehicles",
-      "type": "object"
-    }
-  },
-  "required": [
-    "generated_at",
-    "general",
-    "vehicles"
-  ],
-  "title": "SimulationParameters",
-  "type": "object"
+  }
 }
