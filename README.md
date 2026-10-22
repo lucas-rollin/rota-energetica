@@ -23,19 +23,14 @@ O simulador não parte da conclusão de que uma tecnologia é superior: ele most
 | Contexto | Série histórica de diesel, GNV e Brent, e panorama da infraestrutura de recarga e abastecimento |
 | Acessibilidade | Cada gráfico acompanha resumo textual e tabela |
 
-O teor de biodiesel é tratado como parâmetro da mistura do diesel.
+O teor de biodiesel é tratado como parâmetro da mistura do diesel. Para o detalhamento matemático completo, premissas de fronteira e equações de TCO e emissões, consulte [`docs/metodologia.md`](docs/metodologia.md).
 
-## Dados e selo de qualidade
+## Dados e Rastreabilidade
 
-Todo número vem de uma fonte registrada em [`docs/fontes.md`](docs/fontes.md), com link, data de acesso e status de verificação. Cada parâmetro exibido no site traz um selo:
+Todo número adotado no simulador vem de uma fonte pública ou oficial catalogada em [`data/sources.json`](data/sources.json). Cada parâmetro exibe um selo de confiabilidade metodológica (**Primária**, **Adaptada** ou
+**Ilustrativa**) e um identificador rastreável (`P01`, `E01`, etc.).
 
-| Selo | Significado |
-|---|---|
-| **Primária** | Fonte oficial, sem transformação além de conversão de unidade |
-| **Adaptada** | Derivada de fonte oficial ou setorial, com cálculo ou ajuste descrito |
-| **Ilustrativa** | Sem série pública confiável; exemplo editável |
-
-Principais fontes: ANP (preços), EIA (Brent), MCTI e CNPE (emissões), ANEEL (tarifas), ANTT (custos), ABVE e ABiogás (infraestrutura).
+Para a chave completa de identificadores, critérios dos selos e categorias jurídicas, consulte [`docs/fontes.md`](docs/fontes.md).
 
 ## Como o cálculo funciona
 
@@ -97,6 +92,6 @@ Os resultados dependem das premissas informadas; valores padrão ilustrativos n�
 |---|---|
 | Código | [MIT](LICENSE) |
 | Textos e documentação originais | CC BY 4.0 |
-| Dados de terceiros | **Não são relicenciados.** Mantêm as licenças e os termos de uso de cada fonte, listados em [`docs/fontes.md`](docs/fontes.md) |
+| Dados de terceiros | **Não são relicenciados.** Mantêm as licenças e os termos de uso de cada fonte, registrados em [`data/sources.json`](data/sources.json) |
 
-Os JSONs em `data/processed/` incluem os campos `source` e `retrieved_at` em cada série, para que a atribuição acompanhe o dado onde quer que ele seja reutilizado.
+As regras completas de reuso, privacidade e termos de dados derivados estão em [`LICENSE-DATA.md`](LICENSE-DATA.md). Os JSONs em `data/processed/` incluem os campos `source` e `retrieved_at` em cada série, para que a atribuição acompanhe o dado onde quer que ele seja reutilizado.
