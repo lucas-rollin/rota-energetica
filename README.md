@@ -75,7 +75,7 @@ rota-energetica/
 Requisitos: Node.js 22+, [pnpm](https://pnpm.io) e [uv](https://docs.astral.sh/uv/).
 
 ```bash
-git clone https://github.com/seu-usuario/rota-energetica.git
+git clone https://github.com/lucas-rollin/rota-energetica.git
 cd rota-energetica
 
 cd pipeline && uv sync && uv run pytest   # pipeline e testes
