@@ -7,7 +7,7 @@ Este arquivo define as **regras gerais** de uso e republicação dos dados do **
 ## 1. Regra geral
 
 | Conteúdo | Licença |
-|---|---|
+| --- | --- |
 | Código | MIT (arquivo [`LICENSE`](LICENSE)) |
 | Textos e documentação originais | CC BY 4.0 |
 | Dados de terceiros | **Não são relicenciados.** Mantêm os termos da fonte original, registrados em [`data/sources.json`](data/sources.json) |

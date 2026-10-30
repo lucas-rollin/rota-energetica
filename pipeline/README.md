@@ -6,7 +6,7 @@ A pipeline permite a transformação dos dados brutos em JSON para a web.
 
 Os dados sao vinculados a [fontes](../docs/fontes.md) e possuem um registro de metadados em [`manifest.json`](../data/manifest.json).
 
-### Como registrar 
+### Como registrar
 
 - **Arquivos automáticos** (como o Brent): o pipeline cria a entrada ao baixar.
 - **Arquivos manuais** (como a ANP): coloque o arquivo em `data/raw/<fonte>/` e rode o comando de registro (a ajustar):

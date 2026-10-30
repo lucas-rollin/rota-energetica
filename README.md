@@ -15,7 +15,7 @@ O simulador não parte da conclusão de que uma tecnologia é superior: ele most
 ## O que faz (MVP)
 
 | Item | Escopo |
-|---|---|
+| --- | --- |
 | Alternativas | Diesel B, GNV/GNC, Biometano, Elétrico |
 | Veículo | Cavalo mecânico de longa distância (um único perfil) |
 | Entradas | Km/ano, preço de cada energia, consumo, sobrepreço do veículo, manutenção, horizonte e taxa de desconto |
@@ -27,8 +27,7 @@ O teor de biodiesel é tratado como parâmetro da mistura do diesel. Para o deta
 
 ## Dados e Rastreabilidade
 
-Todo número adotado no simulador vem de uma fonte pública ou oficial catalogada em [`data/sources.json`](data/sources.json). Cada parâmetro exibe um selo de confiabilidade metodológica (**Primária**, **Adaptada** ou
-**Ilustrativa**) e um identificador rastreável (`P01`, `E01`, etc.).
+Todo número adotado no simulador vem de uma fonte pública ou oficial catalogada em [`data/sources.json`](data/sources.json). Cada parâmetro exibe um selo de confiabilidade metodológica (**Primária**, **Adaptada** ou **Ilustrativa**) e um identificador rastreável (`P01`, `E01`, etc.).
 
 Para a chave completa de identificadores, critérios dos selos e categorias jurídicas, consulte [`docs/fontes.md`](docs/fontes.md).
 
@@ -44,19 +43,12 @@ As alternativas utilizam a mesma fronteira de contabilização de emissões defi
 ## Tecnologias
 
 | Camada | Tecnologia |
-|---|---|
+| --- | --- |
 | Site | Astro (estático) + TypeScript |
 | Interface e gráficos | Tailwind CSS + DaisyUI, Apache ECharts |
 | Pipeline de dados | Python + Polars (`uv`) |
 | Testes | Vitest (site), pytest (pipeline) |
 | CI/CD e hospedagem | GitHub Actions, GitHub Pages |
-
-**Decisões:**
-
-- Sem backend: o cálculo roda no navegador.
-- O pipeline roda offline e gera JSONs estáticos, validados por JSON Schema; os tipos TypeScript são gerados a partir dele.
-- Cálculo isolado da interface (`web/src/lib/calc`).
-- Validação cruzada: uma implementação de referência em Python (`pipeline/reference`) e a versão TypeScript devem produzir os mesmos resultados nos mesmos cenários.
 
 ## Estrutura
 
@@ -89,7 +81,7 @@ Os resultados dependem das premissas informadas; valores padrão ilustrativos n�
 ## Licenças e atribuição
 
 | Conteúdo | Licença |
-|---|---|
+| --- | --- |
 | Código | [MIT](LICENSE) |
 | Textos e documentação originais | CC BY 4.0 |
 | Dados de terceiros | **Não são relicenciados.** Mantêm as licenças e os termos de uso de cada fonte, registrados em [`data/sources.json`](data/sources.json) |

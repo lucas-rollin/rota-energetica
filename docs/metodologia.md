@@ -11,7 +11,7 @@ Os IDs (P01, E01, V01...) remetem ao catálogo de [`data/sources.json`](../data/
 O MVP compara quatro alternativas energéticas para veículos pesados rodoviários: Diesel B, GNV (GNC), biometano e eletricidade por bateria.
 
 | Dimensão | Decisão no MVP | Justificativa e limitação |
-|---|---|---|
+| --- | --- | --- |
 | Alternativas | Diesel B, GNV, biometano e elétrico a bateria | Tecnologias de interesse para descarbonização do transporte pesado |
 | Canal de abastecimento | Preços públicos de referência | Evita modelar contratos e infraestrutura próprios de cada frota |
 | Veículos | Modelos nominais comercializados no Brasil | Ancoram os cálculos em referências concretas, sem isolar perfeitamente o efeito da tecnologia |
@@ -37,7 +37,7 @@ A classificação descreve a origem do valor, não garante sua precisão.
 Cada alternativa utiliza um modelo nominal como referência. O simulador compara cenários representativos, não marcas ou veículos equivalentes em todos os aspectos.
 
 | Alternativa | Modelo | Configuração | Fonte |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Diesel B | [Scania R 460 A6x2NA (Super)](https://www.solucoesscania.com.br/wp-content/uploads/2026/10/super-r460-6x2-1.pdf) | 6x2 | V06, V07 |
 | GNV (GNC) | [Scania G 460 A6x2NA](https://www.solucoesscania.com.br/wp-content/uploads/2026/04/especificacoes-tecnicas-g460-6x2-gas-cng.pdf) | 6x2 | V06, V07 |
 | Biometano | Mesmo veículo de referência do GNV | 6x2 | V06, V07 |
@@ -59,7 +59,7 @@ O veículo a gás também serve como referência técnica para o cenário a biom
 ### 3.1 Fontes e tratamento
 
 | Energia | Fonte principal | Indicador do MVP | Tratamento |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Diesel S10 | ANP — Série Histórica de Preços de Combustíveis (P01) | Preço de revenda em R$/L | Série semanal por estado e referência nacional |
 | GNV | ANP — Série Histórica de Preços de Combustíveis (P01) | Preço de revenda em R$/m³ | Série semanal por estado e referência nacional |
 | Biometano | Fonte pública documentada, quando disponível (P05) | Preço de referência em R$/Nm³ | Valor ilustrativo editável quando não houver série representativa |
@@ -102,7 +102,7 @@ Os preços são referências históricas, não previsões. Os cenários financei
 ### 4.1 Parâmetros
 
 | Símbolo | Significado | Unidade |
-|---|---|---|
+| --- | --- | --- |
 | D | Quilometragem anual | km/ano |
 | V₀ | Preço de aquisição do veículo | R$ |
 | fr | Fração do valor residual ao fim do horizonte | fração de V₀ |
@@ -324,7 +324,7 @@ A atualização dos dados não deve alterar silenciosamente as premissas de cál
 ## 9. Fronteira do MVP e evolução futura
 
 | Tema | MVP | Versões futuras |
-|---|---|---|
+| --- | --- | --- |
 | Preço de energia | Referências públicas e parâmetros ilustrativos identificados | Custos efetivos de contratos e abastecimento próprio |
 | Eletricidade | Referência tarifária documentada | Tarifas de alta tensão, demanda contratada, mercado livre e recarga pública observada |
 | GNV e biometano | Preço de referência, sem infraestrutura própria | Tarifas específicas para frotistas, contratos e custos de compressão e transporte |
