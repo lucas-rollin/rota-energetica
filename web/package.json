@@ -9,14 +9,25 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "check": "astro check",
+    "test": "vitest run"
   },
   "dependencies": {
+    "@astrojs/preact": "^6.1.1",
     "@tailwindcss/vite": "^4.3.3",
     "astro": "^7.3.5",
+    "daisyui": "^5.7.50",
+    "echarts": "^6.1.0",
+    "preact": "^11.1.0",
     "tailwindcss": "^4.3.3"
   },
   "allowScripts": {
     "esbuild": true
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.12",
+    "typescript": "~5.7.3",
+    "vitest": "^5.0.5"
   }
 }
