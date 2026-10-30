@@ -1,50 +1,5 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "SimulationParameters",
-  "description": "Full schema for default simulation parameters.",
-  "type": "object",
-  "additionalProperties": false,
-  "required": [
-    "generated_at",
-    "general",
-    "vehicles"
-  ],
-  "properties": {
-    "$schema": {
-      "anyOf": [
-        {
-          "type": "string"
-        },
-        {
-          "type": "null"
-        }
-      ],
-      "default": "../schemas/parameters.schema.json",
-      "title": "$schema"
-    },
-    "schema_version": {
-      "const": 1,
-      "default": 1,
-      "title": "Schema Version",
-      "type": "integer"
-    },
-    "generated_at": {
-      "description": "Data de geração ou última revisão dos parâmetros (AAAA-MM-DD).",
-      "title": "Generated At",
-      "type": "string"
-    },
-    "general": {
-      "$ref": "#/$defs/GeneralParameters",
-      "title": "General Parameters"
-    },
-    "vehicles": {
-      "additionalProperties": {
-        "$ref": "#/$defs/VehicleParameters"
-      },
-      "title": "Vehicles",
-      "type": "object"
-    }
-  },
   "$defs": {
     "GeneralParameters": {
       "additionalProperties": false,
@@ -69,13 +24,31 @@
           "$ref": "#/$defs/ParameterItem",
           "description": "Teor de biodiesel no diesel B (fração decimal).",
           "title": "Biodiesel Blend"
+        },
+        "diesel_fossil_carbon_intensity": {
+          "$ref": "#/$defs/ParameterItem",
+          "description": "Intensidade de carbono do diesel fóssil poço à roda (gCO2eq/MJ).",
+          "title": "Diesel Fossil Carbon Intensity"
+        },
+        "biodiesel_carbon_intensity": {
+          "$ref": "#/$defs/ParameterItem",
+          "description": "Intensidade de carbono do biodiesel poço à roda (gCO2eq/MJ).",
+          "title": "Biodiesel Carbon Intensity"
+        },
+        "arla_price": {
+          "$ref": "#/$defs/ParameterItem",
+          "description": "Preço de referência do ARLA 32 (R$/L).",
+          "title": "ARLA 32 Price"
         }
       },
       "required": [
         "annual_distance_km",
         "horizon_years",
         "discount_rate",
-        "biodiesel_blend"
+        "biodiesel_blend",
+        "diesel_fossil_carbon_intensity",
+        "biodiesel_carbon_intensity",
+        "arla_price"
       ],
       "title": "GeneralParameters",
       "type": "object"
@@ -90,13 +63,13 @@
           "type": "number"
         },
         "unit": {
-          "description": "Unidade de medida (ex: R$/L, km/L, gCO2eq/MJ).",
+          "description": "Unidade de medida (ex: R$/L, km/L, gCO2eq/MJ, fração).",
           "minLength": 1,
           "title": "Unit",
           "type": "string"
         },
         "source_id": {
-          "description": "ID da fonte em docs/fontes.md (ex: P01, E01, V01).",
+          "description": "ID da fonte em docs/fontes.md ou data/sources.json (ex: P01, E01, V01).",
           "pattern": "^[A-Z][0-9]{2}$",
           "title": "Source Id",
           "type": "string"
@@ -123,6 +96,45 @@
           "default": null,
           "description": "Nota explicativa ou justificativa da premissa adotada.",
           "title": "Notes"
+        },
+        "min": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Limite inferior recomendado para slider/entrada.",
+          "title": "Min"
+        },
+        "max": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Limite superior recomendado para slider/entrada.",
+          "title": "Max"
+        },
+        "step": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Incremento sugerido para o slider/controle numérico.",
+          "title": "Step"
         }
       },
       "required": [
@@ -168,15 +180,41 @@
           "description": "Preço total estimado de aquisição do cavalo mecânico (R$).",
           "title": "Vehicle Purchase Price"
         },
-        "vehicle_overprice": {
-          "$ref": "#/$defs/ParameterItem",
-          "description": "Sobrepreço de aquisição em relação ao cavalo mecânico diesel base (R$).",
-          "title": "Vehicle Overprice"
-        },
         "maintenance_cost_per_km": {
           "$ref": "#/$defs/ParameterItem",
           "description": "Custo operacional de manutenção e desgaste de pneus (R$/km).",
           "title": "Maintenance Cost Per Km"
+        },
+        "residual_value_ratio": {
+          "$ref": "#/$defs/ParameterItem",
+          "description": "Fração do preço de aquisição retida ao final do horizonte financeiro (fração decimal de V0).",
+          "title": "Residual Value Ratio"
+        },
+        "charging_efficiency": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ParameterItem"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Eficiência de recarga da bateria (fração decimal de energia armazenada / energia da rede).",
+          "title": "Charging Efficiency"
+        },
+        "arla_consumption_ratio": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ParameterItem"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Consumo de ARLA 32 por litro de diesel consumido (L/L).",
+          "title": "ARLA Consumption Ratio"
         }
       },
       "required": [
@@ -186,11 +224,56 @@
         "energy_density",
         "carbon_intensity",
         "vehicle_purchase_price",
-        "vehicle_overprice",
-        "maintenance_cost_per_km"
+        "maintenance_cost_per_km",
+        "residual_value_ratio"
       ],
       "title": "VehicleParameters",
       "type": "object"
     }
-  }
+  },
+  "additionalProperties": false,
+  "description": "Full schema for default simulation parameters.",
+  "properties": {
+    "$schema": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": "../schemas/parameters.schema.json",
+      "title": "$schema"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "generated_at": {
+      "description": "Data de geração ou última revisão dos parâmetros (AAAA-MM-DD).",
+      "title": "Generated At",
+      "type": "string"
+    },
+    "general": {
+      "$ref": "#/$defs/GeneralParameters",
+      "title": "General Parameters"
+    },
+    "vehicles": {
+      "additionalProperties": {
+        "$ref": "#/$defs/VehicleParameters"
+      },
+      "title": "Vehicles",
+      "type": "object"
+    }
+  },
+  "required": [
+    "generated_at",
+    "general",
+    "vehicles"
+  ],
+  "title": "SimulationParameters",
+  "type": "object"
 }

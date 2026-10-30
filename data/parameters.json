@@ -1,35 +1,77 @@
 {
   "$schema": "../schemas/parameters.schema.json",
   "schema_version": 1,
-  "generated_at": "2026-10-09",
+  "generated_at": "2026-10-29",
   "general": {
     "annual_distance_km": {
       "value": 120000.0,
       "unit": "km/ano",
       "source_id": "V01",
       "badge": "Adaptada",
-      "notes": "Média anual típica de operação rodoviária pesada em rotas de longa distância (ANTT/CNT)"
+      "notes": "Média anual típica de operação rodoviária pesada em rotas de longa distância (ANTT/CNT)",
+      "min": 20000.0,
+      "max": 250000.0,
+      "step": 5000.0
     },
     "horizon_years": {
       "value": 5.0,
       "unit": "anos",
       "source_id": "V05",
       "badge": "Ilustrativa",
-      "notes": "Horizonte padrão de renovação de frota e análise de TCO"
+      "notes": "Horizonte padrão de renovação de frota e análise de TCO",
+      "min": 1.0,
+      "max": 10.0,
+      "step": 1.0
     },
     "discount_rate": {
       "value": 0.1,
-      "unit": "% a.a.",
+      "unit": "fração a.a.",
       "source_id": "V05",
       "badge": "Ilustrativa",
-      "notes": "Taxa de desconto anual para valor presente dos custos operacionais"
+      "notes": "Taxa de desconto anual para valor presente dos custos operacionais",
+      "min": 0.04,
+      "max": 0.2,
+      "step": 0.01
     },
     "biodiesel_blend": {
-      "value": 0.14,
-      "unit": "% v/v",
+      "value": 0.15,
+      "unit": "fração v/v",
       "source_id": "E06",
       "badge": "Primária",
-      "notes": "Mandato de biodiesel B15 no diesel comercial (Lei 14.993/2024)"
+      "notes": "Mandato de biodiesel B15 no diesel comercial (Lei 14.993/2024)",
+      "min": 0.1,
+      "max": 0.3,
+      "step": 0.01
+    },
+    "diesel_fossil_carbon_intensity": {
+      "value": 84.0,
+      "unit": "gCO2eq/MJ",
+      "source_id": "E04",
+      "badge": "Adaptada",
+      "notes": "Intensidade de carbono de ciclo de vida do diesel fóssil (RenovaBio / GHG Protocol)",
+      "min": 70.0,
+      "max": 100.0,
+      "step": 0.5
+    },
+    "biodiesel_carbon_intensity": {
+      "value": 27.0,
+      "unit": "gCO2eq/MJ",
+      "source_id": "E05",
+      "badge": "Primária",
+      "notes": "Intensidade média de emissão do biodiesel no RenovaBio",
+      "min": 10.0,
+      "max": 50.0,
+      "step": 0.5
+    },
+    "arla_price": {
+      "value": 3.5,
+      "unit": "R$/L",
+      "source_id": "V05",
+      "badge": "Adaptada",
+      "notes": "Preço médio de mercado de ARLA 32 a granel/bomba para frotas (NTC/CNT)",
+      "min": 1.5,
+      "max": 6.0,
+      "step": 0.1
     }
   },
   "vehicles": {
@@ -40,49 +82,80 @@
         "unit": "R$/L",
         "source_id": "P03",
         "badge": "Adaptada",
-        "notes": "Média nacional SUROC/ANTT e levantamento semanal ANP"
+        "notes": "Média nacional SUROC/ANTT e levantamento semanal ANP",
+        "min": 4.0,
+        "max": 9.0,
+        "step": 0.05
       },
       "consumption": {
         "value": 2.5,
         "unit": "km/L",
         "source_id": "V02",
         "badge": "Ilustrativa",
-        "notes": "Consumo médio típico de cavalo mecânico 6x2/6x4 carregado"
+        "notes": "Consumo médio típico de cavalo mecânico 6x2/6x4 carregado",
+        "min": 1.5,
+        "max": 4.0,
+        "step": 0.1
       },
       "energy_density": {
         "value": 35.8,
         "unit": "MJ/L",
         "source_id": "E03",
         "badge": "Primária",
-        "notes": "Poder calorífico inferior de referência (BEN/EPE)"
+        "notes": "Poder calorífico inferior de referência (BEN/EPE)",
+        "min": 30.0,
+        "max": 42.0,
+        "step": 0.1
       },
       "carbon_intensity": {
-        "value": 75.5,
+        "value": 75.45,
         "unit": "gCO2eq/MJ",
         "source_id": "E04",
         "badge": "Adaptada",
-        "notes": "Fator de emissão de poço à roda baseado em RenovaBio e GHG Protocol"
+        "notes": "Intensidade calculada para mistura B15: (1-0.15)*84.0 + 0.15*27.0 = 75.45 gCO2eq/MJ",
+        "min": 50.0,
+        "max": 100.0,
+        "step": 0.5
       },
       "vehicle_purchase_price": {
         "value": 850000.0,
         "unit": "R$",
         "source_id": "V02",
         "badge": "Ilustrativa",
-        "notes": "Preço médio de aquisição de cavalo mecânico diesel Euro 6"
-      },
-      "vehicle_overprice": {
-        "value": 0.0,
-        "unit": "R$",
-        "source_id": "V02",
-        "badge": "Ilustrativa",
-        "notes": "Linha de base (sobrepreço zero)"
+        "notes": "Preço médio de aquisição de cavalo mecânico diesel Euro 6",
+        "min": 600000.0,
+        "max": 1300000.0,
+        "step": 25000.0
       },
       "maintenance_cost_per_km": {
         "value": 0.85,
         "unit": "R$/km",
         "source_id": "V05",
         "badge": "Adaptada",
-        "notes": "Manutenção corretiva, preventiva e pneus (dados NTC/CNT)"
+        "notes": "Manutenção corretiva, preventiva e pneus (dados NTC/CNT)",
+        "min": 0.4,
+        "max": 1.5,
+        "step": 0.05
+      },
+      "residual_value_ratio": {
+        "value": 0.5,
+        "unit": "fração",
+        "source_id": "V06",
+        "badge": "Adaptada",
+        "notes": "Fração residual estimada após o horizonte financeiro com base na curva FIPE",
+        "min": 0.2,
+        "max": 0.8,
+        "step": 0.05
+      },
+      "arla_consumption_ratio": {
+        "value": 0.05,
+        "unit": "L/L",
+        "source_id": "V02",
+        "badge": "Ilustrativa",
+        "notes": "Consumo de ARLA 32 por litro de diesel em motor Proconve P8 / Euro 6 (~5%)",
+        "min": 0.02,
+        "max": 0.09,
+        "step": 0.005
       }
     },
     "gnv": {
@@ -92,49 +165,70 @@
         "unit": "R$/m³",
         "source_id": "P01",
         "badge": "Primária",
-        "notes": "Preço médio de bomba da pesquisa semanal da ANP"
+        "notes": "Preço médio de bomba da pesquisa semanal da ANP",
+        "min": 3.0,
+        "max": 7.5,
+        "step": 0.05
       },
       "consumption": {
         "value": 2.2,
         "unit": "km/m³",
         "source_id": "V02",
         "badge": "Ilustrativa",
-        "notes": "Ficha técnica de modelo rodoviário a gás"
+        "notes": "Ficha técnica de modelo rodoviário a gás",
+        "min": 1.2,
+        "max": 3.5,
+        "step": 0.1
       },
       "energy_density": {
         "value": 38.0,
         "unit": "MJ/m³",
         "source_id": "E03",
         "badge": "Primária",
-        "notes": "Poder calorífico do gás natural (BEN/EPE)"
+        "notes": "Poder calorífico do gás natural (BEN/EPE)",
+        "min": 32.0,
+        "max": 45.0,
+        "step": 0.5
       },
       "carbon_intensity": {
         "value": 76.85,
         "unit": "gCO2eq/MJ",
         "source_id": "E01",
         "badge": "Primária",
-        "notes": "Intensidade de carbono regulatória oficial (Resolução CNPE nº 4/2026)"
+        "notes": "Intensidade de carbono regulatória oficial (Resolução CNPE nº 4/2026)",
+        "min": 60.0,
+        "max": 95.0,
+        "step": 0.5
       },
       "vehicle_purchase_price": {
         "value": 1020000.0,
         "unit": "R$",
         "source_id": "V04",
         "badge": "Ilustrativa",
-        "notes": "Sobrepreço estimado de ~20% em relação ao diesel"
-      },
-      "vehicle_overprice": {
-        "value": 170000.0,
-        "unit": "R$",
-        "source_id": "V04",
-        "badge": "Ilustrativa",
-        "notes": "Diferencial de investimento em cilindros e motor ciclo Otto a gás"
+        "notes": "Sobrepreço estimado de ~20% em relação ao diesel",
+        "min": 700000.0,
+        "max": 1500000.0,
+        "step": 25000.0
       },
       "maintenance_cost_per_km": {
         "value": 0.9,
         "unit": "R$/km",
         "source_id": "V05",
         "badge": "Ilustrativa",
-        "notes": "Manutenção incluindo inspeção periódica de cilindros de alta pressão"
+        "notes": "Manutenção incluindo inspeção periódica de cilindros de alta pressão",
+        "min": 0.4,
+        "max": 1.6,
+        "step": 0.05
+      },
+      "residual_value_ratio": {
+        "value": 0.45,
+        "unit": "fração",
+        "source_id": "V05",
+        "badge": "Ilustrativa",
+        "notes": "Fração residual estimada para cavalo mecânico a gás natural",
+        "min": 0.15,
+        "max": 0.75,
+        "step": 0.05
       }
     },
     "biometano": {
@@ -144,49 +238,70 @@
         "unit": "R$/m³",
         "source_id": "P05",
         "badge": "Ilustrativa",
-        "notes": "Estudo Copersucar 2025 via AutoData (sem série oficial em bomba)"
+        "notes": "Estudo Copersucar 2025 via AutoData (sem série oficial em bomba)",
+        "min": 3.0,
+        "max": 7.5,
+        "step": 0.05
       },
       "consumption": {
         "value": 2.2,
         "unit": "km/m³",
         "source_id": "V02",
         "badge": "Ilustrativa",
-        "notes": "Mesmo rendimento volumétrico do motor a gás natural"
+        "notes": "Mesmo rendimento volumétrico do motor a gás natural",
+        "min": 1.2,
+        "max": 3.5,
+        "step": 0.1
       },
       "energy_density": {
         "value": 36.0,
         "unit": "MJ/m³",
         "source_id": "E03",
         "badge": "Primária",
-        "notes": "Poder calorífico de referência do biometano purificado"
+        "notes": "Poder calorífico de referência do biometano purificado",
+        "min": 30.0,
+        "max": 42.0,
+        "step": 0.5
       },
       "carbon_intensity": {
         "value": 8.55,
         "unit": "gCO2eq/MJ",
         "source_id": "E01",
         "badge": "Primária",
-        "notes": "Intensidade de carbono regulatória oficial (Resolução CNPE nº 4/2026)"
+        "notes": "Intensidade de carbono regulatória oficial (Resolução CNPE nº 4/2026)",
+        "min": 0.0,
+        "max": 30.0,
+        "step": 0.5
       },
       "vehicle_purchase_price": {
         "value": 1020000.0,
         "unit": "R$",
         "source_id": "V04",
         "badge": "Ilustrativa",
-        "notes": "Mesmo veículo do cenário GNV"
-      },
-      "vehicle_overprice": {
-        "value": 170000.0,
-        "unit": "R$",
-        "source_id": "V04",
-        "badge": "Ilustrativa",
-        "notes": "Mesmo sobrepreço do veículo a gás"
+        "notes": "Mesmo veículo do cenário GNV",
+        "min": 700000.0,
+        "max": 1500000.0,
+        "step": 25000.0
       },
       "maintenance_cost_per_km": {
         "value": 0.9,
         "unit": "R$/km",
         "source_id": "V05",
         "badge": "Ilustrativa",
-        "notes": "Similar ao GNV"
+        "notes": "Similar ao GNV",
+        "min": 0.4,
+        "max": 1.6,
+        "step": 0.05
+      },
+      "residual_value_ratio": {
+        "value": 0.45,
+        "unit": "fração",
+        "source_id": "V05",
+        "badge": "Ilustrativa",
+        "notes": "Mesmo comportamento de residual estimado do cavalo mecânico a gás",
+        "min": 0.15,
+        "max": 0.75,
+        "step": 0.05
       }
     },
     "eletrico": {
@@ -195,50 +310,81 @@
         "value": 0.82,
         "unit": "R$/kWh",
         "source_id": "P06",
-        "badge": "Adaptada",
-        "notes": "Tarifa média de energia elétrica industrial/comercial homologada (ANEEL)"
+        "badge": "Ilustrativa",
+        "notes": "Tarifa ilustrativa de fornecimento/recarga (tarifa média industrial homologada ANEEL com tributos e encargos). Tarifas complexas ficam para v2",
+        "min": 0.3,
+        "max": 2.0,
+        "step": 0.02
       },
       "consumption": {
         "value": 0.8,
         "unit": "km/kWh",
         "source_id": "V02",
         "badge": "Ilustrativa",
-        "notes": "Equivalente a 1.25 kWh/km para cavalo mecânico rodoviário"
+        "notes": "Equivalente a 1.25 kWh/km para cavalo mecânico rodoviário",
+        "min": 0.4,
+        "max": 1.5,
+        "step": 0.05
       },
       "energy_density": {
         "value": 3.6,
         "unit": "MJ/kWh",
         "source_id": "E03",
         "badge": "Primária",
-        "notes": "Equivalência física exata (1 kWh = 3.6 MJ)"
+        "notes": "Equivalência física exata (1 kWh = 3.6 MJ)",
+        "min": 3.6,
+        "max": 3.6,
+        "step": 0.0
       },
       "carbon_intensity": {
-        "value": 8.03,
+        "value": 10.7,
         "unit": "gCO2eq/MJ",
         "source_id": "E02",
         "badge": "Primária",
-        "notes": "Fator médio do SIN (MCTI/SIRENE: ~28.9 kg CO2/MWh convertido para gCO2eq/MJ)"
+        "notes": "Fator médio anual do SIN consolidado pelo MCTI/SIRENE (38,5 kg CO₂/MWh em 2023 = 10,7 gCO₂eq/MJ)",
+        "min": 2.0,
+        "max": 40.0,
+        "step": 0.5
       },
       "vehicle_purchase_price": {
-        "value": 2125000.0,
+        "value": 1800000.0,
         "unit": "R$",
-        "source_id": "V03",
+        "source_id": "V08",
         "badge": "Ilustrativa",
-        "notes": "Custo inicial estimado em 2.5x o caminhão a diesel (estudo Mirow & Co)"
-      },
-      "vehicle_overprice": {
-        "value": 1275000.0,
-        "unit": "R$",
-        "source_id": "V03",
-        "badge": "Ilustrativa",
-        "notes": "Sobrepreço de aquisição devido ao custo das baterias de grande capacidade"
+        "notes": "Estimativa para cavalo mecânico elétrico 6x4 (Sany SE 588 / estudos de mercado, faixa R$ 1,5–2,1 mi)",
+        "min": 1200000.0,
+        "max": 2600000.0,
+        "step": 50000.0
       },
       "maintenance_cost_per_km": {
         "value": 0.5,
         "unit": "R$/km",
         "source_id": "V05",
         "badge": "Ilustrativa",
-        "notes": "Menor desgaste de freios (regeneração) e menor complexidade motriz mecânica"
+        "notes": "Menor desgaste de freios (regeneração) e menor complexidade motriz mecânica",
+        "min": 0.2,
+        "max": 1.0,
+        "step": 0.05
+      },
+      "residual_value_ratio": {
+        "value": 0.35,
+        "unit": "fração",
+        "source_id": "V03",
+        "badge": "Ilustrativa",
+        "notes": "Fração residual conservadora refletindo incerteza na vida útil da bateria e valor de revenda",
+        "min": 0.1,
+        "max": 0.7,
+        "step": 0.05
+      },
+      "charging_efficiency": {
+        "value": 0.9,
+        "unit": "fração",
+        "source_id": "V03",
+        "badge": "Ilustrativa",
+        "notes": "Eficiência combinada do carregador à bateria (perdas térmicas e de conversão)",
+        "min": 0.75,
+        "max": 0.98,
+        "step": 0.01
       }
     }
   }

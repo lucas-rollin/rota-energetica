@@ -1,35 +1,9 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Rota Energética: manifest de aquisição de dados",
-  "description": "Registro de tudo o que foi baixado para data/raw/.",
-  "type": "object",
-  "additionalProperties": false,
-  "required": ["generated_at"],
-  "properties": {
-    "schema_version": {
-      "const": 1,
-      "default": 1,
-      "title": "Schema Version",
-      "type": "integer"
-    },
-    "generated_at": {
-      "description": "Data da última alteração do manifest.",
-      "format": "date-time",
-      "title": "Generated At",
-      "type": "string"
-    },
-    "entries": {
-      "items": {
-        "$ref": "#/$defs/Entry"
-      },
-      "title": "Entries",
-      "type": "array"
-    }
-  },
   "$defs": {
     "Entry": {
       "additionalProperties": false,
-      "description": "Um arquivo baixado para data/raw/.",
+      "description": "Metadata for a raw downloaded file registered in the manifest.",
       "properties": {
         "source_id": {
           "description": "ID da fonte em docs/fontes.md (ex.: P01).",
@@ -59,7 +33,6 @@
         },
         "retrieved_at": {
           "description": "Data do download (AAAA-MM-DD).",
-          "format": "date",
           "title": "Retrieved At",
           "type": "string"
         },
@@ -86,18 +59,11 @@
         "date_range": {
           "anyOf": [
             {
+              "items": {
+                "type": "string"
+              },
               "maxItems": 2,
               "minItems": 2,
-              "prefixItems": [
-                {
-                  "format": "date",
-                  "type": "string"
-                },
-                {
-                  "format": "date",
-                  "type": "string"
-                }
-              ],
               "type": "array"
             },
             {
@@ -133,5 +99,44 @@
       "title": "Entry",
       "type": "object"
     }
-  }
+  },
+  "additionalProperties": false,
+  "description": "Manifest tracking all acquired raw data files.",
+  "properties": {
+    "$schema": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": "../schemas/manifest.schema.json",
+      "title": "$schema"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "generated_at": {
+      "description": "Data da última alteração do manifest.",
+      "title": "Generated At",
+      "type": "string"
+    },
+    "entries": {
+      "items": {
+        "$ref": "#/$defs/Entry"
+      },
+      "title": "Entries",
+      "type": "array"
+    }
+  },
+  "required": [
+    "generated_at"
+  ],
+  "title": "Manifest",
+  "type": "object"
 }

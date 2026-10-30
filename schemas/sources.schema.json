@@ -1,103 +1,162 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Rota Energética: Catálogo unificado de metadados das fontes",
-  "description": "Registro estruturado e catalogado de todas as fontes de dados do projeto. Uma entrada por source_id.",
-  "type": "object",
+  "$defs": {
+    "Source": {
+      "additionalProperties": false,
+      "description": "Metadata and provenance for a project data source.",
+      "properties": {
+        "id": {
+          "description": "ID unívoco da fonte (ex.: P01, E01, V01, I01).",
+          "pattern": "^[A-Z][0-9]{2}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "description": "Nome formal do conjunto de dados, publicação ou norma.",
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "publisher": {
+          "description": "Órgão, entidade, empresa ou fabricante responsável.",
+          "minLength": 1,
+          "title": "Publisher",
+          "type": "string"
+        },
+        "description": {
+          "description": "Descrição sucinta do dado utilizado no simulador.",
+          "minLength": 1,
+          "title": "Description",
+          "type": "string"
+        },
+        "url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Página oficial ou link institucional de referência.",
+          "title": "Url"
+        },
+        "badge": {
+          "description": "Selo de qualidade técnica do dado no simulador.",
+          "enum": [
+            "Primária",
+            "Adaptada",
+            "Ilustrativa"
+          ],
+          "title": "Badge",
+          "type": "string"
+        },
+        "category": {
+          "description": "Classificação jurídica (A: ato oficial, B: dado aberto, C: privado/setorial, D: imprensa/ficha).",
+          "enum": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
+          "title": "Category",
+          "type": "string"
+        },
+        "terms": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Licença ou termos de uso aplicáveis.",
+          "title": "Terms"
+        },
+        "terms_url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Link oficial para os termos de uso ou licença.",
+          "title": "Terms Url"
+        },
+        "attribution": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Texto sugerido para atribuição de autoria.",
+          "title": "Attribution"
+        },
+        "notes": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Notas metodológicas, conversões ou ressalvas técnicas.",
+          "title": "Notes"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "publisher",
+        "description",
+        "badge",
+        "category"
+      ],
+      "title": "Source",
+      "type": "object"
+    }
+  },
   "additionalProperties": false,
-  "required": ["schema_version", "sources"],
+  "description": "Catalog of all data sources used across the project.",
   "properties": {
     "$schema": {
-      "type": "string",
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": "../schemas/sources.schema.json",
       "title": "$schema"
     },
     "schema_version": {
       "const": 1,
+      "default": 1,
       "title": "Schema Version",
       "type": "integer"
     },
     "sources": {
-      "type": "array",
-      "title": "Sources",
       "items": {
         "$ref": "#/$defs/Source"
-      }
+      },
+      "title": "Sources",
+      "type": "array"
     }
   },
-  "$defs": {
-    "Source": {
-      "type": "object",
-      "title": "Source",
-      "description": "Metadados de proveniência, qualidade técnica e termos de uma fonte de dados.",
-      "additionalProperties": false,
-      "required": ["id", "name", "publisher", "description", "category", "badge"],
-      "properties": {
-        "id": {
-          "type": "string",
-          "title": "Id",
-          "description": "ID unívoco da fonte (ex.: P01, E01, V01, I01).",
-          "pattern": "^[A-Z][0-9]{2}$"
-        },
-        "name": {
-          "type": "string",
-          "title": "Name",
-          "description": "Nome formal do conjunto de dados, publicação, ato oficial ou modelo.",
-          "minLength": 1
-        },
-        "publisher": {
-          "type": "string",
-          "title": "Publisher",
-          "description": "Órgão, entidade, montadora ou veículo de imprensa responsável.",
-          "minLength": 1
-        },
-        "description": {
-          "type": "string",
-          "title": "Description",
-          "description": "Descrição sucinta do dado utilizado no simulador.",
-          "minLength": 1
-        },
-        "url": {
-          "type": "string",
-          "title": "Url",
-          "description": "Página oficial, portal de dados abertos ou link institucional de referência para consulta e citação.",
-          "format": "uri"
-        },
-        "badge": {
-          "type": "string",
-          "title": "Badge",
-          "description": "Selo de qualidade técnica do dado no simulador.",
-          "enum": ["Primária", "Adaptada", "Ilustrativa"]
-        },
-        "category": {
-          "type": "string",
-          "title": "Category",
-          "description": "Classificação jurídica: A (Ato oficial), B (Dado aberto governamental), C (Entidade privada/setorial), D (Imprensa/Ficha técnica).",
-          "enum": ["A", "B", "C", "D"]
-        },
-        "attribution": {
-          "type": "string",
-          "title": "Attribution",
-          "description": "Texto sugerido para atribuição de autoria na interface e nos gráficos.",
-          "minLength": 1
-        },
-        "terms": {
-          "type": "string",
-          "title": "Terms",
-          "description": "Licença ou termos de uso aplicáveis à fonte.",
-          "minLength": 1
-        },
-        "terms_url": {
-          "type": "string",
-          "title": "Terms Url",
-          "description": "Link oficial para a página onde a licença ou termos de uso podem ser consultados.",
-          "format": "uri"
-        },
-        "notes": {
-          "type": "string",
-          "title": "Notes",
-          "description": "Notas metodológicas, conversões de unidade, hipóteses e ressalvas técnicas.",
-          "minLength": 1
-        }
-      }
-    }
-  }
+  "title": "SourcesCatalog",
+  "type": "object"
 }

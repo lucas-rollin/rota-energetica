@@ -62,6 +62,20 @@ def test_load_and_validate_real_parameters_file():
     assert diesel.energy_price.unit == "R$/L"
     assert diesel.energy_price.badge in ("Primária", "Adaptada", "Ilustrativa")
     assert diesel.carbon_intensity.unit == "gCO2eq/MJ"
+    assert diesel.residual_value_ratio.value == 0.50
+    assert diesel.arla_consumption_ratio is not None
+    assert diesel.arla_consumption_ratio.value == 0.05
+
+    # Check electric properties
+    eletrico = params.vehicles["eletrico"]
+    assert eletrico.charging_efficiency is not None
+    assert eletrico.charging_efficiency.value == 0.90
+    assert eletrico.vehicle_purchase_price.value == 1800000.0
+
+    # Check slider bounds
+    assert diesel.energy_price.min is not None
+    assert diesel.energy_price.max is not None
+    assert diesel.energy_price.step is not None
 
 
 def test_load_and_validate_real_sources_catalog():
@@ -84,26 +98,39 @@ def test_load_and_validate_real_sources_catalog():
             params.general.horizon_years.source_id,
             params.general.discount_rate.source_id,
             params.general.biodiesel_blend.source_id,
+            params.general.diesel_fossil_carbon_intensity.source_id,
+            params.general.biodiesel_carbon_intensity.source_id,
+            params.general.arla_price.source_id,
         }
         for vehicle in params.vehicles.values():
-            param_source_ids.update({
-                vehicle.energy_price.source_id,
-                vehicle.consumption.source_id,
-                vehicle.energy_density.source_id,
-                vehicle.carbon_intensity.source_id,
-                vehicle.vehicle_purchase_price.source_id,
-                vehicle.vehicle_overprice.source_id,
-                vehicle.maintenance_cost_per_km.source_id,
-            })
+            param_source_ids.update(
+                {
+                    vehicle.energy_price.source_id,
+                    vehicle.consumption.source_id,
+                    vehicle.energy_density.source_id,
+                    vehicle.carbon_intensity.source_id,
+                    vehicle.vehicle_purchase_price.source_id,
+                    vehicle.maintenance_cost_per_km.source_id,
+                    vehicle.residual_value_ratio.source_id,
+                }
+            )
+            if vehicle.charging_efficiency is not None:
+                param_source_ids.add(vehicle.charging_efficiency.source_id)
+            if vehicle.arla_consumption_ratio is not None:
+                param_source_ids.add(vehicle.arla_consumption_ratio.source_id)
         for sid in param_source_ids:
-            assert sid in source_ids, f"Source ID '{sid}' from parameters.json missing from sources.json"
+            assert sid in source_ids, (
+                f"Source ID '{sid}' from parameters.json missing from sources.json"
+            )
 
     # Cross-reference: all manifest sources must exist in sources catalog
     manifest_path = REPO_ROOT / "data" / "manifest.json"
     if manifest_path.exists():
         manifest = Manifest.load(manifest_path)
         for entry in manifest.entries:
-            assert entry.source_id in source_ids, f"Source ID '{entry.source_id}' from manifest.json missing from sources.json"
+            assert entry.source_id in source_ids, (
+                f"Source ID '{entry.source_id}' from manifest.json missing from sources.json"
+            )
 
 
 def test_export_parameters_schema(tmp_path: Path):

@@ -13,7 +13,10 @@ from pydantic import BaseModel, ConfigDict, Field, StringConstraints
 QualityBadge = Literal["Primária", "Adaptada", "Ilustrativa"]
 SourceCategory = Literal["A", "B", "C", "D"]
 
-TODAY = datetime.now(ZoneInfo("America/Sao_Paulo"))
+
+def get_current_iso_timestamp() -> str:
+    """Return the current ISO timestamp in America/Sao_Paulo timezone."""
+    return datetime.now(ZoneInfo("America/Sao_Paulo")).isoformat()
 
 
 class Source(BaseModel):
@@ -113,6 +116,7 @@ class SourcesCatalog(BaseModel):
             json.dumps(dump, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
         )
 
+
 class Entry(BaseModel):
     """Metadata for a raw downloaded file registered in the manifest."""
 
@@ -198,7 +202,7 @@ class Manifest(BaseModel):
         if not path.exists():
             return cls(
                 schema_version=1,
-                generated_at=TODAY.isoformat(),
+                generated_at=get_current_iso_timestamp(),
                 entries=[],
             )
 
@@ -206,7 +210,7 @@ class Manifest(BaseModel):
         if not content:
             return cls(
                 schema_version=1,
-                generated_at=TODAY.isoformat(),
+                generated_at=get_current_iso_timestamp(),
                 entries=[],
             )
 
@@ -218,7 +222,7 @@ class Manifest(BaseModel):
                 f"Failed to validate '{path}' against schema: {e}\n"
                 "If this is an initial placeholder file, you can reset it to empty: "
                 '{"schema_version": 1, "generated_at": "'
-                + TODAY.isoformat()
+                + get_current_iso_timestamp()
                 + '", "entries": []}'
             ) from e
 
@@ -239,7 +243,7 @@ class Manifest(BaseModel):
             if existing.file == entry.file:
                 sha_changed = existing.sha256 != entry.sha256
                 self.entries[i] = entry
-                self.generated_at = TODAY.isoformat()
+                self.generated_at = get_current_iso_timestamp()
                 if sha_changed:
                     msg = f"Updated '{entry.file}' (SHA-256 changed: {existing.sha256[:8]}... -> {entry.sha256[:8]}...)"
                 else:
@@ -248,7 +252,7 @@ class Manifest(BaseModel):
 
         self.entries.append(entry)
         self.entries.sort(key=lambda e: (e.source_id, e.file))
-        self.generated_at = TODAY.isoformat()
+        self.generated_at = get_current_iso_timestamp()
         return True, f"Added new entry '{entry.file}' [{entry.source_id}]"
 
 
@@ -270,12 +274,12 @@ class ParameterItem(BaseModel):
     unit: str = Field(
         ...,
         min_length=1,
-        description="Unidade de medida (ex: R$/L, km/L, gCO2eq/MJ).",
+        description="Unidade de medida (ex: R$/L, km/L, gCO2eq/MJ, fração).",
         title="Unit",
     )
     source_id: Annotated[str, StringConstraints(pattern=r"^[A-Z][0-9]{2}$")] = Field(
         ...,
-        description="ID da fonte em docs/fontes.md (ex: P01, E01, V01).",
+        description="ID da fonte em docs/fontes.md ou data/sources.json (ex: P01, E01, V01).",
         title="Source Id",
     )
     badge: QualityBadge = Field(
@@ -287,6 +291,21 @@ class ParameterItem(BaseModel):
         default=None,
         description="Nota explicativa ou justificativa da premissa adotada.",
         title="Notes",
+    )
+    min: float | None = Field(
+        default=None,
+        description="Limite inferior recomendado para slider/entrada.",
+        title="Min",
+    )
+    max: float | None = Field(
+        default=None,
+        description="Limite superior recomendado para slider/entrada.",
+        title="Max",
+    )
+    step: float | None = Field(
+        default=None,
+        description="Incremento sugerido para o slider/controle numérico.",
+        title="Step",
     )
 
 
@@ -314,6 +333,21 @@ class GeneralParameters(BaseModel):
         ...,
         description="Teor de biodiesel no diesel B (fração decimal).",
         title="Biodiesel Blend",
+    )
+    diesel_fossil_carbon_intensity: ParameterItem = Field(
+        ...,
+        description="Intensidade de carbono do diesel fóssil poço à roda (gCO2eq/MJ).",
+        title="Diesel Fossil Carbon Intensity",
+    )
+    biodiesel_carbon_intensity: ParameterItem = Field(
+        ...,
+        description="Intensidade de carbono do biodiesel poço à roda (gCO2eq/MJ).",
+        title="Biodiesel Carbon Intensity",
+    )
+    arla_price: ParameterItem = Field(
+        ...,
+        description="Preço de referência do ARLA 32 (R$/L).",
+        title="ARLA 32 Price",
     )
 
 
@@ -352,15 +386,25 @@ class VehicleParameters(BaseModel):
         description="Preço total estimado de aquisição do cavalo mecânico (R$).",
         title="Vehicle Purchase Price",
     )
-    vehicle_overprice: ParameterItem = Field(
-        ...,
-        description="Sobrepreço de aquisição em relação ao cavalo mecânico diesel base (R$).",
-        title="Vehicle Overprice",
-    )
     maintenance_cost_per_km: ParameterItem = Field(
         ...,
         description="Custo operacional de manutenção e desgaste de pneus (R$/km).",
         title="Maintenance Cost Per Km",
+    )
+    residual_value_ratio: ParameterItem = Field(
+        ...,
+        description="Fração do preço de aquisição retida ao final do horizonte financeiro (fração decimal de V0).",
+        title="Residual Value Ratio",
+    )
+    charging_efficiency: ParameterItem | None = Field(
+        default=None,
+        description="Eficiência de recarga da bateria (fração decimal de energia armazenada / energia da rede).",
+        title="Charging Efficiency",
+    )
+    arla_consumption_ratio: ParameterItem | None = Field(
+        default=None,
+        description="Consumo de ARLA 32 por litro de diesel consumido (L/L).",
+        title="ARLA Consumption Ratio",
     )
 
 
@@ -410,6 +454,27 @@ class SimulationParameters(BaseModel):
         """Export JSON Schema to file."""
         output_path.parent.mkdir(parents=True, exist_ok=True)
         schema = cls.model_json_schema()
+        schema = {"$schema": "https://json-schema.org/draft/2020-12/schema", **schema}
         output_path.write_text(
             json.dumps(schema, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
         )
+
+
+def export_all_schemas(schemas_dir: Path) -> dict[str, Path]:
+    """Export JSON Schema for all models to target directory."""
+    schemas_dir.mkdir(parents=True, exist_ok=True)
+    results: dict[str, Path] = {}
+    schema_map = {
+        "manifest.schema.json": Manifest,
+        "parameters.schema.json": SimulationParameters,
+        "sources.schema.json": SourcesCatalog,
+    }
+    for filename, model_cls in schema_map.items():
+        out_file = schemas_dir / filename
+        schema = model_cls.model_json_schema()
+        schema = {"$schema": "https://json-schema.org/draft/2020-12/schema", **schema}
+        out_file.write_text(
+            json.dumps(schema, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
+        )
+        results[filename] = out_file
+    return results
