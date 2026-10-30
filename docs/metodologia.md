@@ -297,8 +297,6 @@ Os resultados devem ser acompanhados de resumo textual ou tabela, para que a int
 
 ### 8.1 Validação dos cálculos
 
-A implementação de referência em Python e a implementação TypeScript devem produzir resultados equivalentes para os mesmos parâmetros.
-
 Antes da publicação, devem existir pelo menos três cenários de referência calculados manualmente, cobrindo:
 
 1. Custo energético e operacional por quilômetro.
