@@ -3,10 +3,7 @@ import type {
   SimulationParameters,
   VehicleParameters,
 } from '../types/parameters';
-import type {
-  MetricComparison,
-  SimulationResults,
-} from '../types/scenario';
+import type { MetricComparison, SimulationResults } from '../types/scenario';
 import { calculateOperationalCost } from './cost';
 import { calculateEmissions } from './emissions';
 import { calculateTco } from './tco';
@@ -47,32 +44,109 @@ export function validateBounds(
  */
 export function validateSimulationParameters(params: SimulationParameters): void {
   const g = params.general;
-  validateBounds('annual_distance_km', g.annual_distance_km.value, g.annual_distance_km.min, g.annual_distance_km.max);
-  validateBounds('horizon_years', g.horizon_years.value, g.horizon_years.min, g.horizon_years.max);
-  validateBounds('discount_rate', g.discount_rate.value, g.discount_rate.min, g.discount_rate.max);
-  validateBounds('biodiesel_blend', g.biodiesel_blend.value, g.biodiesel_blend.min, g.biodiesel_blend.max);
-  validateBounds('diesel_fossil_carbon_intensity', g.diesel_fossil_carbon_intensity.value, g.diesel_fossil_carbon_intensity.min, g.diesel_fossil_carbon_intensity.max);
-  validateBounds('biodiesel_carbon_intensity', g.biodiesel_carbon_intensity.value, g.biodiesel_carbon_intensity.min, g.biodiesel_carbon_intensity.max);
+  validateBounds(
+    'annual_distance_km',
+    g.annual_distance_km.value,
+    g.annual_distance_km.min,
+    g.annual_distance_km.max
+  );
+  validateBounds(
+    'horizon_years',
+    g.horizon_years.value,
+    g.horizon_years.min,
+    g.horizon_years.max
+  );
+  validateBounds(
+    'discount_rate',
+    g.discount_rate.value,
+    g.discount_rate.min,
+    g.discount_rate.max
+  );
+  validateBounds(
+    'biodiesel_blend',
+    g.biodiesel_blend.value,
+    g.biodiesel_blend.min,
+    g.biodiesel_blend.max
+  );
+  validateBounds(
+    'diesel_fossil_carbon_intensity',
+    g.diesel_fossil_carbon_intensity.value,
+    g.diesel_fossil_carbon_intensity.min,
+    g.diesel_fossil_carbon_intensity.max
+  );
+  validateBounds(
+    'biodiesel_carbon_intensity',
+    g.biodiesel_carbon_intensity.value,
+    g.biodiesel_carbon_intensity.min,
+    g.biodiesel_carbon_intensity.max
+  );
   validateBounds('arla_price', g.arla_price.value, g.arla_price.min, g.arla_price.max);
 
   for (const alt of ALTERNATIVE_IDS) {
     const v = params.vehicles[alt];
     if (!v) {
-      throw new Error(`Powertrain alternative '${alt}' not found in simulation parameters`);
+      throw new Error(
+        `Powertrain alternative '${alt}' not found in simulation parameters`
+      );
     }
-    validateBounds(`${alt}.energy_price`, v.energy_price.value, v.energy_price.min, v.energy_price.max);
-    validateBounds(`${alt}.consumption`, v.consumption.value, v.consumption.min, v.consumption.max);
-    validateBounds(`${alt}.energy_density`, v.energy_density.value, v.energy_density.min, v.energy_density.max);
-    validateBounds(`${alt}.carbon_intensity`, v.carbon_intensity.value, v.carbon_intensity.min, v.carbon_intensity.max);
-    validateBounds(`${alt}.vehicle_purchase_price`, v.vehicle_purchase_price.value, v.vehicle_purchase_price.min, v.vehicle_purchase_price.max);
-    validateBounds(`${alt}.maintenance_cost_per_km`, v.maintenance_cost_per_km.value, v.maintenance_cost_per_km.min, v.maintenance_cost_per_km.max);
-    validateBounds(`${alt}.residual_value_ratio`, v.residual_value_ratio.value, v.residual_value_ratio.min, v.residual_value_ratio.max);
+    validateBounds(
+      `${alt}.energy_price`,
+      v.energy_price.value,
+      v.energy_price.min,
+      v.energy_price.max
+    );
+    validateBounds(
+      `${alt}.consumption`,
+      v.consumption.value,
+      v.consumption.min,
+      v.consumption.max
+    );
+    validateBounds(
+      `${alt}.energy_density`,
+      v.energy_density.value,
+      v.energy_density.min,
+      v.energy_density.max
+    );
+    validateBounds(
+      `${alt}.carbon_intensity`,
+      v.carbon_intensity.value,
+      v.carbon_intensity.min,
+      v.carbon_intensity.max
+    );
+    validateBounds(
+      `${alt}.vehicle_purchase_price`,
+      v.vehicle_purchase_price.value,
+      v.vehicle_purchase_price.min,
+      v.vehicle_purchase_price.max
+    );
+    validateBounds(
+      `${alt}.maintenance_cost_per_km`,
+      v.maintenance_cost_per_km.value,
+      v.maintenance_cost_per_km.min,
+      v.maintenance_cost_per_km.max
+    );
+    validateBounds(
+      `${alt}.residual_value_ratio`,
+      v.residual_value_ratio.value,
+      v.residual_value_ratio.min,
+      v.residual_value_ratio.max
+    );
 
     if (v.charging_efficiency) {
-      validateBounds(`${alt}.charging_efficiency`, v.charging_efficiency.value, v.charging_efficiency.min, v.charging_efficiency.max);
+      validateBounds(
+        `${alt}.charging_efficiency`,
+        v.charging_efficiency.value,
+        v.charging_efficiency.min,
+        v.charging_efficiency.max
+      );
     }
     if (v.arla_consumption_ratio) {
-      validateBounds(`${alt}.arla_consumption_ratio`, v.arla_consumption_ratio.value, v.arla_consumption_ratio.min, v.arla_consumption_ratio.max);
+      validateBounds(
+        `${alt}.arla_consumption_ratio`,
+        v.arla_consumption_ratio.value,
+        v.arla_consumption_ratio.min,
+        v.arla_consumption_ratio.max
+      );
     }
   }
 }
@@ -169,9 +243,15 @@ export function simulate(params: SimulationParameters): SimulationResults {
   for (const alt of ALTERNATIVE_IDS) {
     const r = results[alt];
     r.deltas = {
-      operationalCostPerKm: calculateDelta(r.operationalCostPerKm, dieselBase.operationalCostPerKm),
+      operationalCostPerKm: calculateDelta(
+        r.operationalCostPerKm,
+        dieselBase.operationalCostPerKm
+      ),
       tco: calculateDelta(r.tco, dieselBase.tco),
-      annualEmissionsTon: calculateDelta(r.annualEmissionsTon, dieselBase.annualEmissionsTon),
+      annualEmissionsTon: calculateDelta(
+        r.annualEmissionsTon,
+        dieselBase.annualEmissionsTon
+      ),
     };
   }
 

@@ -12,8 +12,8 @@ export default defineConfig({
     plugins: [/** @type {any} */ (tailwindcss())],
     server: {
       fs: {
-        allow: ['..']
-      }
-    }
-  }
+        allow: ['..'],
+      },
+    },
+  },
 });

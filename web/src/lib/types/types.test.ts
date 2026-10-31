@@ -31,7 +31,9 @@ describe('Type contracts', () => {
 
     expect(mockResult.tcoBreakdown.vehiclePurchasePrice).toBe(850000);
     expect(mockResult.operationalCostPerKm).toBeCloseTo(
-      mockResult.energyCostPerKm + mockResult.arlaCostPerKm + mockResult.maintenanceCostPerKm,
+      mockResult.energyCostPerKm +
+        mockResult.arlaCostPerKm +
+        mockResult.maintenanceCostPerKm,
       3
     );
   });

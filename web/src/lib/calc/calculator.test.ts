@@ -104,7 +104,10 @@ describe('Calculator Engine Unit Tests', () => {
       expect(b.pvOperational).toBeCloseTo(b.pvEnergy + b.pvArla + b.pvMaintenance, 6);
       // Invariant 3: TCO = netInvestment + pvOperational = V0 + pvOperational - pvResidual
       expect(res.tco).toBeCloseTo(b.netInvestment + b.pvOperational, 6);
-      expect(res.tco).toBeCloseTo(b.vehiclePurchasePrice + b.pvOperational - b.pvResidual, 6);
+      expect(res.tco).toBeCloseTo(
+        b.vehiclePurchasePrice + b.pvOperational - b.pvResidual,
+        6
+      );
       // Invariant 4: levelizedCostPerKm = TCO / levelizedKm
       expect(res.levelizedCostPerKm).toBeCloseTo(res.tco / res.levelizedKm, 6);
     });
@@ -146,7 +149,9 @@ describe('Calculator Engine Unit Tests', () => {
     it('invariants: higher energy price strictly increases TCO', () => {
       const baseResults = simulate(defaultParams);
 
-      const modifiedParams: SimulationParameters = JSON.parse(JSON.stringify(defaultParams));
+      const modifiedParams: SimulationParameters = JSON.parse(
+        JSON.stringify(defaultParams)
+      );
       modifiedParams.vehicles.diesel.energy_price.value += 0.5;
 
       const modifiedResults = simulate(modifiedParams);
@@ -169,14 +174,15 @@ describe('Calculator Engine Unit Tests', () => {
         maintenanceCostPerKm: 0.85,
       });
 
-      const simpleSum =
-        850000 + 5 * (120000 * (2.444 + 0.07 + 0.85)) - 0.5 * 850000;
+      const simpleSum = 850000 + 5 * (120000 * (2.444 + 0.07 + 0.85)) - 0.5 * 850000;
       expect(resZero.tco).toBeCloseTo(simpleSum, 4);
       expect(resZero.levelizedKm).toBe(5 * 120000);
     });
 
     it('rejects parameters outside min/max bounds', () => {
-      const invalidParams: SimulationParameters = JSON.parse(JSON.stringify(defaultParams));
+      const invalidParams: SimulationParameters = JSON.parse(
+        JSON.stringify(defaultParams)
+      );
       invalidParams.general.discount_rate.value = 0.99; // max is 0.20
 
       expect(() => simulate(invalidParams)).toThrow(/is above maximum allowed bound/);
