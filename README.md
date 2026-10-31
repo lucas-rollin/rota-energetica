@@ -54,9 +54,9 @@ As alternativas utilizam a mesma fronteira de contabilização de emissões defi
 
 ```text
 rota-energetica/
-├── schemas/       # JSON Schemas compartilhados (manifest, parameters)
+├── schemas/       # JSON Schemas compartilhados (manifest, parameters, sources)
 ├── docs/          # fontes, metodologia, acessibilidade
-├── pipeline/      # Python + Polars e implementação de referência
+├── pipeline/      # Pipeline de agregação e ingestão de dados em Python
 ├── data/          # raw/, processed/ e parameters.json
 ├── web/           # Astro + TypeScript (src/lib/calc = módulo de cálculo)
 └── .github/workflows/

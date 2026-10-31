@@ -297,13 +297,13 @@ Os resultados devem ser acompanhados de resumo textual ou tabela, para que a int
 
 ### 8.1 Validação dos cálculos
 
-Antes da publicação, devem existir pelo menos três cenários de referência calculados manualmente, cobrindo:
+O motor de cálculo em TypeScript é validado diretamente por testes automatizados contra cenários calculados manualmente e invariantes matemáticos formais, cobrindo:
 
 1. Custo energético e operacional por quilômetro.
-2. TCO e custo nivelado por quilômetro.
-3. Consumo energético e emissões por quilômetro.
+2. TCO, decomposição de valor presente e custo nivelado por quilômetro.
+3. Consumo energético e emissões por quilômetro (incluindo a mistura do Diesel B).
 
-A tolerância numérica será definida conforme a grandeza e o arredondamento aplicado. Os testes devem cobrir também entradas inválidas, valores ausentes e limites dos parâmetros.
+A tolerância numérica segue a precisão contábil e científica adequada para cada grandeza. A suíte de testes unitários cobre casos de borda (taxa de desconto nula $r = 0$, horizonte unitário $h = 1$, eficiência $\eta < 1$, ARLA exclusivo no diesel), invariantes econômicos (não-monotonicidade negativa de preços, identidade da decomposição do TCO) e rejeição estrita de entradas fora dos limites estipulados.
 
 ### 8.2 Validação do pipeline
 
