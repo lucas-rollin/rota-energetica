@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-10-31T08:16:27.233246-03:00",
+  "defaults": {
+    "diesel": {
+      "value": 7.28,
+      "unit": "R$/L",
+      "source_id": "P01",
+      "badge": "Adaptada",
+      "notes": "Mediana das últimas 12 semanas da pesquisa ANP (2026-W16 a 2026-W27) para SC",
+      "weeks_window": 12,
+      "reference_uf": "SC",
+      "is_fallback": false
+    },
+    "gnv": {
+      "value": 4.59,
+      "unit": "R$/m³",
+      "source_id": "P01",
+      "badge": "Adaptada",
+      "notes": "Mediana das últimas 12 semanas da pesquisa ANP (2026-W16 a 2026-W27) para SC",
+      "weeks_window": 12,
+      "reference_uf": "SC",
+      "is_fallback": false
+    },
+    "biometano": {
+      "value": 4.6,
+      "unit": "R$/m³",
+      "source_id": "P05",
+      "badge": "Ilustrativa",
+      "notes": "Estudo de mercado Copersucar / AutoData (sem série oficial em bomba)",
+      "reference_uf": "SC",
+      "is_fallback": false
+    },
+    "eletrico": {
+      "value": 1.01,
+      "unit": "R$/kWh",
+      "source_id": "P06",
+      "badge": "Adaptada",
+      "notes": "Tarifa homologada ANEEL B3 Comercial (CELESC, RESOLUÇÃO HOMOLOGATÓRIA Nº 3.602, DE 21 DE AGOSTO DE 2026, vigência 2026-08-22) com incidência tributária estimada (24%)",
+      "reference_uf": "SC",
+      "is_fallback": false
+    }
+  }
+}

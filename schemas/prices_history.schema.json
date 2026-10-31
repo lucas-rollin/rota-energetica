@@ -1,0 +1,157 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "FuelSeries": {
+      "additionalProperties": false,
+      "description": "Time series for a specific fuel product or commodity.",
+      "properties": {
+        "source_id": {
+          "description": "Source ID registered in sources.json (e.g. P01, P02).",
+          "pattern": "^[A-Z][0-9]{2}$",
+          "title": "Source Id",
+          "type": "string"
+        },
+        "unit_nominal": {
+          "description": "Original nominal measurement unit (e.g. 'R$/L', 'R$/m³', 'US$/bbl').",
+          "title": "Unit Nominal",
+          "type": "string"
+        },
+        "unit_energy": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Energy price unit, typically 'R$/MJ'.",
+          "title": "Unit Energy"
+        },
+        "series": {
+          "description": "Chronological series of weekly aggregated price points.",
+          "items": {
+            "$ref": "#/$defs/PricePoint"
+          },
+          "title": "Series",
+          "type": "array"
+        }
+      },
+      "required": [
+        "source_id",
+        "unit_nominal"
+      ],
+      "title": "FuelSeries",
+      "type": "object"
+    },
+    "PricePoint": {
+      "additionalProperties": false,
+      "description": "Weekly aggregated price point for an energy source or commodity.",
+      "properties": {
+        "week": {
+          "description": "ISO year and week string (e.g. '2026-W24').",
+          "pattern": "^[0-9]{4}-W[0-9]{2}$",
+          "title": "Week",
+          "type": "string"
+        },
+        "date": {
+          "description": "Reference calendar date (start of collection or week, AAAA-MM-DD).",
+          "title": "Date",
+          "type": "string"
+        },
+        "price_nominal": {
+          "description": "Nominal price in original unit (e.g. R$/L, R$/m³, US$/bbl).",
+          "title": "Price Nominal",
+          "type": "number"
+        },
+        "price_mj": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Converted energy price in R$/MJ using LHV, if applicable.",
+          "title": "Price per MJ"
+        },
+        "is_fallback": {
+          "default": false,
+          "description": "True if state coverage was insufficient and national fallback was used.",
+          "title": "Is Fallback",
+          "type": "boolean"
+        },
+        "sample_size": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Number of sampled locations or observations in the week.",
+          "title": "Sample Size"
+        }
+      },
+      "required": [
+        "week",
+        "date",
+        "price_nominal"
+      ],
+      "title": "PricePoint",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Weekly historical prices dataset exported for frontend visualizer.",
+  "properties": {
+    "$schema": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": "../schemas/prices_history.schema.json",
+      "title": "$schema"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "generated_at": {
+      "description": "Timestamp of dataset generation.",
+      "title": "Generated At",
+      "type": "string"
+    },
+    "reference_uf": {
+      "default": "SC",
+      "description": "Reference federated state (UF).",
+      "title": "Reference UF",
+      "type": "string"
+    },
+    "fuels": {
+      "additionalProperties": {
+        "$ref": "#/$defs/FuelSeries"
+      },
+      "description": "Fuel and commodity price series keyed by identifier.",
+      "title": "Fuels",
+      "type": "object"
+    }
+  },
+  "required": [
+    "generated_at"
+  ],
+  "title": "PricesHistory",
+  "type": "object"
+}

@@ -1,7 +1,7 @@
 {
   "$schema": "../schemas/parameters.schema.json",
   "schema_version": 1,
-  "generated_at": "2026-10-29",
+  "generated_at": "2026-10-31",
   "general": {
     "annual_distance_km": {
       "value": 120000.0,
@@ -78,11 +78,11 @@
     "diesel": {
       "label": "Diesel B",
       "energy_price": {
-        "value": 6.11,
+        "value": 7.28,
         "unit": "R$/L",
-        "source_id": "P03",
+        "source_id": "P01",
         "badge": "Adaptada",
-        "notes": "Média nacional SUROC/ANTT e levantamento semanal ANP",
+        "notes": "Mediana das últimas 12 semanas da pesquisa ANP (2026-W16 a 2026-W27) para SC",
         "min": 4.0,
         "max": 9.0,
         "step": 0.05
@@ -161,11 +161,11 @@
     "gnv": {
       "label": "GNV / GNC",
       "energy_price": {
-        "value": 4.75,
+        "value": 4.59,
         "unit": "R$/m³",
         "source_id": "P01",
-        "badge": "Primária",
-        "notes": "Preço médio de bomba da pesquisa semanal da ANP",
+        "badge": "Adaptada",
+        "notes": "Mediana das últimas 12 semanas da pesquisa ANP (2026-W16 a 2026-W27) para SC",
         "min": 3.0,
         "max": 7.5,
         "step": 0.05
@@ -238,7 +238,7 @@
         "unit": "R$/m³",
         "source_id": "P05",
         "badge": "Ilustrativa",
-        "notes": "Estudo Copersucar 2025 via AutoData (sem série oficial em bomba)",
+        "notes": "Estudo de mercado Copersucar / AutoData (sem série oficial em bomba)",
         "min": 3.0,
         "max": 7.5,
         "step": 0.05
@@ -307,11 +307,11 @@
     "eletrico": {
       "label": "Elétrico (BEV)",
       "energy_price": {
-        "value": 0.82,
+        "value": 1.01,
         "unit": "R$/kWh",
         "source_id": "P06",
-        "badge": "Ilustrativa",
-        "notes": "Tarifa ilustrativa de fornecimento/recarga (tarifa média industrial homologada ANEEL com tributos e encargos). Tarifas complexas ficam para v2",
+        "badge": "Adaptada",
+        "notes": "Tarifa homologada ANEEL B3 Comercial (CELESC, RESOLUÇÃO HOMOLOGATÓRIA Nº 3.602, DE 21 DE AGOSTO DE 2026, vigência 2026-08-22) com incidência tributária estimada (24%)",
         "min": 0.3,
         "max": 2.0,
         "step": 0.02
