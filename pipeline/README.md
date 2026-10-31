@@ -1,34 +1,107 @@
-# Pipeline — Rota Energética
+# Pipeline de Dados — Rota Energética
 
-A pipeline permite a transformação dos dados brutos em JSON para a web.
+Módulo Python responsável pela ingestão, validação de integridade, agregação estatística com Polars e exportação de schemas e datasets processados para o simulador web.
 
-## Registro de fonte
+## 1. Visão Geral da Arquitetura
 
-Os dados sao vinculados a [fontes](../docs/fontes.md) e possuem um registro de metadados em [`manifest.json`](../data/manifest.json).
+O pipeline conecta os dados brutos aos artefatos versionados consumidos pelo site:
 
-### Como registrar
+```text
+data/raw/ (não versionado)
+├── anp/ca-*.csv            ──┐
+├── eia/brent-weekly.csv    ──┼──> [pipeline build] ──> data/processed/prices_history.json
+└── aneel/tarifas-*.csv     ──┼──> [pipeline defaults] ──> data/processed/default_prices.json
+                              └──> [--apply] ────────────> data/parameters.json
+```
 
-- **Arquivos automáticos** (como o Brent): o pipeline cria a entrada ao baixar.
-- **Arquivos manuais** (como a ANP): coloque o arquivo em `data/raw/<fonte>/` e rode o comando de registro (a ajustar):
+- **Polars LazyFrames:** Processamento rápido e com baixo uso de memória dos arquivos semestrais da ANP e tarifas da ANEEL.
+- **Pydantic (Single Source of Truth):** Modelos formais com `extra="forbid"`, validando premissas, metadados e histórico.
+- **Governança e Privacidade:** Nenhuma linha de dado bruto por posto ou CNPJ é exportada para os JSONs públicos (`LICENSE-DATA.md` §5). Apenas agregações estatísticas por município e estado são publicadas.
 
-  ```bash
-  cd pipeline
-  uv run python -m pipeline.register \
-    --source P01 \
-    --origin-url "https://www.gov.br/anp/..." \
-    --file ../data/raw/anp/ca-2026-01.csv
-  ```
+## 2. Comandos CLI
 
-  Ele varre as pastas, calcula `sha256`, `rows` e `date_range` e cria ou atualiza as entradas.
+A CLI unificada é invocada através de subcomandos via `uv run pipeline <comando>`:
 
-### Atualizações
+### 2.1 `pipeline build`
 
-- O arquivo do **semestre corrente** muda a cada semana. Ao rebaixá-lo, a entrada existente é sobrescrita (novo `sha256`, `retrieved_at` e `date_range`). O histórico fica no git.
-- Se, ao rebaixar um **semestre já encerrado**, o `sha256` mudar, a fonte revisou os dados. Investigar antes de aceitar o novo arquivo.
+Varre os dados brutos de `data/raw/` e gera a série histórica semanal agregada em `data/processed/prices_history.json`.
 
-### Verificações automáticas
+```bash
+cd pipeline
+uv run pipeline build
+```
 
-- No pipeline: todo arquivo em `data/raw/` tem entrada e toda entrada aponta para um arquivo existente; o `sha256` confere; as colunas esperadas estão presentes e não há lacunas de datas. Em caso de falha, a mensagem lista o que baixar ou registrar.
-- Na CI, onde os brutos não existem: todo `source_id` do manifest consta neste documento, e todo `source_id` em `data/processed/` consta no manifest.
+- Normaliza cabeçalhos e encodings heterogêneos (`utf-8-sig` / `latin1`).
+- Calcula a mediana de preços por município e a mediana estadual para Santa Catarina por semana ISO.
+- Aplica fallback nacional automático quando a semana possuir menos de 3 municípios amostrados em SC.
+- Converte preços nominais em R$/MJ utilizando o poder calorífico de referência (`parameters.json`).
+- Agrega a série semanal de Brent em US$/bbl.
 
-O formato é validado por [`schemas/manifest.schema.json`](../schemas/manifest.schema.json).
+### 2.2 `pipeline defaults`
+
+Calcula a mediana móvel das últimas 12 semanas (janela metodológica padrão) para combustíveis observados na ANP e extrai a tarifa comercial da ANEEL com tributos.
+
+```bash
+cd pipeline
+# Exibe o diff e grava data/processed/default_prices.json (dry-run)
+uv run pipeline defaults
+
+# Atualiza data/parameters.json com os novos preços padrão calculados
+uv run pipeline defaults --apply
+```
+
+- **Diesel B (S10):** Mediana de 12 semanas da ANP em SC (`P01`, badge **Adaptada**).
+- **GNV:** Mediana de 12 semanas da ANP em SC (`P01`, badge **Adaptada**).
+- **Biometano:** Preço de referência ilustrativo fixado em R$ 4,60/m³ (`P05`, badge **Ilustrativa**).
+- **Eletricidade:** Tarifa homologada ANEEL B3 Comercial da CELESC com incidência tributária estimada de ~24,5% ICMS + PIS/COFINS (`P06`, badge **Adaptada**).
+
+### 2.3 `pipeline export-schemas`
+
+Exporta os JSON Schemas atualizados a partir dos modelos Pydantic para a pasta `schemas/`.
+
+```bash
+cd pipeline
+uv run pipeline export-schemas
+```
+
+- Gera `schemas/manifest.schema.json`, `schemas/parameters.schema.json`, `schemas/sources.schema.json` e `schemas/prices_history.schema.json`.
+- A integridade contratual é verificada pelo teste unitário `test_no_schema_drift` na CI.
+
+### 2.4 `pipeline register`
+
+Registra e audita novos arquivos brutos baixados manualmente em `data/manifest.json`.
+
+```bash
+cd pipeline
+uv run pipeline register \
+  --source P01 \
+  --origin-url "https://www.gov.br/anp/pt-br/centrais-de-conteudo/dados-abertos/serie-historica-de-precos-de-combustiveis" \
+  --file ../data/raw/anp/ca-2026-02.csv
+```
+
+Calcula checksum SHA-256, contagem de linhas e intervalo de datas do arquivo.
+
+## 3. Testes e Qualidade de Código
+
+Para executar a suíte de testes e os linters do pipeline:
+
+```bash
+cd pipeline
+
+# Executar testes unitários e de integração
+uv run pytest
+
+# Verificação de lint e formatação (Ruff)
+uv run ruff check .
+uv run ruff format --check .
+
+# Verificação estática de tipos (Pyrefly)
+uv run pyrefly check
+```
+
+A suíte de testes inclui:
+
+1. `test_parameters.py`: Validação de consistência e limites de `data/parameters.json`.
+2. `test_pipeline.py`: Agregação com CSVs sintéticos, fallback de amostragem municipal e integridade referencial dos datasets processados.
+3. `test_register.py`: Verificação de cálculo de hash e registros no manifest.
+4. `test_schemas.py`: Prevenção contra deriva entre os modelos Python e os JSON Schemas versionados.

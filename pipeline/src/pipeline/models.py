@@ -460,6 +460,154 @@ class SimulationParameters(BaseModel):
         )
 
 
+# =============================================================================
+# Processed Prices History Models
+# =============================================================================
+
+
+class PricePoint(BaseModel):
+    """Weekly aggregated price point for an energy source or commodity."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    week: Annotated[str, StringConstraints(pattern=r"^[0-9]{4}-W[0-9]{2}$")] = Field(
+        ...,
+        description="ISO year and week string (e.g. '2026-W24').",
+        title="Week",
+    )
+    date: str = Field(
+        ...,
+        description="Reference calendar date (start of collection or week, AAAA-MM-DD).",
+        title="Date",
+    )
+    price_nominal: float = Field(
+        ...,
+        description="Nominal price in original unit (e.g. R$/L, R$/m³, US$/bbl).",
+        title="Price Nominal",
+    )
+    price_mj: float | None = Field(
+        default=None,
+        description="Converted energy price in R$/MJ using LHV, if applicable.",
+        title="Price per MJ",
+    )
+    is_fallback: bool = Field(
+        default=False,
+        description="True if state coverage was insufficient and national fallback was used.",
+        title="Is Fallback",
+    )
+    sample_size: int | None = Field(
+        default=None,
+        ge=0,
+        description="Number of sampled locations or observations in the week.",
+        title="Sample Size",
+    )
+
+
+class FuelSeries(BaseModel):
+    """Time series for a specific fuel product or commodity."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    source_id: Annotated[str, StringConstraints(pattern=r"^[A-Z][0-9]{2}$")] = Field(
+        ...,
+        description="Source ID registered in sources.json (e.g. P01, P02).",
+        title="Source Id",
+    )
+    unit_nominal: str = Field(
+        ...,
+        description="Original nominal measurement unit (e.g. 'R$/L', 'R$/m³', 'US$/bbl').",
+        title="Unit Nominal",
+    )
+    unit_energy: str | None = Field(
+        default=None,
+        description="Energy price unit, typically 'R$/MJ'.",
+        title="Unit Energy",
+    )
+    series: list[PricePoint] = Field(
+        default_factory=list,
+        description="Chronological series of weekly aggregated price points.",
+        title="Series",
+    )
+
+
+class PricesHistory(BaseModel):
+    """Weekly historical prices dataset exported for frontend visualizer."""
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+    dollar_schema: str | None = Field(
+        default="../schemas/prices_history.schema.json",
+        alias="$schema",
+        title="$schema",
+    )
+    schema_version: Literal[1] = Field(
+        default=1,
+        title="Schema Version",
+    )
+    generated_at: str = Field(
+        ...,
+        description="Timestamp of dataset generation.",
+        title="Generated At",
+    )
+    reference_uf: str = Field(
+        default="SC",
+        description="Reference federated state (UF).",
+        title="Reference UF",
+    )
+    fuels: dict[str, FuelSeries] = Field(
+        default_factory=dict,
+        description="Fuel and commodity price series keyed by identifier.",
+        title="Fuels",
+    )
+
+    @classmethod
+    def load(cls, path: Path) -> PricesHistory:
+        content = path.read_text(encoding="utf-8")
+        data = json.loads(content)
+        return cls.model_validate(data)
+
+    def save(self, path: Path) -> None:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        dump = self.model_dump(exclude_none=True, by_alias=True)
+        path.write_text(
+            json.dumps(dump, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
+        )
+
+
+class DefaultPriceItem(BaseModel):
+    """Calculated default price baseline with provenance."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    value: float = Field(..., title="Value")
+    unit: str = Field(..., title="Unit")
+    source_id: str = Field(..., title="Source Id")
+    badge: QualityBadge = Field(..., title="Badge")
+    notes: str = Field(..., title="Notes")
+    weeks_window: int | None = Field(default=None, title="Weeks Window")
+    reference_uf: str = Field(..., title="Reference UF")
+    is_fallback: bool = Field(default=False, title="Is Fallback")
+
+
+class DefaultPricesCatalog(BaseModel):
+    """Calculated default baseline prices for fuels."""
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+    schema_version: Literal[1] = Field(default=1, title="Schema Version")
+    generated_at: str = Field(..., title="Generated At")
+    defaults: dict[str, DefaultPriceItem] = Field(
+        default_factory=dict, title="Defaults"
+    )
+
+    def save(self, path: Path) -> None:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        dump = self.model_dump(exclude_none=True, by_alias=True)
+        path.write_text(
+            json.dumps(dump, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
+        )
+
+
 def export_all_schemas(schemas_dir: Path) -> dict[str, Path]:
     """Export JSON Schema for all models to target directory."""
     schemas_dir.mkdir(parents=True, exist_ok=True)
@@ -468,6 +616,7 @@ def export_all_schemas(schemas_dir: Path) -> dict[str, Path]:
         "manifest.schema.json": Manifest,
         "parameters.schema.json": SimulationParameters,
         "sources.schema.json": SourcesCatalog,
+        "prices_history.schema.json": PricesHistory,
     }
     for filename, model_cls in schema_map.items():
         out_file = schemas_dir / filename

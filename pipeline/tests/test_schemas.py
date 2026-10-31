@@ -3,7 +3,12 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from pipeline.models import Manifest, SimulationParameters, SourcesCatalog
+from pipeline.models import (
+    Manifest,
+    PricesHistory,
+    SimulationParameters,
+    SourcesCatalog,
+)
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SCHEMAS_DIR = REPO_ROOT / "schemas"
@@ -15,6 +20,7 @@ def test_no_schema_drift():
         "manifest.schema.json": Manifest,
         "parameters.schema.json": SimulationParameters,
         "sources.schema.json": SourcesCatalog,
+        "prices_history.schema.json": PricesHistory,
     }
 
     for filename, model_cls in schema_map.items():
