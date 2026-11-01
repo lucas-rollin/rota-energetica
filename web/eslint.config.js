@@ -1,5 +1,6 @@
 import eslintPluginAstro from 'eslint-plugin-astro';
 import tseslint from 'typescript-eslint';
+import reactHooks from 'eslint-plugin-react-hooks';
 
 export default [
   // Ignore build and cache directories
@@ -10,6 +11,8 @@ export default [
   ...tseslint.configs.recommended,
   // Astro standard configurations
   ...eslintPluginAstro.configs.recommended,
+  // React Hooks flat configuration
+  reactHooks.configs.flat.recommended,
   // Project-specific rule overrides
   {
     files: ['**/*.ts', '**/*.tsx', '**/*.js', '**/*.astro'],
