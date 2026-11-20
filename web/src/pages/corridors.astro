@@ -2,11 +2,15 @@
 import Layout from '../layouts/Layout.astro';
 import { CorridorsDashboard } from '../components/corridors/CorridorsDashboard';
 import corridorsJson from '../../../data/processed/corridors.json';
-import plantsJson from '../../../data/processed/biomethane_plants.json';
-import type { BiomethanePlantsCatalog, CorridorsCatalog } from '../lib/types/catalogs';
+import stationsJson from '../../../data/processed/corridor_fuel_stations.json';
+import brazilStatesGeoJson from '../../../data/processed/brazil_states.geo.json';
+import type {
+  CorridorFuelStationsCatalog,
+  CorridorsCatalog,
+} from '../lib/types/catalogs';
 
 const corridorsData = corridorsJson as unknown as CorridorsCatalog;
-const biomethanePlantsData = plantsJson as unknown as BiomethanePlantsCatalog;
+const stationsData = stationsJson as unknown as CorridorFuelStationsCatalog;
 
 const baseUrl = import.meta.env.BASE_URL.endsWith('/')
   ? import.meta.env.BASE_URL
@@ -15,7 +19,7 @@ const baseUrl = import.meta.env.BASE_URL.endsWith('/')
 
 <Layout
   title="Corredores Logísticos & Infraestrutura — Rota Energética"
-  description="Modelagem territorial de corredores rodoviários de carga, disponibilidade de gás e biometano, recarga rápida e viabilidade física pela Lei da Balança."
+  description="Modelagem territorial de corredores rodoviários de carga, mapa interativo de postos de biometano/GNV e eletropostos HPC com anéis de autonomia e Lei da Balança."
 >
   <div class="space-y-6">
     <!-- Breadcrumbs & Page Header -->
@@ -30,11 +34,16 @@ const baseUrl = import.meta.env.BASE_URL.endsWith('/')
         Corredores Estratégicos & Prontidão de Abastecimento
       </h1>
       <p class="mt-1 text-sm sm:text-base text-base-content/75 max-w-3xl">
-        Diagnóstico operacional de rotas de escoamento de safra e carga geral no Brasil. Compare a maturidade de postos de biometano/GNC, eletropostos HPC (&gt;150kW) e o impacto de peso da bateria na carga líquida útil.
+        Diagnóstico operacional e territorial das rotas de carga no Brasil. Compare a cobertura de postos de GNV/biometano e eletropostos HPC (&gt;150 kW) com anéis dinâmicos de autonomia e o impacto da bateria na Lei da Balança.
       </p>
     </div>
 
-    <!-- Interactive Corridors & Plants Dashboard -->
-    <CorridorsDashboard client:load corridorsData={corridorsData} biomethanePlantsData={biomethanePlantsData} />
+    <!-- Interactive Corridors & Infrastructure Map Dashboard -->
+    <CorridorsDashboard
+      client:load
+      corridorsData={corridorsData}
+      stationsData={stationsData}
+      brazilGeoJson={brazilStatesGeoJson}
+    />
   </div>
 </Layout>
