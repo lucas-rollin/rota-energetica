@@ -21,6 +21,7 @@ export interface GeneralParameters {
   diesel_fossil_carbon_intensity: ParameterItem;
   biodiesel_carbon_intensity: ParameterItem;
   arla_price: ParameterItem;
+  cbio_price?: ParameterItem;
 }
 
 export interface VehicleParameters {
@@ -34,6 +35,7 @@ export interface VehicleParameters {
   residual_value_ratio: ParameterItem;
   charging_efficiency?: ParameterItem;
   arla_consumption_ratio?: ParameterItem;
+  payload_penalty_kg?: ParameterItem;
 }
 
 export interface SimulationParameters {

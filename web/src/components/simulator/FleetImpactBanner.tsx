@@ -1,0 +1,151 @@
+import React, { useMemo } from 'react';
+import type { AlternativeId, SimulationParameters } from '../../lib/types/parameters';
+import type { SimulationResults } from '../../lib/types/scenario';
+import { formatCurrency, formatNumber } from '../../lib/utils/format';
+
+interface FleetImpactBannerProps {
+  results: SimulationResults;
+  params: SimulationParameters;
+  fleetSize: number;
+}
+
+export const FleetImpactBanner: React.FC<FleetImpactBannerProps> = ({
+  results,
+  params,
+  fleetSize,
+}) => {
+  const horizonYears = Math.round(params.general.horizon_years.value);
+  const dieselRes = results.diesel;
+
+  // Find the alternative with maximum cumulative TCO savings vs Diesel
+  const { bestAlt, maxSavings, co2AbatedTon, annualOpexSavings } = useMemo(() => {
+    if (!dieselRes) {
+      return {
+        bestAlt: null,
+        maxSavings: 0,
+        co2AbatedTon: 0,
+        annualOpexSavings: 0,
+      };
+    }
+
+    const alts: AlternativeId[] = ['biometano', 'eletrico', 'gnv'];
+    let best: { id: AlternativeId; name: string } | null = null;
+    let maxDiff = 0;
+    let co2Abated = 0;
+    let opexSavings = 0;
+
+    for (const alt of alts) {
+      const res = results[alt];
+      if (!res) continue;
+
+      const tcoDiff = (dieselRes.tco - res.tco) * fleetSize;
+      if (tcoDiff > maxDiff) {
+        maxDiff = tcoDiff;
+        best = { id: alt, name: res.label };
+        co2Abated =
+          (dieselRes.annualEmissionsTon - res.annualEmissionsTon) *
+          horizonYears *
+          fleetSize;
+        opexSavings =
+          (dieselRes.annualOperationalCost - res.annualOperationalCost) * fleetSize;
+      }
+    }
+
+    return {
+      bestAlt: best,
+      maxSavings: maxDiff,
+      co2AbatedTon: co2Abated,
+      annualOpexSavings: opexSavings,
+    };
+  }, [results, dieselRes, fleetSize, horizonYears]);
+
+  if (!bestAlt || maxSavings <= 0) {
+    return (
+      <div className="card bg-base-100 border-base-200 rounded-2xl border p-4 shadow-sm sm:p-5">
+        <div className="flex items-center gap-3">
+          <div className="bg-primary/10 text-primary flex h-10 w-10 shrink-0 items-center justify-center rounded-xl">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              className="h-5 w-5"
+              aria-hidden="true"
+            >
+              <path d="M3.375 4.5C2.339 4.5 1.5 5.34 1.5 6.375V13.5h12V6.375c0-1.036-.84-1.875-1.875-1.875h-8.25ZM13.5 15h-12v2.625c0 1.035.84 1.875 1.875 1.875h.375a3 3 0 1 1 6 0h3a.75.75 0 0 0 .75-.75V15Zm1.5-6.75V15h4.125a.75.75 0 0 0 .75-.75v-3.75a2.25 2.25 0 0 0-2.25-2.25H15Zm0 7.5v2.25a.75.75 0 0 0 .75.75h.375a3 3 0 1 0 6 0H22.5a.75.75 0 0 0 .75-.75V12.75a3.75 3.75 0 0 0-3.75-3.75H15v6.75Z" />
+            </svg>
+          </div>
+          <div>
+            <h3 className="text-base-content text-sm font-bold sm:text-base">
+              Configuração de Frota: {fleetSize}{' '}
+              {fleetSize === 1 ? 'caminhão' : 'caminhões'} em {horizonYears} anos
+            </h3>
+            <p className="text-base-content/70 text-xs">
+              Ajuste as premissas no painel ao lado para simular o ponto de virada
+              econômica das tecnologias alternativas.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="via-base-100 to-base-100 relative overflow-hidden rounded-2xl border border-emerald-500/30 bg-gradient-to-br from-emerald-950/20 p-4 shadow-sm sm:p-6 dark:from-emerald-950/40">
+      <div className="relative z-10 flex flex-col justify-between gap-4 lg:flex-row lg:items-center">
+        <div>
+          <div className="flex items-center gap-2">
+            <span className="badge badge-sm badge-success font-mono text-[10px] font-bold tracking-wider uppercase">
+              Economia Consolidada da Frota
+            </span>
+            <span className="text-base-content/60 text-xs">
+              {fleetSize} {fleetSize === 1 ? 'caminhão' : 'caminhões'} · {horizonYears}{' '}
+              anos
+            </span>
+          </div>
+
+          <div className="mt-2 flex flex-wrap items-baseline gap-2">
+            <span className="font-mono text-2xl font-black tracking-tight text-emerald-600 sm:text-3xl dark:text-emerald-400">
+              {formatCurrency(maxSavings, 0)}
+            </span>
+            <span className="text-base-content/80 text-xs font-semibold sm:text-sm">
+              de economia estimada com{' '}
+              <strong className="text-base-content">{bestAlt.name}</strong>
+            </span>
+          </div>
+
+          <p className="text-base-content/70 mt-1 max-w-2xl text-xs">
+            Frente à linha de base do Diesel B15, considerando a redução acumulada de
+            despesas com combustível e manutenção trazidas a valor presente.
+          </p>
+        </div>
+
+        {/* Aggregate KPI Badges */}
+        <div className="flex shrink-0 flex-wrap gap-2.5 sm:gap-3">
+          <div className="bg-base-200/70 border-base-300/80 rounded-xl border px-3 py-2 text-center">
+            <span className="text-base-content/60 block text-[10px] font-semibold tracking-wider uppercase">
+              Abatimento CO₂
+            </span>
+            <span className="font-mono text-sm font-bold text-emerald-600 sm:text-base dark:text-emerald-400">
+              {formatNumber(co2AbatedTon, 0)} t
+            </span>
+            <span className="text-base-content/50 block text-[10px]">
+              Poço à Roda (WtW)
+            </span>
+          </div>
+
+          <div className="bg-base-200/70 border-base-300/80 rounded-xl border px-3 py-2 text-center">
+            <span className="text-base-content/60 block text-[10px] font-semibold tracking-wider uppercase">
+              Economia OPEX
+            </span>
+            <span className="text-base-content font-mono text-sm font-bold sm:text-base">
+              {formatCurrency(annualOpexSavings, 0)}
+            </span>
+            <span className="text-base-content/50 block text-[10px]">
+              por ano de operação
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};

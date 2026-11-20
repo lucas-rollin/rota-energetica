@@ -6,7 +6,7 @@ import type {
 import type { MetricComparison, SimulationResults } from '../types/scenario';
 import { calculateOperationalCost } from './cost';
 import { calculateEmissions } from './emissions';
-import { calculateTco } from './tco';
+import { calculateAnnuityDiscountFactor, calculateTco } from './tco';
 
 export const ALTERNATIVE_IDS: AlternativeId[] = [
   'diesel',
@@ -81,6 +81,9 @@ export function validateSimulationParameters(params: SimulationParameters): void
     g.biodiesel_carbon_intensity.max
   );
   validateBounds('arla_price', g.arla_price.value, g.arla_price.min, g.arla_price.max);
+  if (g.cbio_price) {
+    validateBounds('cbio_price', g.cbio_price.value, g.cbio_price.min, g.cbio_price.max);
+  }
 
   for (const alt of ALTERNATIVE_IDS) {
     const v = params.vehicles[alt];
@@ -146,6 +149,14 @@ export function validateSimulationParameters(params: SimulationParameters): void
         v.arla_consumption_ratio.value,
         v.arla_consumption_ratio.min,
         v.arla_consumption_ratio.max
+      );
+    }
+    if (v.payload_penalty_kg) {
+      validateBounds(
+        `${alt}.payload_penalty_kg`,
+        v.payload_penalty_kg.value,
+        v.payload_penalty_kg.min,
+        v.payload_penalty_kg.max
       );
     }
   }
@@ -236,12 +247,31 @@ export function simulate(params: SimulationParameters): SimulationResults {
     };
   }
 
-  // 4. Calculate comparative deltas against Diesel B baseline
+  // 4. Calculate comparative deltas against Diesel B baseline & CBIO monetization
   const results = rawResults as SimulationResults;
   const dieselBase = results.diesel;
+  const cbioPrice = g.cbio_price?.value ?? 102.0;
+  const annuityFactor = calculateAnnuityDiscountFactor(discountRate, horizonYears);
 
   for (const alt of ALTERNATIVE_IDS) {
     const r = results[alt];
+    const v = params.vehicles[alt];
+    const avoidedTons = Math.max(0, dieselBase.annualEmissionsTon - r.annualEmissionsTon);
+    const annualCbioGenerated = alt === 'diesel' ? 0 : avoidedTons;
+    const annualCbioRevenue = annualCbioGenerated * cbioPrice;
+    const pvCbioRevenue = annualCbioRevenue * annuityFactor;
+    const netTco = r.tco - pvCbioRevenue;
+    const cbioCreditPerKm = annualDistanceKm > 0 ? annualCbioRevenue / annualDistanceKm : 0;
+    const netLevelizedCostPerKm =
+      r.levelizedKm > 0 ? netTco / r.levelizedKm : r.levelizedCostPerKm;
+
+    r.annualCbioGenerated = annualCbioGenerated;
+    r.annualCbioRevenue = annualCbioRevenue;
+    r.cbioCreditPerKm = cbioCreditPerKm;
+    r.netLevelizedCostPerKm = netLevelizedCostPerKm;
+    r.netTco = netTco;
+    r.payloadPenaltyKg = v.payload_penalty_kg?.value ?? 0;
+
     r.deltas = {
       operationalCostPerKm: calculateDelta(
         r.operationalCostPerKm,

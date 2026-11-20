@@ -187,5 +187,28 @@ describe('Calculator Engine Unit Tests', () => {
 
       expect(() => simulate(invalidParams)).toThrow(/is above maximum allowed bound/);
     });
+
+    it('calculates CBIO monetization and reflects payload penalties', () => {
+      const res = simulate(defaultParams);
+
+      // Diesel generates zero CBIOs
+      expect(res.diesel.annualCbioGenerated).toBe(0);
+      expect(res.diesel.annualCbioRevenue).toBe(0);
+      expect(res.diesel.netTco).toBeCloseTo(res.diesel.tco, 4);
+      expect(res.diesel.payloadPenaltyKg).toBe(0);
+
+      // Biomethane avoids significant CO2 and generates positive CBIO revenue
+      expect(res.biometano.annualCbioGenerated).toBeGreaterThan(0);
+      expect(res.biometano.annualCbioRevenue).toBeGreaterThan(0);
+      expect(res.biometano.netTco).toBeLessThan(res.biometano.tco);
+      expect(res.biometano.netLevelizedCostPerKm).toBeLessThan(
+        res.biometano.levelizedCostPerKm
+      );
+      expect(res.biometano.payloadPenaltyKg).toBe(-280);
+
+      // Electric has tare battery penalty
+      expect(res.eletrico.payloadPenaltyKg).toBe(-2400);
+      expect(res.eletrico.annualCbioGenerated).toBeGreaterThan(0);
+    });
   });
 });

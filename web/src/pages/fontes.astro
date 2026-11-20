@@ -1,0 +1,480 @@
+---
+import Layout from '../layouts/Layout.astro';
+import parametersJson from '../../../data/parameters.json';
+import sourcesJson from '../../../data/sources.json';
+import type { ParameterItem, SimulationParameters } from '../lib/types/parameters';
+import type { SourcesData } from '../lib/types/sources';
+
+const paramsData = parametersJson as unknown as SimulationParameters;
+const sourcesData = sourcesJson as unknown as SourcesData;
+
+const sources = sourcesData.sources;
+
+// Flatten parameters for the reference table
+interface FlattenedParam {
+  group: string;
+  key: string;
+  name: string;
+  item: ParameterItem;
+}
+
+const paramRows: FlattenedParam[] = [];
+
+// General params
+const generalLabels: Record<string, string> = {
+  annual_distance_km: 'Distância anual percorrida',
+  horizon_years: 'Horizonte de análise econômica',
+  discount_rate: 'Taxa de desconto anual',
+  biodiesel_blend: 'Teor de biodiesel no diesel (mandato)',
+  diesel_fossil_carbon_intensity: 'Intensidade de carbono: diesel fóssil',
+  biodiesel_carbon_intensity: 'Intensidade de carbono: biodiesel',
+  arla_price: 'Preço do agente redutor (ARLA 32)',
+};
+
+for (const [key, item] of Object.entries(paramsData.general)) {
+  paramRows.push({
+    group: 'Geral / Operação',
+    key,
+    name: generalLabels[key] || key,
+    item: item as ParameterItem,
+  });
+}
+
+// Vehicle params
+const vehicleLabels: Record<string, string> = {
+  diesel: 'Diesel B15',
+  gnv: 'GNV',
+  biometano: 'Biometano',
+  eletrico: 'Elétrico',
+};
+
+const vehicleFieldLabels: Record<string, string> = {
+  vehicle_purchase_price: 'Preço de aquisição',
+  energy_price: 'Preço da energia / combustível',
+  consumption: 'Consumo específico',
+  energy_density: 'Densidade energética (PCI)',
+  carbon_intensity: 'Intensidade de carbono (WtW)',
+  maintenance_cost_per_km: 'Custo de manutenção e pneus',
+  residual_value_ratio: 'Fração de valor residual',
+  charging_efficiency: 'Eficiência de recarga (rede-bateria)',
+  arla_consumption_ratio: 'Consumo de ARLA 32 (% diesel)',
+};
+
+for (const [altId, vehicle] of Object.entries(paramsData.vehicles)) {
+  for (const [fieldKey, fieldVal] of Object.entries(vehicle)) {
+    if (fieldKey === 'label') continue;
+    paramRows.push({
+      group: vehicleLabels[altId] || altId,
+      key: `${altId}.${fieldKey}`,
+      name: vehicleFieldLabels[fieldKey] || fieldKey,
+      item: fieldVal as ParameterItem,
+    });
+  }
+}
+---
+
+<Layout
+  title="Fontes, Metadados e Licenças — Rota Energética"
+  description="Registro de proveniência, termos de uso, atribuições oficiais e transparência de dados do simulador Rota Energética."
+>
+  <div class="space-y-8 max-w-5xl mx-auto py-2">
+    <!-- Header -->
+    <div class="border-b border-base-200 pb-4">
+      <div class="breadcrumbs text-xs text-base-content/60 mb-2">
+        <ul>
+          <li>
+            <a
+              href={
+                Astro.url.pathname.includes('/rota-energetica')
+                  ? '/rota-energetica/'
+                  : '/'
+              }
+            >
+              Início
+            </a>
+          </li>
+          <li>Fontes e Licenças</li>
+        </ul>
+      </div>
+      <h1 class="text-3xl font-extrabold text-base-content tracking-tight">
+        Fontes de Dados, Proveniência e Licenças
+      </h1>
+      <p class="mt-2 text-base text-base-content/80 leading-relaxed">
+        Conforme definido no documento de governança{' '}
+        <a
+          href="https://github.com/lucas-rollin/rota-energetica/blob/main/LICENSE-DATA.md"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="link link-primary font-semibold"
+        >
+          LICENSE-DATA.md §4
+        </a>
+        , todos os parâmetros utilizados no modelo são explicitamente atribuídos aos seus
+        órgãos de origem, com transparência sobre metodologia, qualidade do dado e
+        licenças de reuso.
+      </p>
+    </div>
+
+    <!-- Governance Alert -->
+    <div class="bg-base-100 border border-base-200 rounded-2xl p-5 shadow-xs flex flex-col sm:flex-row gap-4 items-start">
+      <div class="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold text-lg shrink-0">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="w-5 h-5"
+          aria-hidden="true"
+        >
+          <path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z" />
+          <path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z" />
+          <path d="M7 21h10" />
+          <path d="M12 3v18" />
+          <path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2" />
+        </svg>
+      </div>
+      <div class="text-sm space-y-1.5">
+        <h2 class="font-bold text-base text-base-content">
+          Regra de Não-Relicenciamento e Proteção de Dados
+        </h2>
+        <p class="text-base-content/75 leading-relaxed">
+          Os dados primários de terceiros não são relicenciados sob a licença de software
+          (MIT) e mantêm os termos de seus publicadores originais. O projeto não publica
+          registros brutos ou dados individualizados por postos ou estabelecimentos,
+          apenas séries agregadas em nível estadual e nacional.
+        </p>
+        <p class="pt-1">
+          <a
+            href="https://github.com/lucas-rollin/rota-energetica/blob/main/LICENSE-DATA.md"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="link link-primary text-xs font-semibold inline-flex items-center gap-1"
+          >
+            Consultar documento integral de governança de dados (LICENSE-DATA.md)
+            <span aria-hidden="true">↗</span>
+          </a>
+        </p>
+      </div>
+    </div>
+
+    <!-- Selos de Qualidade -->
+    <section
+      aria-labelledby="badges-heading"
+      class="bg-base-100 border border-base-200 rounded-2xl p-5 shadow-xs"
+    >
+      <h2 id="badges-heading" class="text-lg font-bold text-base-content mb-3">
+        Classificação de Qualidade dos Parâmetros
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div class="p-3.5 rounded-xl border border-success/30 bg-success/5">
+          <div class="flex items-center gap-2 mb-1.5">
+            <span class="badge badge-success text-white text-xs font-bold">Primária</span>
+          </div>
+          <p class="text-xs text-base-content/80 leading-relaxed">
+            Dados derivados diretamente de órgãos oficiais reguladores ou leis vigentes
+            (ex.: levantamentos de preços da ANP, mandatos do CNPE).
+          </p>
+        </div>
+        <div class="p-3.5 rounded-xl border border-info/30 bg-info/5">
+          <div class="flex items-center gap-2 mb-1.5">
+            <span class="badge badge-info text-white text-xs font-bold">Adaptada</span>
+          </div>
+          <p class="text-xs text-base-content/80 leading-relaxed">
+            Dados de fontes consolidadas do setor (ex.: CNT, ANTT, RenovaBio) adaptados ou
+            ajustados metodologicamente para a operação em SC.
+          </p>
+        </div>
+        <div class="p-3.5 rounded-xl border border-base-300 bg-base-200/50">
+          <div class="flex items-center gap-2 mb-1.5">
+            <span class="badge badge-ghost text-base-content/70 text-xs font-bold">
+              Ilustrativa
+            </span>
+          </div>
+          <p class="text-xs text-base-content/80 leading-relaxed">
+            Hipóteses de trabalho de mercado ou especificações indicativas com maior
+            volatilidade, abertas à calibração pelo usuário nos sliders.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Transparência e Limitações Metodológicas (§10 da Metodologia) -->
+    <section
+      aria-labelledby="transparency-heading"
+      class="bg-base-100 border border-base-200 rounded-2xl p-5 shadow-xs space-y-3"
+    >
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+            class="w-4 h-4"
+            aria-hidden="true"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495ZM10 5a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 10 5Zm0 9a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z"
+              clip-rule="evenodd"
+            />
+          </svg>
+        </div>
+        <div>
+          <h2 id="transparency-heading" class="text-base font-bold text-base-content">
+            Transparência e Limitações Metodológicas (§10)
+          </h2>
+          <p class="text-xs text-base-content/70">
+            Fronteiras e premissas fundamentais para interpretação dos resultados do
+            simulador.
+          </p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs pt-1">
+        <div class="p-3 rounded-xl bg-base-200/40 border border-base-200">
+          <span class="font-bold text-base-content block mb-0.5">
+            1. Finalidade Educacional
+          </span>
+          <p class="text-base-content/75 leading-relaxed">
+            Estimativas comparativas para fins acadêmicos. Não constituem recomendação de
+            investimento ou projeto de engenharia.
+          </p>
+        </div>
+
+        <div class="p-3 rounded-xl bg-base-200/40 border border-base-200">
+          <span class="font-bold text-base-content block mb-0.5">
+            2. Preços Públicos de Referência
+          </span>
+          <p class="text-base-content/75 leading-relaxed">
+            Baseados em pesquisas oficiais (ANP, ANEEL), podendo divergir de contratos
+            atacadistas e créditos tributários de frotistas.
+          </p>
+        </div>
+
+        <div class="p-3 rounded-xl bg-base-200/40 border border-base-200">
+          <span class="font-bold text-base-content block mb-0.5">
+            3. Premissas Editáveis
+          </span>
+          <p class="text-base-content/75 leading-relaxed">
+            Valores com selo "Ilustrativa" representam hipóteses de trabalho abertas à
+            calibração pelo usuário.
+          </p>
+        </div>
+
+        <div class="p-3 rounded-xl bg-base-200/40 border border-base-200">
+          <span class="font-bold text-base-content block mb-0.5">
+            4. Não-Isolamento Tecnológico
+          </span>
+          <p class="text-base-content/75 leading-relaxed">
+            Comparam-se veículos comerciais reais (Scania, Sany) que possuem massas e
+            capacidades de carga distintas.
+          </p>
+        </div>
+
+        <div class="p-3 rounded-xl bg-base-200/40 border border-base-200">
+          <span class="font-bold text-base-content block mb-0.5">
+            5. Fronteira do TCO (MVP)
+          </span>
+          <p class="text-base-content/75 leading-relaxed">
+            Não inclui infraestrutura própria de eletroposto/gás, custos de financiamento,
+            seguros e impostos sobre propriedade.
+          </p>
+        </div>
+
+        <div class="p-3 rounded-xl bg-base-200/40 border border-base-200">
+          <span class="font-bold text-base-content block mb-0.5">
+            6. Emissões Poço à Roda (WtW)
+          </span>
+          <p class="text-base-content/75 leading-relaxed">
+            Calculadas no ciclo de vida Well-to-Wheel pelos fatores regulatórios médios
+            (RenovaBio, MCTI e EPE).
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tabela de Parâmetros e Fontes -->
+    <section aria-labelledby="params-heading" class="space-y-3">
+      <div>
+        <h2 id="params-heading" class="text-xl font-bold text-base-content">
+          Tabela de Parâmetros e Proveniência
+        </h2>
+        <p class="text-xs text-base-content/70">
+          Relação de todas as premissas numéricas com identificador de fonte, selo e
+          unidade.
+        </p>
+      </div>
+
+      <div class="overflow-x-auto rounded-2xl border border-base-200 bg-base-100 shadow-xs">
+        <table class="table table-sm table-zebra w-full text-xs">
+          <thead>
+            <tr class="bg-base-200 text-base-content">
+              <th>Grupo / Powertrain</th>
+              <th>Parâmetro</th>
+              <th class="text-right">Valor Padrão</th>
+              <th>Unidade</th>
+              <th>Selo</th>
+              <th>ID da Fonte</th>
+            </tr>
+          </thead>
+          <tbody>
+            {paramRows.map((row) => {
+              const badgeClass =
+                row.item.badge === 'Primária'
+                  ? 'badge-success text-white'
+                  : row.item.badge === 'Adaptada'
+                    ? 'badge-info text-white'
+                    : 'badge-ghost';
+              return (
+                <tr class="hover:bg-base-200/50">
+                  <td class="font-medium text-base-content/80 whitespace-nowrap">
+                    {row.group}
+                  </td>
+                  <td class="font-semibold text-base-content">
+                    <div>{row.name}</div>
+                    {row.item.notes && (
+                      <div class="text-[10px] text-base-content/60 font-normal leading-tight mt-0.5">
+                        {row.item.notes}
+                      </div>
+                    )}
+                  </td>
+                  <td class="text-right font-mono font-bold whitespace-nowrap">
+                    {row.item.value}
+                  </td>
+                  <td class="font-mono text-base-content/70 whitespace-nowrap">
+                    {row.item.unit}
+                  </td>
+                  <td>
+                    <span class={`badge badge-xs font-medium ${badgeClass}`}>
+                      {row.item.badge}
+                    </span>
+                  </td>
+                  <td>
+                    <a
+                      href={`#source-${row.item.source_id}`}
+                      class="badge badge-sm badge-outline badge-primary font-mono text-[10px] hover:bg-primary hover:text-primary-content transition-colors"
+                    >
+                      {row.item.source_id}
+                    </a>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Catálogo de Fontes de Dados -->
+    <section aria-labelledby="sources-heading" class="space-y-4 pt-4">
+      <div class="border-b border-base-200 pb-2">
+        <h2 id="sources-heading" class="text-xl font-bold text-base-content">
+          Catálogo Completo de Fontes Cadastradas ({sources.length})
+        </h2>
+        <p class="text-xs text-base-content/70">
+          Metadados completos, termos de licença, descrição e texto formal de atribuição
+          de cada base utilizada.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {sources.map((src) => {
+          const badgeClass =
+            src.badge === 'Primária'
+              ? 'badge-success text-white'
+              : src.badge === 'Adaptada'
+                ? 'badge-info text-white'
+                : 'badge-ghost';
+
+          return (
+            <div
+              id={`source-${src.id}`}
+              class="card bg-base-100 border border-base-200 shadow-xs rounded-2xl p-5 hover:border-primary/40 transition-colors"
+            >
+              <div class="flex items-start justify-between gap-2 border-b border-base-200 pb-3 mb-3">
+                <div>
+                  <div class="flex items-center gap-2 mb-1">
+                    <span class="font-mono text-xs px-2 py-0.5 rounded bg-base-200 font-bold text-base-content/80">
+                      {src.id}
+                    </span>
+                    <span class={`badge badge-xs font-medium ${badgeClass}`}>
+                      {src.badge}
+                    </span>
+                    <span class="text-[11px] text-base-content/60 font-medium">
+                      Categoria {src.category}
+                    </span>
+                  </div>
+                  <h3 class="font-bold text-base text-base-content leading-snug">
+                    {src.name}
+                  </h3>
+                  <p class="text-xs text-primary font-semibold mt-0.5">{src.publisher}</p>
+                </div>
+              </div>
+
+              <div class="space-y-3 text-xs flex-1">
+                <p class="text-base-content/80 leading-relaxed">{src.description}</p>
+
+                {src.notes && (
+                  <div class="p-2.5 bg-base-200/50 rounded-lg border border-base-200">
+                    <span class="font-bold block text-[10px] uppercase tracking-wider text-base-content/60 mb-0.5">
+                      Notas
+                    </span>
+                    <p class="text-base-content/70 text-[11px] leading-relaxed">
+                      {src.notes}
+                    </p>
+                  </div>
+                )}
+
+                {src.attribution && (
+                  <div class="pt-1">
+                    <span class="font-bold block text-[10px] uppercase tracking-wider text-base-content/60 mb-1">
+                      Atribuição Requerida
+                    </span>
+                    <blockquote class="border-l-2 border-primary pl-2.5 py-1 text-[11px] italic text-base-content/90 bg-primary/5 font-mono rounded-r">
+                      {src.attribution}
+                    </blockquote>
+                  </div>
+                )}
+
+                <div class="pt-2 border-t border-base-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <span class="text-[11px] text-base-content/70">
+                    Termos: <strong class="text-base-content">{src.terms}</strong>
+                    {src.terms_url && (
+                      <a
+                        href={src.terms_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="link link-primary ml-1"
+                      >
+                        (termos ↗)
+                      </a>
+                    )}
+                  </span>
+
+                  {src.url ? (
+                    <a
+                      href={src.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="btn btn-xs btn-outline btn-primary shrink-0 inline-flex items-center gap-1"
+                    >
+                      Visitar Fonte
+                      <span aria-hidden="true">↗</span>
+                    </a>
+                  ) : (
+                    <span class="text-[11px] text-base-content/50 italic">
+                      Link direto não disponível
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  </div>
+</Layout>

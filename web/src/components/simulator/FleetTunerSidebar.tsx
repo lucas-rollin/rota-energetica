@@ -1,0 +1,403 @@
+import React, { useState } from 'react';
+import type {
+  AlternativeId,
+  GeneralParameters,
+  SimulationParameters,
+  VehicleParameters,
+} from '../../lib/types/parameters';
+
+interface FleetTunerSidebarProps {
+  params: SimulationParameters;
+  fleetSize: number;
+  onFleetSizeChange: (size: number) => void;
+  onGeneralChange: <K extends keyof GeneralParameters>(key: K, value: number) => void;
+  onVehicleChange: <K extends keyof VehicleParameters>(
+    alt: AlternativeId,
+    key: K,
+    value: number
+  ) => void;
+  onResetAll: () => void;
+  alteredCount: number;
+  onOpenSource: (sourceId: string, paramLabel: string) => void;
+}
+
+export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
+  params,
+  fleetSize,
+  onFleetSizeChange,
+  onGeneralChange,
+  onVehicleChange,
+  onResetAll,
+  alteredCount,
+  onOpenSource,
+}) => {
+  const [showVehicleDetails, setShowVehicleDetails] = useState(false);
+  const [selectedAltTab, setSelectedAltTab] = useState<AlternativeId>('eletrico');
+
+  const horizonYears = Math.round(params.general.horizon_years.value);
+  const annualDistance = params.general.annual_distance_km.value;
+  const discountRate = params.general.discount_rate.value;
+
+  const fuels: {
+    alt: AlternativeId;
+    label: string;
+    unit: string;
+    dotColor: string;
+    sourceId: string;
+    step: number;
+  }[] = [
+    {
+      alt: 'diesel',
+      label: 'Diesel B15',
+      unit: 'R$/L',
+      dotColor: 'bg-slate-400',
+      sourceId: params.vehicles.diesel.energy_price.source_id,
+      step: 0.05,
+    },
+    {
+      alt: 'biometano',
+      label: 'Biometano',
+      unit: 'R$/m³',
+      dotColor: 'bg-emerald-500',
+      sourceId: params.vehicles.biometano.energy_price.source_id,
+      step: 0.05,
+    },
+    {
+      alt: 'eletrico',
+      label: 'Energia Elétrica',
+      unit: 'R$/kWh',
+      dotColor: 'bg-purple-500',
+      sourceId: params.vehicles.eletrico.energy_price.source_id,
+      step: 0.02,
+    },
+    {
+      alt: 'gnv',
+      label: 'GNV',
+      unit: 'R$/m³',
+      dotColor: 'bg-amber-500',
+      sourceId: params.vehicles.gnv.energy_price.source_id,
+      step: 0.05,
+    },
+  ];
+
+  return (
+    <aside
+      aria-label="Painel de controle e ajuste de parâmetros da frota"
+      className="card bg-base-100 border-base-200 overflow-hidden rounded-2xl border shadow-sm"
+    >
+      {/* Sidebar Header */}
+      <div className="border-base-200 bg-base-200/30 flex items-center justify-between border-b px-4 py-3">
+        <div className="flex items-center gap-2">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+            className="text-primary h-4 w-4 shrink-0"
+            aria-hidden="true"
+          >
+            <path
+              fillRule="evenodd"
+              d="M7.84 1.804A1 1 0 0 1 8.82 1h2.36a1 1 0 0 1 .98.804l.331 1.652a6.993 6.993 0 0 1 1.929 1.115l1.598-.54a1 1 0 0 1 1.186.447l1.18 2.044a1 1 0 0 1-.205 1.251l-1.267 1.113a7.047 7.047 0 0 1 0 2.228l1.267 1.113a1 1 0 0 1 .206 1.25l-1.18 2.045a1 1 0 0 1-1.187.447l-1.598-.54a6.993 6.993 0 0 1-1.929 1.115l-.33 1.652a1 1 0 0 1-.98.804H8.82a1 1 0 0 1-.98-.804l-.331-1.652a6.993 6.993 0 0 1-1.929-1.115l-1.598.54a1 1 0 0 1-1.186-.447l-1.18-2.044a1 1 0 0 1 .205-1.251l1.267-1.114a7.05 7.05 0 0 1 0-2.227L1.821 7.773a1 1 0 0 1-.206-1.25l1.18-2.045a1 1 0 0 1 1.187-.447l1.598.54A6.993 6.993 0 0 1 7.51 3.456l.33-1.652ZM10 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"
+              clipRule="evenodd"
+            />
+          </svg>
+          <h2 className="text-base-content text-sm font-bold sm:text-base">
+            Parâmetros da Frota
+          </h2>
+        </div>
+
+        <button
+          type="button"
+          onClick={onResetAll}
+          disabled={alteredCount === 0 && fleetSize === 1}
+          aria-label="Restaurar parâmetros para os padrões originais"
+          className="btn btn-ghost btn-xs text-base-content/70 hover:text-base-content text-[11px]"
+        >
+          ↺ Padrão
+        </button>
+      </div>
+
+      <div className="space-y-4 p-4 text-xs">
+        {/* 1. Fleet Size Controller */}
+        <div className="bg-base-200/40 border-base-200 rounded-xl border p-3">
+          <div className="mb-1.5 flex items-center justify-between">
+            <label
+              htmlFor="tuner-fleet-size"
+              className="text-base-content text-xs font-semibold"
+            >
+              Tamanho da Frota
+            </label>
+            <div className="bg-base-100 border-base-300 flex items-center gap-1 rounded border px-2 py-0.5">
+              <input
+                id="tuner-fleet-size"
+                type="number"
+                min="1"
+                max="300"
+                value={fleetSize}
+                onChange={(e) => {
+                  const val = parseInt(e.target.value, 10);
+                  onFleetSizeChange(isNaN(val) || val < 1 ? 1 : val);
+                }}
+                className="text-base-content w-10 bg-transparent text-right font-mono font-bold focus:outline-none"
+              />
+              <span className="text-base-content/60 text-[10px]">un</span>
+            </div>
+          </div>
+          <input
+            type="range"
+            min="1"
+            max="100"
+            value={fleetSize}
+            onChange={(e) => onFleetSizeChange(parseInt(e.target.value, 10))}
+            className="range range-primary range-xs w-full"
+            aria-label="Tamanho da frota em número de cavalos mecânicos"
+          />
+          <div className="text-base-content/50 mt-0.5 flex justify-between text-[10px]">
+            <span>1 un</span>
+            <span>Frota Dedicada</span>
+            <span>100+ un</span>
+          </div>
+        </div>
+
+        {/* 2. Annual Distance Controller */}
+        <div className="bg-base-200/40 border-base-200 rounded-xl border p-3">
+          <div className="mb-1.5 flex items-center justify-between">
+            <label
+              htmlFor="tuner-mileage"
+              className="text-base-content text-xs font-semibold"
+            >
+              Distância Anual
+            </label>
+            <div className="bg-base-100 border-base-300 flex items-center gap-1 rounded border px-2 py-0.5">
+              <input
+                id="tuner-mileage"
+                type="number"
+                min="20000"
+                max="220000"
+                step="5000"
+                value={annualDistance}
+                onChange={(e) => {
+                  const val = parseFloat(e.target.value);
+                  if (!isNaN(val) && val > 0) onGeneralChange('annual_distance_km', val);
+                }}
+                className="text-base-content w-16 bg-transparent text-right font-mono font-bold focus:outline-none"
+              />
+              <span className="text-base-content/60 text-[10px]">km</span>
+            </div>
+          </div>
+          <input
+            type="range"
+            min="30000"
+            max="180000"
+            step="5000"
+            value={annualDistance}
+            onChange={(e) =>
+              onGeneralChange('annual_distance_km', parseFloat(e.target.value))
+            }
+            className="range range-primary range-xs w-full"
+            aria-label="Quilometragem média anual por caminhão"
+          />
+          <div className="text-base-content/50 mt-0.5 flex justify-between text-[10px]">
+            <span>Regional (40k)</span>
+            <span>Média (100k)</span>
+            <span>Longo Curso (180k)</span>
+          </div>
+        </div>
+
+        {/* 3. Economic Horizon & Discount Rate */}
+        <div className="grid grid-cols-2 gap-2">
+          {/* Horizon Pills */}
+          <div className="bg-base-200/40 border-base-200 rounded-xl border p-2.5">
+            <span className="text-base-content/70 mb-1.5 block text-[10px] font-semibold">
+              Horizonte
+            </span>
+            <div className="flex gap-1">
+              {[5, 7, 10].map((h) => (
+                <button
+                  key={h}
+                  type="button"
+                  onClick={() => onGeneralChange('horizon_years', h)}
+                  className={`flex-1 rounded py-1 font-mono text-[11px] font-bold transition-colors ${
+                    horizonYears === h
+                      ? 'bg-primary text-primary-content shadow-xs'
+                      : 'bg-base-100 text-base-content/70 hover:bg-base-200'
+                  }`}
+                >
+                  {h}a
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Discount Rate */}
+          <div className="bg-base-200/40 border-base-200 flex flex-col justify-between rounded-xl border p-2.5">
+            <span className="text-base-content/70 mb-1 block text-[10px] font-semibold">
+              Taxa Desconto
+            </span>
+            <div className="bg-base-100 border-base-300 flex items-center justify-between rounded border px-2 py-1">
+              <input
+                type="number"
+                step="0.01"
+                min="0"
+                max="0.30"
+                value={discountRate}
+                onChange={(e) => {
+                  const val = parseFloat(e.target.value);
+                  if (!isNaN(val)) onGeneralChange('discount_rate', val);
+                }}
+                className="text-base-content w-12 bg-transparent text-right font-mono font-bold focus:outline-none"
+                aria-label="Taxa de desconto anual real"
+              />
+              <span className="text-base-content/60 text-[10px]">% a.a.</span>
+            </div>
+          </div>
+        </div>
+
+        {/* 4. Fuel & Energy Prices (Dense List) */}
+        <div className="border-base-200 space-y-2 border-t pt-3">
+          <div className="flex items-center justify-between">
+            <span className="text-base-content/60 text-[10px] font-bold tracking-wider uppercase">
+              Preços de Mercado (Bomba / Insumos)
+            </span>
+          </div>
+
+          <div className="space-y-1.5">
+            {fuels.map((fuel) => {
+              const currentVal = params.vehicles[fuel.alt].energy_price.value;
+              return (
+                <div
+                  key={fuel.alt}
+                  className="bg-base-200/40 hover:bg-base-200/70 border-base-200 flex items-center justify-between rounded-lg border p-2 transition-colors"
+                >
+                  <div className="flex items-center gap-2">
+                    <span className={`h-2 w-2 rounded-full ${fuel.dotColor}`}></span>
+                    <span className="text-base-content text-xs font-medium">
+                      {fuel.label}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => onOpenSource(fuel.sourceId, fuel.label)}
+                      className="text-primary font-mono text-[9px] hover:underline"
+                      title="Ver fonte oficial deste dado"
+                    >
+                      [{fuel.sourceId}]
+                    </button>
+                  </div>
+
+                  <div className="bg-base-100 border-base-300 flex items-center gap-1 rounded border px-1.5 py-0.5">
+                    <span className="text-base-content/50 font-mono text-[10px]">R$</span>
+                    <input
+                      type="number"
+                      step={fuel.step}
+                      min="0.1"
+                      value={currentVal}
+                      onChange={(e) => {
+                        const val = parseFloat(e.target.value);
+                        if (!isNaN(val) && val > 0) {
+                          onVehicleChange(fuel.alt, 'energy_price', val);
+                        }
+                      }}
+                      className="text-base-content w-12 bg-transparent text-right font-mono text-xs font-bold focus:outline-none"
+                      aria-label={`Preço do ${fuel.label}`}
+                    />
+                    <span className="text-base-content/60 font-mono text-[10px]">
+                      {fuel.unit.replace('R$', '')}
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* 5. Collapsible Truck Technical Details (CAPEX & Consumo) */}
+        <div className="border-base-200 border-t pt-2.5">
+          <button
+            type="button"
+            onClick={() => setShowVehicleDetails(!showVehicleDetails)}
+            className="text-base-content/70 hover:text-primary flex w-full items-center justify-between py-1 text-xs font-semibold transition-colors"
+            aria-expanded={showVehicleDetails}
+          >
+            <span>Preço do Caminhão (CAPEX) & Consumo</span>
+            <span className="font-mono text-[10px]">
+              {showVehicleDetails ? '▲ Fechar' : '▼ Ajustar'}
+            </span>
+          </button>
+
+          {showVehicleDetails && (
+            <div className="bg-base-200/30 border-base-200 mt-2.5 space-y-2.5 rounded-xl border p-2.5">
+              {/* Powertrain mini tabs */}
+              <div className="grid grid-cols-4 gap-1">
+                {(['diesel', 'biometano', 'eletrico', 'gnv'] as AlternativeId[]).map(
+                  (alt) => (
+                    <button
+                      key={alt}
+                      type="button"
+                      onClick={() => setSelectedAltTab(alt)}
+                      className={`rounded py-1 text-[10px] font-bold uppercase transition-colors ${
+                        selectedAltTab === alt
+                          ? 'bg-primary text-primary-content'
+                          : 'bg-base-100 text-base-content/70 hover:bg-base-200'
+                      }`}
+                    >
+                      {alt === 'eletrico' ? 'Elétr.' : alt === 'biometano' ? 'Bio' : alt}
+                    </button>
+                  )
+                )}
+              </div>
+
+              {/* Purchase price */}
+              <div className="flex items-center justify-between">
+                <span className="text-base-content/70 text-[11px]">Aquisição (R$):</span>
+                <input
+                  type="number"
+                  step="20000"
+                  value={params.vehicles[selectedAltTab].vehicle_purchase_price.value}
+                  onChange={(e) => {
+                    const val = parseFloat(e.target.value);
+                    if (!isNaN(val))
+                      onVehicleChange(selectedAltTab, 'vehicle_purchase_price', val);
+                  }}
+                  className="bg-base-100 text-base-content border-base-300 w-24 rounded border px-2 py-0.5 text-right font-mono text-xs font-bold focus:outline-none"
+                />
+              </div>
+
+              {/* Consumption */}
+              <div className="flex items-center justify-between">
+                <span className="text-base-content/70 text-[11px]">
+                  Consumo ({params.vehicles[selectedAltTab].consumption.unit}):
+                </span>
+                <input
+                  type="number"
+                  step="0.1"
+                  value={params.vehicles[selectedAltTab].consumption.value}
+                  onChange={(e) => {
+                    const val = parseFloat(e.target.value);
+                    if (!isNaN(val)) onVehicleChange(selectedAltTab, 'consumption', val);
+                  }}
+                  className="bg-base-100 text-base-content border-base-300 w-20 rounded border px-2 py-0.5 text-right font-mono text-xs font-bold focus:outline-none"
+                />
+              </div>
+
+              {/* Maintenance */}
+              <div className="flex items-center justify-between">
+                <span className="text-base-content/70 text-[11px]">Manut. (R$/km):</span>
+                <input
+                  type="number"
+                  step="0.05"
+                  value={params.vehicles[selectedAltTab].maintenance_cost_per_km.value}
+                  onChange={(e) => {
+                    const val = parseFloat(e.target.value);
+                    if (!isNaN(val))
+                      onVehicleChange(selectedAltTab, 'maintenance_cost_per_km', val);
+                  }}
+                  className="bg-base-100 text-base-content border-base-300 w-20 rounded border px-2 py-0.5 text-right font-mono text-xs font-bold focus:outline-none"
+                />
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </aside>
+  );
+};

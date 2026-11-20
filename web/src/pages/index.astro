@@ -1,12 +1,26 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import Simulator from '../components/simulator/Simulator';
+import parametersJson from '../../../data/parameters.json';
+import type { SimulationParameters } from '../lib/types';
+
+const defaults = parametersJson as unknown as SimulationParameters;
 ---
 
-<Layout>
-  <main class="max-w-4xl mx-auto px-4 py-12">
-    <h1 class="text-3xl font-bold tracking-tight">Rota Energética</h1>
-    <p class="mt-2 text-lg text-gray-600">
-      Simulador educacional de alternativas energéticas para frotas pesadas.
+<Layout
+  title="Rota Energética — Simulador Educacional de Transição em Frotas Pesadas"
+  description="Ferramenta interativa de cálculo de TCO e emissões para cavalos mecânicos rodoviários: Diesel B15, GNV, Biometano e Elétrico."
+>
+  <div class="mb-6">
+    <h1 class="text-2xl sm:text-3xl font-extrabold text-base-content tracking-tight">
+      Simulador de Custos e Emissões de Frotas Pesadas
+    </h1>
+    <p class="mt-1 text-sm sm:text-base text-base-content/75 max-w-3xl">
+      Compare o Custo Total de Propriedade (TCO), custos operacionais nivelados e emissões
+      de gases de efeito estufa (Poço à Roda) entre Diesel comercial, GNV, Biometano e
+      Tração Elétrica em Santa Catarina.
     </p>
-  </main>
+  </div>
+
+  <Simulator client:load defaults={defaults} />
 </Layout>

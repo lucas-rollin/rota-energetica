@@ -59,6 +59,19 @@ export interface ScenarioResult {
   /** Estimated operational driving range (km, or null when not modeled) */
   estimatedRangeKm: number | null;
 
+  /** Annual CBIOs generated (tCO₂eq avoided vs diesel baseline, 0 for diesel) */
+  annualCbioGenerated?: number;
+  /** Annual CBIO revenue (BRL/year = annualCbioGenerated × cbioPrice) */
+  annualCbioRevenue?: number;
+  /** Levelized CBIO credit per km (BRL/km) */
+  cbioCreditPerKm?: number;
+  /** Net levelized cost per kilometer accounting for CBIO monetization (BRL/km) */
+  netLevelizedCostPerKm?: number;
+  /** Net TCO accounting for Present Value of CBIO revenue (BRL) */
+  netTco?: number;
+  /** Tare / payload penalty under Lei da Balança (kg vs diesel baseline) */
+  payloadPenaltyKg?: number;
+
   /** Metric comparisons (absolute and percentage) against Diesel B baseline */
   deltas?: {
     operationalCostPerKm: MetricComparison;
