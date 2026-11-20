@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { Truck } from 'lucide-react';
 import type { AlternativeId, SimulationParameters } from '../../lib/types/parameters';
 import type { SimulationResults } from '../../lib/types/scenario';
 import { formatCurrency, formatNumber } from '../../lib/utils/format';
@@ -64,15 +65,7 @@ export const FleetImpactBanner: React.FC<FleetImpactBannerProps> = ({
       <div className="card bg-base-100 border-base-200 rounded-2xl border p-4 shadow-sm sm:p-5">
         <div className="flex items-center gap-3">
           <div className="bg-primary/10 text-primary flex h-10 w-10 shrink-0 items-center justify-center rounded-xl">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-              className="h-5 w-5"
-              aria-hidden="true"
-            >
-              <path d="M3.375 4.5C2.339 4.5 1.5 5.34 1.5 6.375V13.5h12V6.375c0-1.036-.84-1.875-1.875-1.875h-8.25ZM13.5 15h-12v2.625c0 1.035.84 1.875 1.875 1.875h.375a3 3 0 1 1 6 0h3a.75.75 0 0 0 .75-.75V15Zm1.5-6.75V15h4.125a.75.75 0 0 0 .75-.75v-3.75a2.25 2.25 0 0 0-2.25-2.25H15Zm0 7.5v2.25a.75.75 0 0 0 .75.75h.375a3 3 0 1 0 6 0H22.5a.75.75 0 0 0 .75-.75V12.75a3.75 3.75 0 0 0-3.75-3.75H15v6.75Z" />
-            </svg>
+            <Truck className="h-5 w-5" aria-hidden="true" />
           </div>
           <div>
             <h3 className="text-base-content text-sm font-bold sm:text-base">
@@ -90,7 +83,7 @@ export const FleetImpactBanner: React.FC<FleetImpactBannerProps> = ({
   }
 
   return (
-    <div className="via-base-100 to-base-100 relative overflow-hidden rounded-2xl border border-emerald-500/30 bg-gradient-to-br from-emerald-950/20 p-4 shadow-sm sm:p-6 dark:from-emerald-950/40">
+    <div className="via-base-100 to-base-100 relative overflow-hidden rounded-2xl border border-emerald-500/30 bg-linear-to-br from-emerald-950/20 p-4 shadow-sm sm:p-6 dark:from-emerald-950/40">
       <div className="relative z-10 flex flex-col justify-between gap-4 lg:flex-row lg:items-center">
         <div>
           <div className="flex items-center gap-2">

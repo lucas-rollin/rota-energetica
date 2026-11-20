@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { BarChart2, Table } from 'lucide-react';
 
 export interface ChartTableData {
   headers: string[];
@@ -68,15 +69,7 @@ export const ChartContainer: React.FC<ChartContainerProps> = ({
               aria-pressed={viewMode === 'chart'}
               aria-label="Ver como gráfico interativo"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-                className="h-3.5 w-3.5"
-                aria-hidden="true"
-              >
-                <path d="M2 11a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1v-5Zm6-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1V7Zm6-3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1V4Z" />
-              </svg>
+              <BarChart2 className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
               <span>Gráfico</span>
             </button>
             <button
@@ -88,19 +81,7 @@ export const ChartContainer: React.FC<ChartContainerProps> = ({
               aria-pressed={viewMode === 'table'}
               aria-label="Ver dados em tabela acessível"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-                className="h-3.5 w-3.5"
-                aria-hidden="true"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M4 2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H4Zm1 4h10v2H5V6Zm0 4h10v2H5v-2Zm0 4h10v2H5v-2Z"
-                  clipRule="evenodd"
-                />
-              </svg>
+              <Table className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
               <span>Tabela</span>
             </button>
           </div>

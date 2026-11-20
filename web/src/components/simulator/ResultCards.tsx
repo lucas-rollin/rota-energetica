@@ -1,4 +1,5 @@
 import React from 'react';
+import { Fuel, Leaf, Zap, Flame } from 'lucide-react';
 import type { AlternativeId } from '../../lib/types/parameters';
 import type { MetricComparison, SimulationResults } from '../../lib/types/scenario';
 import { formatCurrency, formatNumber, formatPercent } from '../../lib/utils/format';
@@ -52,35 +53,14 @@ const POWERTRAIN_CONFIG: Record<
   }
 > = {
   diesel: {
-    icon: (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 20 20"
-        fill="currentColor"
-        className="h-4 w-4 text-slate-500"
-        aria-hidden="true"
-      >
-        <path d="M3 4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h7a2 2 0 0 0 2-2v-4.586l1.293 1.293a1 1 0 0 0 1.414-1.414l-3-3a1 1 0 0 0-1.414 0l-3 3a1 1 0 1 0 1.414 1.414L10 11.414V16H3V6h7v2a1 1 0 1 0 2 0V6a2 2 0 0 0-2-2H3Z" />
-        <path d="M15 4a1 1 0 0 1 1-1h1a2 2 0 0 1 2 2v7.5a1.5 1.5 0 0 1-3 0V9a1 1 0 0 0-1-1h-.5a.5.5 0 0 1-.5-.5V4Z" />
-      </svg>
-    ),
+    icon: <Fuel className="h-4 w-4 text-slate-500" aria-hidden="true" />,
     tag: 'Linha de Base',
     borderAccent: 'border-l-4 border-l-slate-400 dark:border-l-slate-600',
     highlightText: 'Referência de Mercado',
     highlightClass: 'bg-base-200/60 text-base-content/70',
   },
   biometano: {
-    icon: (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 20 20"
-        fill="currentColor"
-        className="h-4 w-4 text-emerald-500"
-        aria-hidden="true"
-      >
-        <path d="M10 2a8 8 0 0 0-8 8c0 4.418 3.582 8 8 8 3.5 0 6.467-2.247 7.534-5.4A8.004 8.004 0 0 0 10 2Zm3.707 6.707a1 1 0 0 0-1.414-1.414L9 10.586 7.707 9.293a1 1 0 0 0-1.414 1.414l2 2a1 1 0 0 0 1.414 0l4-4Z" />
-      </svg>
-    ),
+    icon: <Leaf className="h-4 w-4 text-emerald-500" aria-hidden="true" />,
     tag: 'Bioenergia Agro',
     borderAccent: 'border-l-4 border-l-emerald-500',
     highlightText: 'Menor TCO Acumulado',
@@ -88,38 +68,14 @@ const POWERTRAIN_CONFIG: Record<
       'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 font-semibold',
   },
   eletrico: {
-    icon: (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 20 20"
-        fill="currentColor"
-        className="h-4 w-4 text-purple-500"
-        aria-hidden="true"
-      >
-        <path d="M11.983 1.59a.75.75 0 0 0-1.292-.614l-5.5 6.5A.75.75 0 0 0 5.77 8.75h4.072l-1.825 9.66a.75.75 0 0 0 1.292.614l5.5-6.5A.75.75 0 0 0 14.23 11.25H10.16l1.824-9.66Z" />
-      </svg>
-    ),
+    icon: <Zap className="h-4 w-4 text-purple-500" aria-hidden="true" />,
     tag: 'Tração Elétrica',
     borderAccent: 'border-l-4 border-l-purple-500',
     highlightText: 'Zero Emissão Local (Escopo 1)',
     highlightClass: 'bg-purple-500/10 text-purple-700 dark:text-purple-400 font-semibold',
   },
   gnv: {
-    icon: (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 20 20"
-        fill="currentColor"
-        className="h-4 w-4 text-amber-500"
-        aria-hidden="true"
-      >
-        <path
-          fillRule="evenodd"
-          d="M10 2a1 1 0 0 1 1 1v1.055a7.002 7.002 0 0 1 5.945 5.945H18a1 1 0 1 1 0 2h-1.055a7.002 7.002 0 0 1-5.945 5.945V18a1 1 0 1 1-2 0v-1.055A7.002 7.002 0 0 1 3.055 11H2a1 1 0 1 1 0-2h1.055A7.002 7.002 0 0 1 9 3.055V2a1 1 0 0 1 1-1Zm0 4a5 5 0 1 0 0 10 5 5 0 0 0 0-10Z"
-          clipRule="evenodd"
-        />
-      </svg>
-    ),
+    icon: <Flame className="h-4 w-4 text-amber-500" aria-hidden="true" />,
     tag: 'Gás de Transição',
     borderAccent: 'border-l-4 border-l-amber-500',
     highlightText: 'Redução Imediata de CO₂',

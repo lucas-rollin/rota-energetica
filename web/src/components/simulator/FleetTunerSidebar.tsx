@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { SlidersHorizontal } from 'lucide-react';
 import type {
   AlternativeId,
   GeneralParameters,
@@ -88,19 +89,10 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
       {/* Sidebar Header */}
       <div className="border-base-200 bg-base-200/30 flex items-center justify-between border-b px-4 py-3">
         <div className="flex items-center gap-2">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 20 20"
-            fill="currentColor"
+          <SlidersHorizontal
             className="text-primary h-4 w-4 shrink-0"
             aria-hidden="true"
-          >
-            <path
-              fillRule="evenodd"
-              d="M7.84 1.804A1 1 0 0 1 8.82 1h2.36a1 1 0 0 1 .98.804l.331 1.652a6.993 6.993 0 0 1 1.929 1.115l1.598-.54a1 1 0 0 1 1.186.447l1.18 2.044a1 1 0 0 1-.205 1.251l-1.267 1.113a7.047 7.047 0 0 1 0 2.228l1.267 1.113a1 1 0 0 1 .206 1.25l-1.18 2.045a1 1 0 0 1-1.187.447l-1.598-.54a6.993 6.993 0 0 1-1.929 1.115l-.33 1.652a1 1 0 0 1-.98.804H8.82a1 1 0 0 1-.98-.804l-.331-1.652a6.993 6.993 0 0 1-1.929-1.115l-1.598.54a1 1 0 0 1-1.186-.447l-1.18-2.044a1 1 0 0 1 .205-1.251l1.267-1.114a7.05 7.05 0 0 1 0-2.227L1.821 7.773a1 1 0 0 1-.206-1.25l1.18-2.045a1 1 0 0 1 1.187-.447l1.598.54A6.993 6.993 0 0 1 7.51 3.456l.33-1.652ZM10 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"
-              clipRule="evenodd"
-            />
-          </svg>
+          />
           <h2 className="text-base-content text-sm font-bold sm:text-base">
             Parâmetros da Frota
           </h2>
@@ -263,47 +255,69 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
 
           <div className="space-y-1.5">
             {fuels.map((fuel) => {
-              const currentVal = params.vehicles[fuel.alt].energy_price.value;
+              const priceObj = params.vehicles[fuel.alt].energy_price;
+              const currentVal = priceObj.value;
+              const minVal = priceObj.min;
+              const maxVal = priceObj.max;
+              const isOutOfRange =
+                (minVal !== undefined && currentVal < minVal) ||
+                (maxVal !== undefined && currentVal > maxVal);
+
               return (
                 <div
                   key={fuel.alt}
-                  className="bg-base-200/40 hover:bg-base-200/70 border-base-200 flex items-center justify-between rounded-lg border p-2 transition-colors"
+                  className={`border-base-200 flex flex-col gap-1 rounded-lg border p-2 transition-colors ${
+                    isOutOfRange
+                      ? 'border-amber-400/60 bg-amber-500/10'
+                      : 'bg-base-200/40 hover:bg-base-200/70'
+                  }`}
                 >
-                  <div className="flex items-center gap-2">
-                    <span className={`h-2 w-2 rounded-full ${fuel.dotColor}`}></span>
-                    <span className="text-base-content text-xs font-medium">
-                      {fuel.label}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => onOpenSource(fuel.sourceId, fuel.label)}
-                      className="text-primary font-mono text-[9px] hover:underline"
-                      title="Ver fonte oficial deste dado"
-                    >
-                      [{fuel.sourceId}]
-                    </button>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className={`h-2 w-2 rounded-full ${fuel.dotColor}`}></span>
+                      <span className="text-base-content text-xs font-medium">
+                        {fuel.label}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => onOpenSource(fuel.sourceId, fuel.label)}
+                        className="text-primary font-mono text-[9px] hover:underline"
+                        title="Ver fonte oficial deste dado"
+                      >
+                        [{fuel.sourceId}]
+                      </button>
+                    </div>
+
+                    <div className="bg-base-100 border-base-300 flex items-center gap-1 rounded border px-1.5 py-0.5">
+                      <span className="text-base-content/50 font-mono text-[10px]">R$</span>
+                      <input
+                        type="number"
+                        step={fuel.step}
+                        min="0.01"
+                        value={currentVal}
+                        onChange={(e) => {
+                          const val = parseFloat(e.target.value);
+                          if (!isNaN(val) && val > 0) {
+                            onVehicleChange(fuel.alt, 'energy_price', val);
+                          }
+                        }}
+                        className="text-base-content w-12 bg-transparent text-right font-mono text-xs font-bold focus:outline-none"
+                        aria-label={`Preço do ${fuel.label}`}
+                      />
+                      <span className="text-base-content/60 font-mono text-[10px]">
+                        {fuel.unit.replace('R$', '')}
+                      </span>
+                    </div>
                   </div>
 
-                  <div className="bg-base-100 border-base-300 flex items-center gap-1 rounded border px-1.5 py-0.5">
-                    <span className="text-base-content/50 font-mono text-[10px]">R$</span>
-                    <input
-                      type="number"
-                      step={fuel.step}
-                      min="0.1"
-                      value={currentVal}
-                      onChange={(e) => {
-                        const val = parseFloat(e.target.value);
-                        if (!isNaN(val) && val > 0) {
-                          onVehicleChange(fuel.alt, 'energy_price', val);
-                        }
-                      }}
-                      className="text-base-content w-12 bg-transparent text-right font-mono text-xs font-bold focus:outline-none"
-                      aria-label={`Preço do ${fuel.label}`}
-                    />
-                    <span className="text-base-content/60 font-mono text-[10px]">
-                      {fuel.unit.replace('R$', '')}
-                    </span>
-                  </div>
+                  {isOutOfRange && (
+                    <div className="text-[10px] text-amber-700 dark:text-amber-300 flex items-center justify-between font-mono pt-0.5 border-t border-amber-300/30">
+                      <span>Aviso: fora da ref. ANP/ANEEL</span>
+                      <span>
+                        [{minVal} - {maxVal}]
+                      </span>
+                    </div>
+                  )}
                 </div>
               );
             })}

@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
+import { TriangleAlert } from 'lucide-react';
 import { getSource } from '../../lib/data/sources';
-import { simulate } from '../../lib/calc';
+import { getParameterWarnings, simulate } from '../../lib/calc';
 import type {
   AlternativeId,
   GeneralParameters,
@@ -73,13 +74,14 @@ export const Simulator: React.FC<SimulatorProps> = ({ defaults }) => {
   }, [params, defaults]);
 
   // Derived simulation results with useMemo and fallback safety
-  const { results, simulationError } = useMemo(() => {
+  const { results, simulationWarnings, simulationError } = useMemo(() => {
     try {
+      const warnings = getParameterWarnings(params);
       const res = simulate(params);
-      return { results: res, simulationError: null };
+      return { results: res, simulationWarnings: warnings, simulationError: null };
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Erro no cálculo da simulação';
-      return { results: null, simulationError: message };
+      return { results: null, simulationWarnings: [], simulationError: message };
     }
   }, [params]);
 
@@ -192,10 +194,34 @@ export const Simulator: React.FC<SimulatorProps> = ({ defaults }) => {
         />
       </section>
 
-      {/* Validation Error Alert if any */}
+      {/* Mild Warning for Out-of-Bound Sensitivity Scenarios (Does not disrupt charts) */}
+      {simulationWarnings && simulationWarnings.length > 0 && (
+        <div
+          role="status"
+          aria-live="polite"
+          className="bg-amber-500/10 border border-amber-500/30 text-amber-900 dark:text-amber-200 rounded-2xl p-3.5 shadow-xs flex items-start gap-3 text-xs"
+        >
+          <TriangleAlert className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" aria-hidden="true" />
+          <div className="space-y-1">
+            <span className="font-semibold block text-base-content">
+              Cenário de Sensibilidade — Parâmetro fora da faixa de referência:
+            </span>
+            <ul className="list-disc list-inside text-base-content/80 text-[11px] space-y-0.5">
+              {simulationWarnings.map((w, idx) => (
+                <li key={idx}>{w}</li>
+              ))}
+            </ul>
+            <p className="text-[10px] text-base-content/60 pt-0.5">
+              Os gráficos e métricas de TCO continuam sendo calculados e apresentados normalmente com base no valor personalizado.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Fatal Calculation Error Alert if any */}
       {simulationError && (
-        <div role="alert" className="alert alert-error rounded-2xl shadow-lg">
-          <span className="font-bold">Aviso de validação:</span>
+        <div role="alert" className="alert alert-error rounded-2xl shadow-lg text-xs">
+          <span className="font-bold">Erro no cálculo:</span>
           <span>{simulationError}</span>
         </div>
       )}

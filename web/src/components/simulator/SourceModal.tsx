@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { X, ExternalLink } from 'lucide-react';
 import type { SourceItem } from '../../lib/types/sources';
 
 interface SourceModalProps {
@@ -80,15 +81,7 @@ export const SourceModal: React.FC<SourceModalProps> = ({
             className="btn btn-sm btn-circle btn-ghost"
             aria-label="Fechar modal de fonte"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-              className="h-4 w-4"
-              aria-hidden="true"
-            >
-              <path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z" />
-            </svg>
+            <X className="h-4 w-4" aria-hidden="true" />
           </button>
         </div>
 
@@ -121,7 +114,7 @@ export const SourceModal: React.FC<SourceModalProps> = ({
           {source.attribution && (
             <div>
               <span className="text-base-content/60 mb-1 block text-xs font-semibold tracking-wider uppercase">
-                Texto de Atribuição (LICENSE-DATA §4)
+                Texto de Atribuição (LICENSE-DATA)
               </span>
               <blockquote className="border-primary bg-primary/5 text-base-content/90 rounded-r border-l-4 py-1 pl-3 font-mono text-xs italic">
                 {source.attribution}
@@ -145,8 +138,8 @@ export const SourceModal: React.FC<SourceModalProps> = ({
                       rel="noopener noreferrer"
                       className="link link-primary inline-flex items-center gap-1"
                     >
-                      Ver termos
-                      <span aria-hidden="true">↗</span>
+                      <span>Ver termos</span>
+                      <ExternalLink className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
                     </a>
                   </>
                 )}
@@ -164,8 +157,8 @@ export const SourceModal: React.FC<SourceModalProps> = ({
                   rel="noopener noreferrer"
                   className="link link-primary inline-flex items-center gap-1 text-xs font-medium break-all"
                 >
-                  Acessar página oficial
-                  <span aria-hidden="true">↗</span>
+                  <span>Acessar página oficial</span>
+                  <ExternalLink className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
                 </a>
               ) : (
                 <span className="text-base-content/50 text-xs italic">
