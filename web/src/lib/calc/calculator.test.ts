@@ -6,7 +6,9 @@ import {
   calculateDieselBBlendIntensity,
   calculateOperationalCost,
   calculateTco,
+  getParameterWarnings,
   simulate,
+  validateBounds,
 } from './index';
 
 const defaultParams = defaultParametersJson as unknown as SimulationParameters;
@@ -179,13 +181,31 @@ describe('Calculator Engine Unit Tests', () => {
       expect(resZero.levelizedKm).toBe(5 * 120000);
     });
 
-    it('rejects parameters outside min/max bounds', () => {
+    it('generates mild warnings on parameters outside min/max bounds without breaking simulation', () => {
       const invalidParams: SimulationParameters = JSON.parse(
         JSON.stringify(defaultParams)
       );
       invalidParams.general.discount_rate.value = 0.99; // max is 0.20
+      invalidParams.vehicles.diesel.energy_price.value = 12.0; // max is 9.00
 
-      expect(() => simulate(invalidParams)).toThrow(/is above maximum allowed bound/);
+      const warnings = getParameterWarnings(invalidParams);
+      expect(warnings.length).toBe(2);
+      expect(warnings.some((w) => w.includes('Taxa de desconto'))).toBe(true);
+      expect(warnings.some((w) => w.includes('Preço do combustível (Diesel B)'))).toBe(true);
+
+      // Simulation continues to calculate smoothly without disrupting charts
+      const results = simulate(invalidParams);
+      expect(results.diesel).toBeDefined();
+      expect(results.diesel.tco).toBeGreaterThan(0);
+    });
+
+    it('rejects non-finite numerical parameters', () => {
+      const nanParams: SimulationParameters = JSON.parse(
+        JSON.stringify(defaultParams)
+      );
+      nanParams.general.discount_rate.value = NaN;
+
+      expect(() => simulate(nanParams)).toThrow(/must be a finite number/);
     });
 
     it('calculates CBIO monetization and reflects payload penalties', () => {

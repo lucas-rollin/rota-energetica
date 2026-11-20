@@ -17,147 +17,126 @@ export const ALTERNATIVE_IDS: AlternativeId[] = [
 
 /**
  * Validates that a numeric parameter lies within defined bounds [min, max].
+ * If strict is true, throws an error if outside [min, max].
+ * Otherwise, ensures the number is finite.
  */
 export function validateBounds(
   name: string,
   value: number,
   min?: number,
-  max?: number
+  max?: number,
+  strict = false
 ): void {
   if (Number.isNaN(value) || !Number.isFinite(value)) {
     throw new Error(`Parameter '${name}' must be a finite number (received: ${value})`);
   }
-  if (min !== undefined && value < min) {
-    throw new Error(
-      `Parameter '${name}' (${value}) is below minimum allowed bound (${min})`
-    );
-  }
-  if (max !== undefined && value > max) {
-    throw new Error(
-      `Parameter '${name}' (${value}) is above maximum allowed bound (${max})`
-    );
+  if (strict) {
+    if (min !== undefined && value < min) {
+      throw new Error(
+        `Parameter '${name}' (${value}) is below minimum allowed bound (${min})`
+      );
+    }
+    if (max !== undefined && value > max) {
+      throw new Error(
+        `Parameter '${name}' (${value}) is above maximum allowed bound (${max})`
+      );
+    }
   }
 }
 
 /**
- * Validates the numerical integrity and slider boundaries of input simulation parameters.
+ * Returns mild warning messages when parameters deviate from recommended historical reference bounds [min, max].
+ * Does not disrupt the simulation calculation or chart rendering.
  */
-export function validateSimulationParameters(params: SimulationParameters): void {
+export function getParameterWarnings(params: SimulationParameters): string[] {
+  const warnings: string[] = [];
+
+  const check = (
+    label: string,
+    value: number,
+    min?: number,
+    max?: number,
+    unit?: string
+  ) => {
+    if (min !== undefined && value < min) {
+      warnings.push(
+        `${label} (${value}${unit ? ` ${unit}` : ''}) está abaixo da faixa de referência histórica (mín: ${min}${unit ? ` ${unit}` : ''}).`
+      );
+    } else if (max !== undefined && value > max) {
+      warnings.push(
+        `${label} (${value}${unit ? ` ${unit}` : ''}) está acima da faixa de referência histórica (máx: ${max}${unit ? ` ${unit}` : ''}).`
+      );
+    }
+  };
+
   const g = params.general;
-  validateBounds(
-    'annual_distance_km',
-    g.annual_distance_km.value,
-    g.annual_distance_km.min,
-    g.annual_distance_km.max
-  );
-  validateBounds(
-    'horizon_years',
-    g.horizon_years.value,
-    g.horizon_years.min,
-    g.horizon_years.max
-  );
-  validateBounds(
-    'discount_rate',
-    g.discount_rate.value,
-    g.discount_rate.min,
-    g.discount_rate.max
-  );
-  validateBounds(
-    'biodiesel_blend',
-    g.biodiesel_blend.value,
-    g.biodiesel_blend.min,
-    g.biodiesel_blend.max
-  );
-  validateBounds(
-    'diesel_fossil_carbon_intensity',
-    g.diesel_fossil_carbon_intensity.value,
-    g.diesel_fossil_carbon_intensity.min,
-    g.diesel_fossil_carbon_intensity.max
-  );
-  validateBounds(
-    'biodiesel_carbon_intensity',
-    g.biodiesel_carbon_intensity.value,
-    g.biodiesel_carbon_intensity.min,
-    g.biodiesel_carbon_intensity.max
-  );
-  validateBounds('arla_price', g.arla_price.value, g.arla_price.min, g.arla_price.max);
+  check('Distância anual', g.annual_distance_km.value, g.annual_distance_km.min, g.annual_distance_km.max, g.annual_distance_km.unit);
+  check('Horizonte temporal', g.horizon_years.value, g.horizon_years.min, g.horizon_years.max, g.horizon_years.unit);
+  check('Taxa de desconto', g.discount_rate.value, g.discount_rate.min, g.discount_rate.max, g.discount_rate.unit);
+  check('Mandato de biodiesel', g.biodiesel_blend.value, g.biodiesel_blend.min, g.biodiesel_blend.max, g.biodiesel_blend.unit);
+  check('Preço do ARLA 32', g.arla_price.value, g.arla_price.min, g.arla_price.max, g.arla_price.unit);
+
+  const vehicleLabels: Record<AlternativeId, string> = {
+    diesel: 'Diesel B',
+    gnv: 'GNV',
+    biometano: 'Biometano',
+    eletrico: 'Elétrico',
+  };
+
+  for (const alt of ALTERNATIVE_IDS) {
+    const v = params.vehicles[alt];
+    if (!v) continue;
+    const vName = vehicleLabels[alt] || alt;
+    check(`Preço do combustível (${vName})`, v.energy_price.value, v.energy_price.min, v.energy_price.max, v.energy_price.unit);
+    check(`Consumo (${vName})`, v.consumption.value, v.consumption.min, v.consumption.max, v.consumption.unit);
+    check(`Preço do caminhão (${vName})`, v.vehicle_purchase_price.value, v.vehicle_purchase_price.min, v.vehicle_purchase_price.max, v.vehicle_purchase_price.unit);
+    check(`Custo de manutenção (${vName})`, v.maintenance_cost_per_km.value, v.maintenance_cost_per_km.min, v.maintenance_cost_per_km.max, v.maintenance_cost_per_km.unit);
+    check(`Valor residual (${vName})`, v.residual_value_ratio.value, v.residual_value_ratio.min, v.residual_value_ratio.max, v.residual_value_ratio.unit);
+  }
+
+  return warnings;
+}
+
+/**
+ * Validates the numerical integrity of input simulation parameters.
+ */
+export function validateSimulationParameters(
+  params: SimulationParameters,
+  strict = false
+): void {
+  const g = params.general;
+  validateBounds('annual_distance_km', g.annual_distance_km.value, g.annual_distance_km.min, g.annual_distance_km.max, strict);
+  validateBounds('horizon_years', g.horizon_years.value, g.horizon_years.min, g.horizon_years.max, strict);
+  validateBounds('discount_rate', g.discount_rate.value, g.discount_rate.min, g.discount_rate.max, strict);
+  validateBounds('biodiesel_blend', g.biodiesel_blend.value, g.biodiesel_blend.min, g.biodiesel_blend.max, strict);
+  validateBounds('diesel_fossil_carbon_intensity', g.diesel_fossil_carbon_intensity.value, g.diesel_fossil_carbon_intensity.min, g.diesel_fossil_carbon_intensity.max, strict);
+  validateBounds('biodiesel_carbon_intensity', g.biodiesel_carbon_intensity.value, g.biodiesel_carbon_intensity.min, g.biodiesel_carbon_intensity.max, strict);
+  validateBounds('arla_price', g.arla_price.value, g.arla_price.min, g.arla_price.max, strict);
   if (g.cbio_price) {
-    validateBounds('cbio_price', g.cbio_price.value, g.cbio_price.min, g.cbio_price.max);
+    validateBounds('cbio_price', g.cbio_price.value, g.cbio_price.min, g.cbio_price.max, strict);
   }
 
   for (const alt of ALTERNATIVE_IDS) {
     const v = params.vehicles[alt];
     if (!v) {
-      throw new Error(
-        `Powertrain alternative '${alt}' not found in simulation parameters`
-      );
+      throw new Error(`Powertrain alternative '${alt}' not found in simulation parameters`);
     }
-    validateBounds(
-      `${alt}.energy_price`,
-      v.energy_price.value,
-      v.energy_price.min,
-      v.energy_price.max
-    );
-    validateBounds(
-      `${alt}.consumption`,
-      v.consumption.value,
-      v.consumption.min,
-      v.consumption.max
-    );
-    validateBounds(
-      `${alt}.energy_density`,
-      v.energy_density.value,
-      v.energy_density.min,
-      v.energy_density.max
-    );
-    validateBounds(
-      `${alt}.carbon_intensity`,
-      v.carbon_intensity.value,
-      v.carbon_intensity.min,
-      v.carbon_intensity.max
-    );
-    validateBounds(
-      `${alt}.vehicle_purchase_price`,
-      v.vehicle_purchase_price.value,
-      v.vehicle_purchase_price.min,
-      v.vehicle_purchase_price.max
-    );
-    validateBounds(
-      `${alt}.maintenance_cost_per_km`,
-      v.maintenance_cost_per_km.value,
-      v.maintenance_cost_per_km.min,
-      v.maintenance_cost_per_km.max
-    );
-    validateBounds(
-      `${alt}.residual_value_ratio`,
-      v.residual_value_ratio.value,
-      v.residual_value_ratio.min,
-      v.residual_value_ratio.max
-    );
+    validateBounds(`${alt}.energy_price`, v.energy_price.value, v.energy_price.min, v.energy_price.max, strict);
+    validateBounds(`${alt}.consumption`, v.consumption.value, v.consumption.min, v.consumption.max, strict);
+    validateBounds(`${alt}.energy_density`, v.energy_density.value, v.energy_density.min, v.energy_density.max, strict);
+    validateBounds(`${alt}.carbon_intensity`, v.carbon_intensity.value, v.carbon_intensity.min, v.carbon_intensity.max, strict);
+    validateBounds(`${alt}.vehicle_purchase_price`, v.vehicle_purchase_price.value, v.vehicle_purchase_price.min, v.vehicle_purchase_price.max, strict);
+    validateBounds(`${alt}.maintenance_cost_per_km`, v.maintenance_cost_per_km.value, v.maintenance_cost_per_km.min, v.maintenance_cost_per_km.max, strict);
+    validateBounds(`${alt}.residual_value_ratio`, v.residual_value_ratio.value, v.residual_value_ratio.min, v.residual_value_ratio.max, strict);
 
     if (v.charging_efficiency) {
-      validateBounds(
-        `${alt}.charging_efficiency`,
-        v.charging_efficiency.value,
-        v.charging_efficiency.min,
-        v.charging_efficiency.max
-      );
+      validateBounds(`${alt}.charging_efficiency`, v.charging_efficiency.value, v.charging_efficiency.min, v.charging_efficiency.max, strict);
     }
     if (v.arla_consumption_ratio) {
-      validateBounds(
-        `${alt}.arla_consumption_ratio`,
-        v.arla_consumption_ratio.value,
-        v.arla_consumption_ratio.min,
-        v.arla_consumption_ratio.max
-      );
+      validateBounds(`${alt}.arla_consumption_ratio`, v.arla_consumption_ratio.value, v.arla_consumption_ratio.min, v.arla_consumption_ratio.max, strict);
     }
     if (v.payload_penalty_kg) {
-      validateBounds(
-        `${alt}.payload_penalty_kg`,
-        v.payload_penalty_kg.value,
-        v.payload_penalty_kg.min,
-        v.payload_penalty_kg.max
-      );
+      validateBounds(`${alt}.payload_penalty_kg`, v.payload_penalty_kg.value, v.payload_penalty_kg.min, v.payload_penalty_kg.max, strict);
     }
   }
 }
