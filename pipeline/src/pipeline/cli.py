@@ -10,8 +10,20 @@ from pathlib import Path
 from pipeline.aggregator import build_prices_history
 from pipeline.config import DEFAULT_CONFIG, get_repo_root
 from pipeline.defaults import apply_default_prices_to_parameters, compute_default_prices
-from pipeline.models import PricesHistory, SimulationParameters, export_all_schemas
+from pipeline.models import (
+    CorridorFuelStationsCatalog,
+    CorridorsCatalog,
+    PricesHistory,
+    SimulationParameters,
+    SourcesCatalog,
+    export_all_schemas,
+)
 from pipeline.register import main as register_main
+from pipeline.stations import (
+    build_brazil_states_geojson,
+    build_stations_catalog_from_csv,
+    validate_stations_catalog,
+)
 
 
 def export_schemas_cmd(args: list[str]) -> int:
@@ -179,6 +191,57 @@ def defaults_cmd(args: list[str]) -> int:
     return 0
 
 
+def stations_cmd(args: list[str]) -> int:
+    parser = argparse.ArgumentParser(
+        prog="pipeline stations",
+        description="Build Brazil UF GeoJSON and validate/ingest corridor fuel stations.",
+    )
+    parser.add_argument(
+        "--input-csv",
+        type=Path,
+        default=None,
+        help="Optional sanitized/raw CSV path to rebuild data/processed/corridor_fuel_stations.json",
+    )
+    parser.add_argument(
+        "--skip-geojson",
+        action="store_true",
+        help="Skip rebuilding brazil_states.geo.json from data/raw/ibge/brazil_uf.geo.json",
+    )
+    parsed = parser.parse_args(args)
+
+    repo_root = get_repo_root()
+    raw_geojson = repo_root / "data" / "raw" / "ibge" / "brazil_uf.geo.json"
+    out_geojson = repo_root / "data" / "processed" / "brazil_states.geo.json"
+    stations_path = repo_root / "data" / "processed" / "corridor_fuel_stations.json"
+    corridors_path = repo_root / "data" / "processed" / "corridors.json"
+    sources_path = repo_root / "data" / "sources.json"
+
+    if not parsed.skip_geojson and raw_geojson.exists():
+        uf_count = build_brazil_states_geojson(raw_geojson, out_geojson)
+        print(f"Built '{out_geojson}' ({uf_count} UF features).")
+
+    if parsed.input_csv is not None:
+        catalog = build_stations_catalog_from_csv(parsed.input_csv, stations_path)
+        print(f"Ingested {len(catalog.stations)} stations into '{stations_path}'.")
+
+    if stations_path.exists():
+        stations_catalog = CorridorFuelStationsCatalog.load(stations_path)
+        corridors_catalog = CorridorsCatalog.load(corridors_path)
+        sources_catalog = SourcesCatalog.load(sources_path)
+        errors = validate_stations_catalog(
+            stations_catalog, corridors_catalog, sources_catalog
+        )
+        if errors:
+            for err in errors:
+                print(f"Validation error: {err}", file=sys.stderr)
+            return 1
+        print(
+            f"Validated '{stations_path}' ({len(stations_catalog.stations)} stations, 0 errors)."
+        )
+
+    return 0
+
+
 def main() -> None:
     """Command-line entry point dispatcher."""
     if len(sys.argv) > 1 and sys.argv[1] == "register":
@@ -189,6 +252,8 @@ def main() -> None:
         sys.exit(build_cmd(sys.argv[2:]))
     elif len(sys.argv) > 1 and sys.argv[1] == "defaults":
         sys.exit(defaults_cmd(sys.argv[2:]))
+    elif len(sys.argv) > 1 and sys.argv[1] == "stations":
+        sys.exit(stations_cmd(sys.argv[2:]))
     elif len(sys.argv) > 1 and sys.argv[1] in ("--help", "-h"):
         print("Usage: pipeline <command> [options]")
         print("\nAvailable commands:")
@@ -201,6 +266,9 @@ def main() -> None:
         )
         print(
             "  defaults        Compute rolling baseline prices and optionally update parameters"
+        )
+        print(
+            "  stations        Build Brazil GeoJSON and validate/ingest corridor stations"
         )
         sys.exit(0)
     else:
@@ -215,6 +283,9 @@ def main() -> None:
         )
         print(
             "  defaults        Compute rolling baseline prices and optionally update parameters"
+        )
+        print(
+            "  stations        Build Brazil GeoJSON and validate/ingest corridor stations"
         )
         sys.exit(1)
 

@@ -1,0 +1,210 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "FuelStation": {
+      "additionalProperties": false,
+      "description": "Georeferenced highway refueling or heavy-duty charging hub.",
+      "properties": {
+        "id": {
+          "description": "Identificador único do ponto ou hub rodoviário.",
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "description": "Nome operacional do hub/entroncamento rodoviário (sem PII/CNPJ).",
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "technology": {
+          "description": "Tecnologia energética do ponto: 'biomethane_cng' ou 'electric_hpc'.",
+          "enum": [
+            "biomethane_cng",
+            "electric_hpc"
+          ],
+          "title": "Technology",
+          "type": "string"
+        },
+        "corridor_ids": {
+          "description": "Lista de IDs dos corredores logísticos atendidos.",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Corridor Ids",
+          "type": "array"
+        },
+        "highway": {
+          "description": "Rodovia principal de localização (ex.: BR-163, SP-330, BR-116).",
+          "minLength": 1,
+          "title": "Highway",
+          "type": "string"
+        },
+        "km_marker": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Quilômetro aproximado na rodovia de referência.",
+          "title": "KM Marker"
+        },
+        "city": {
+          "description": "Município de referência.",
+          "minLength": 1,
+          "title": "City",
+          "type": "string"
+        },
+        "state": {
+          "description": "Sigla da Unidade Federativa (UF).",
+          "pattern": "^[A-Z]{2}$",
+          "title": "State",
+          "type": "string"
+        },
+        "latitude": {
+          "description": "Latitude geográfica (graus decimais).",
+          "maximum": 6.0,
+          "minimum": -34.0,
+          "title": "Latitude",
+          "type": "number"
+        },
+        "longitude": {
+          "description": "Longitude geográfica (graus decimais).",
+          "maximum": -32.0,
+          "minimum": -75.0,
+          "title": "Longitude",
+          "type": "number"
+        },
+        "capacity_spec": {
+          "description": "Especificação de vazão ou potência instalada (ex.: 'GNC Alta Vazão' ou 'HPC 300 kW CCS2').",
+          "minLength": 1,
+          "title": "Capacity Spec",
+          "type": "string"
+        },
+        "power_kw": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Potência elétrica nominal em kW (para eletropostos HPC >150 kW).",
+          "title": "Power (kW)"
+        },
+        "high_flow_truck_ready": {
+          "default": true,
+          "description": "Indica se o ponto dispõe de acesso/bico/vaga compatível com caminhões pesados.",
+          "title": "High Flow Truck Ready",
+          "type": "boolean"
+        },
+        "operator_network": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Rede, concessionária ou distribuidora de referência.",
+          "title": "Operator Network"
+        },
+        "status": {
+          "default": "Operacional",
+          "description": "Status operacional do ponto.",
+          "enum": [
+            "Operacional",
+            "Em Expansão",
+            "Planejado"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "badge": {
+          "description": "Selo de qualidade do registro ('Primária', 'Adaptada' ou 'Ilustrativa').",
+          "enum": [
+            "Primária",
+            "Adaptada",
+            "Ilustrativa"
+          ],
+          "title": "Badge",
+          "type": "string"
+        },
+        "source_id": {
+          "description": "ID da fonte no catálogo data/sources.json.",
+          "pattern": "^[A-Z][0-9]{2}$",
+          "title": "Source Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "technology",
+        "corridor_ids",
+        "highway",
+        "city",
+        "state",
+        "latitude",
+        "longitude",
+        "capacity_spec",
+        "badge",
+        "source_id"
+      ],
+      "title": "FuelStation",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Catalog of georeferenced highway refueling and HPC charging hubs.",
+  "properties": {
+    "$schema": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": "../../schemas/corridor_fuel_stations.schema.json",
+      "title": "$schema"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "generated_at": {
+      "description": "Data de geração do catálogo.",
+      "title": "Generated At",
+      "type": "string"
+    },
+    "stations": {
+      "description": "Relação de postos/hubs rodoviários georreferenciados.",
+      "items": {
+        "$ref": "#/$defs/FuelStation"
+      },
+      "title": "Stations",
+      "type": "array"
+    }
+  },
+  "required": [
+    "generated_at",
+    "stations"
+  ],
+  "title": "CorridorFuelStationsCatalog",
+  "type": "object"
+}

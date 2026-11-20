@@ -1,8 +1,17 @@
 {
   "$schema": "../schemas/manifest.schema.json",
   "schema_version": 1,
-  "generated_at": "2026-10-18T12:30:51.041300-03:00",
+  "generated_at": "2026-11-20T17:05:45.875642-03:00",
   "entries": [
+    {
+      "source_id": "I14",
+      "file": "data/raw/ibge/brazil_uf.geo.json",
+      "origin_url": "https://servicodados.ibge.gov.br/api/v3/malhas/paises/BR?formato=application/vnd.geo+json&qualidade=minima&intrarregiao=UF",
+      "acquisition": "auto",
+      "retrieved_at": "2026-11-20",
+      "sha256": "07c671aa87aa1ab296c446de6294df9827112782537b996c0a160284907e7c0f",
+      "notes": "Malha simplificada das 27 UFs do Brasil (IBGE API v3)"
+    },
     {
       "source_id": "P01",
       "file": "data/raw/anp/ca-2020-01.csv",

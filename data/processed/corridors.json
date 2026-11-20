@@ -5,26 +5,75 @@
   "corridors": [
     {
       "id": "rondonopolis-santos",
-      "name": "Corredor Agro Centro-Oeste — BR-163 / SP-330",
+      "name": "Corredor Agro Centro-Oeste — BR-163 / BR-364 / SP-330",
       "origin": "Rondonópolis (MT)",
       "destination": "Porto de Santos (SP)",
       "distance_km": 1680.0,
       "cargo_profile": "Escoamento de safra de grãos (soja e milho) e retorno com fertilizantes",
       "typical_pbtc": "74t (Rodotrem 9 eixos)",
+      "highways": [
+        "BR-163",
+        "BR-364",
+        "SP-310",
+        "SP-330",
+        "SP-150"
+      ],
+      "route_waypoints": [
+        [
+          -54.636,
+          -16.471
+        ],
+        [
+          -53.215,
+          -17.314
+        ],
+        [
+          -51.714,
+          -17.881
+        ],
+        [
+          -50.92,
+          -17.798
+        ],
+        [
+          -49.215,
+          -18.42
+        ],
+        [
+          -48.277,
+          -18.918
+        ],
+        [
+          -47.81,
+          -21.177
+        ],
+        [
+          -47.061,
+          -22.906
+        ],
+        [
+          -46.633,
+          -23.55
+        ],
+        [
+          -46.333,
+          -23.961
+        ]
+      ],
       "refueling_points": {
         "diesel": "210+ postos rodoviários ao longo da rota",
-        "biomethane_cng": "18 postos certificados na rota e usinas com GNC móvel",
-        "electric_hpc": "2 pontos de recarga rápida >150kW (gargalo crítico)"
+        "biomethane_cng": "Concentração em SP/MG e gap crítico no trecho MT–GO (abastecimento com GNC móvel)",
+        "electric_hpc": "2 pontos de recarga rápida >150kW concentrados no eixo paulista (gargalo crítico)"
       },
       "powertrain_evaluations": {
         "biometano": {
-          "feasibility_score": 96,
-          "feasibility_label": "Altamente Viável",
+          "feasibility_score": 86,
+          "feasibility_label": "Viável com Planejamento de Base",
           "stops_description": "2 a 3 paradas de abastecimento (~15 min cada)",
           "refuel_time_minutes": 35,
           "payload_penalty_kg": -280.0,
           "emission_reduction_percent": 92.4,
-          "recommendation": "Excelente disponibilidade de postos GNC/Biometano em Goiás e interior paulista (SP-330). Autonomia de 900-1.000 km cobre os trechos com folga operacional."
+          "recommendation": "Forte cobertura de GNC/Biometano em SP (SP-330) e Triângulo Mineiro, porém com vazio operacional entre o Sul de MT e o Sudoeste de GO — exige autonomia >= 700 km ou ponto dedicado em Rondonópolis/Jataí."
         },
         "diesel": {
           "feasibility_score": 100,
@@ -42,7 +91,7 @@
           "refuel_time_minutes": 360,
           "payload_penalty_kg": -2400.0,
           "emission_reduction_percent": 88.5,
-          "recommendation": "Gargalo Crítico: Perda de até 2.400 kg de carga líquida de grãos sob a Lei da Balança e escassez de infraestrutura de Megawatt Charging (MCS) inviabilizam economicamente o trecho rodoviário longo."
+          "recommendation": "Gargalo Crítico: Perda de até 2.400 kg de carga líquida de grãos sob a Lei da Balança e ausência de eletropostos >150 kW em mais de 1.100 km entre MT, GO e norte de SP."
         }
       },
       "source_ids": [
@@ -54,16 +103,42 @@
     },
     {
       "id": "curitiba-paranagua",
-      "name": "Corredor Sul Grãos & Proteína — BR-277",
-      "origin": "Curitiba e Campos Gerais (PR)",
+      "name": "Corredor Sul Grãos & Proteína — BR-277 / BR-376",
+      "origin": "Ponta Grossa e Curitiba (PR)",
       "destination": "Porto de Paranaguá (PR)",
-      "distance_km": 98.0,
+      "distance_km": 215.0,
       "cargo_profile": "Descida de serra com grãos, proteína animal congelada e contêineres",
       "typical_pbtc": "45t a 57t (Cavalo mecânico 6x2 / 6x4)",
+      "highways": [
+        "BR-376",
+        "BR-277"
+      ],
+      "route_waypoints": [
+        [
+          -50.161,
+          -25.095
+        ],
+        [
+          -49.527,
+          -25.459
+        ],
+        [
+          -49.273,
+          -25.428
+        ],
+        [
+          -48.875,
+          -25.565
+        ],
+        [
+          -48.509,
+          -25.516
+        ]
+      ],
       "refueling_points": {
         "diesel": "25+ postos estruturados",
-        "biomethane_cng": "12 postos dedicados na BR-277 e rede Compagás",
-        "electric_hpc": "4 postos rápidos na descida da serra e pátios"
+        "biomethane_cng": "Rede Compagás Corredores Sustentáveis (Ponta Grossa, Curitiba, São José dos Pinhais e Paranaguá)",
+        "electric_hpc": "4 hubs rápidos na Região Metropolitana de Curitiba e pátios portuários"
       },
       "powertrain_evaluations": {
         "biometano": {
@@ -73,7 +148,7 @@
           "refuel_time_minutes": 15,
           "payload_penalty_kg": -280.0,
           "emission_reduction_percent": 91.0,
-          "recommendation": "Distância curta permite ciclo duplo diário. Rede de gás e biometano da agroindústria suinícola paranaense viabilizam custo operacional atrativo."
+          "recommendation": "Distância curta permite ciclo duplo diário. Rede de gás e biometano da agroindústria paranaense (Compagás Corredores Sustentáveis) viabilizam custo operacional atrativo."
         },
         "diesel": {
           "feasibility_score": 100,
@@ -103,16 +178,49 @@
     },
     {
       "id": "sp-rio",
-      "name": "Eixo Sudeste Industrial & Carga Fracionada — Via Dutra (BR-116)",
+      "name": "Eixo Sudeste Industrial — Via Dutra (BR-116)",
       "origin": "São Paulo (SP)",
       "destination": "Rio de Janeiro (RJ)",
       "distance_km": 435.0,
       "cargo_profile": "Manufatura, carga fracionada B2B, farmacêutico e e-commerce de alto valor agregado",
       "typical_pbtc": "40t a 45t (Cavalo mecânico 4x2 e 6x2)",
+      "highways": [
+        "BR-116"
+      ],
+      "route_waypoints": [
+        [
+          -46.633,
+          -23.55
+        ],
+        [
+          -45.887,
+          -23.223
+        ],
+        [
+          -45.555,
+          -23.026
+        ],
+        [
+          -45.19,
+          -22.816
+        ],
+        [
+          -44.451,
+          -22.469
+        ],
+        [
+          -44.104,
+          -22.523
+        ],
+        [
+          -43.173,
+          -22.907
+        ]
+      ],
       "refueling_points": {
         "diesel": "60+ postos rodoviários",
-        "biomethane_cng": "22 postos homologados com alto fluxo na Via Dutra",
-        "electric_hpc": "10 eletropostos rápidos >150kW operados por concessionárias e distribuidoras"
+        "biomethane_cng": "Corredor mais denso do país com alta concentração de postos GNC/GNV no Vale do Paraíba e RJ",
+        "electric_hpc": "Eixo com maior densidade de eletropostos >150kW operados por concessionárias e distribuidoras"
       },
       "powertrain_evaluations": {
         "biometano": {
@@ -122,7 +230,7 @@
           "refuel_time_minutes": 15,
           "payload_penalty_kg": -280.0,
           "emission_reduction_percent": 90.5,
-          "recommendation": "Corredor Dutra possui ampla rede de gás canalizado (NTS) e biometano de aterros sanitários (Paulínia e Seropédica). Excelente disponibilidade e custo."
+          "recommendation": "Corredor Dutra possui ampla rede de gás canalizado (NTS) e biometano de aterros sanitários (Paulínia e Seropédica). Cobertura contínua mesmo com autonomia conservadora."
         },
         "diesel": {
           "feasibility_score": 100,
@@ -140,7 +248,7 @@
           "refuel_time_minutes": 50,
           "payload_penalty_kg": -2100.0,
           "emission_reduction_percent": 90.2,
-          "recommendation": "Melhor infraestrutura de recarga rápida para pesados do Brasil. Ideal para frotas de e-commerce e bens de consumo com compromissos SBTi e Scope 1 zero."
+          "recommendation": "Melhor infraestrutura de recarga rápida do Brasil (São Paulo, São José dos Campos, Resende e Rio). Ideal para frotas de e-commerce com compromissos Scope 1 zero."
         }
       },
       "source_ids": [
@@ -158,10 +266,45 @@
       "distance_km": 550.0,
       "cargo_profile": "Frigoríficos, suínos e aves congeladas de exportação e insumos agroindustriais",
       "typical_pbtc": "45t a 57t (Cavalo mecânico 6x2 / 6x4 frigorífico)",
+      "highways": [
+        "BR-282",
+        "BR-470",
+        "BR-101"
+      ],
+      "route_waypoints": [
+        [
+          -52.615,
+          -27.1
+        ],
+        [
+          -51.518,
+          -27.176
+        ],
+        [
+          -51.225,
+          -27.399
+        ],
+        [
+          -50.326,
+          -27.816
+        ],
+        [
+          -49.64,
+          -27.214
+        ],
+        [
+          -49.066,
+          -26.919
+        ],
+        [
+          -48.662,
+          -26.908
+        ]
+      ],
       "refueling_points": {
         "diesel": "45+ postos estruturados ao longo da BR-470 e BR-282",
-        "biomethane_cng": "8 postos com GNV/GNC na malha SCGÁS no litoral e expansão no Oeste",
-        "electric_hpc": "3 hubs rápidos no litoral (Itajaí, Joinville e Florianópolis)"
+        "biomethane_cng": "Forte rede SCGÁS no litoral e Vale do Itajaí, com menor densidade no Meio-Oeste",
+        "electric_hpc": "Hubs rápidos concentrados no eixo litorâneo (Joinville, Itajaí e Florianópolis)"
       },
       "powertrain_evaluations": {
         "biometano": {
@@ -171,7 +314,7 @@
           "refuel_time_minutes": 20,
           "payload_penalty_kg": -280.0,
           "emission_reduction_percent": 93.0,
-          "recommendation": "Conecta o maior polo de dejetos agropecuários do Brasil (Oeste SC) aos portos exportadores de Itajaí e Navegantes. Fortíssima vocação para economia circular e biometano suinícola."
+          "recommendation": "Conecta o maior polo de dejetos agropecuários do Brasil (Oeste SC) aos portos exportadores de Itajaí e Navegantes. Exige atenção ao trecho serrano entre Campos Novos e Rio do Sul."
         },
         "diesel": {
           "feasibility_score": 100,
@@ -189,7 +332,7 @@
           "refuel_time_minutes": 90,
           "payload_penalty_kg": -2200.0,
           "emission_reduction_percent": 91.5,
-          "recommendation": "Exige expansão de eletropostos pesados no trecho do Meio-Oeste da BR-282. Viabilidade já consolidada para o trecho final litorâneo (Joinville-Itajaí-Florianópolis)."
+          "recommendation": "Exige expansão de eletropostos pesados no trecho do Meio-Oeste da BR-282/BR-470. Viabilidade já consolidada para o trecho final litorâneo (Joinville–Itajaí–Florianópolis)."
         }
       },
       "source_ids": [
@@ -198,6 +341,423 @@
         "V01",
         "V10",
         "E05"
+      ]
+    },
+    {
+      "id": "goiania-santos",
+      "name": "Eixo Planalto Central–Santos — BR-050 / SP-330",
+      "origin": "Anápolis / Goiânia (GO)",
+      "destination": "Porto de Santos (SP)",
+      "distance_km": 980.0,
+      "cargo_profile": "Grãos, açúcar, etanol, defensivos e carga industrial do Triângulo Mineiro",
+      "typical_pbtc": "57t a 74t (Bitrem / Rodotrem)",
+      "highways": [
+        "BR-153",
+        "BR-050",
+        "SP-330",
+        "SP-150"
+      ],
+      "route_waypoints": [
+        [
+          -48.953,
+          -16.328
+        ],
+        [
+          -49.264,
+          -16.687
+        ],
+        [
+          -47.939,
+          -18.17
+        ],
+        [
+          -48.277,
+          -18.918
+        ],
+        [
+          -47.931,
+          -19.748
+        ],
+        [
+          -47.81,
+          -21.177
+        ],
+        [
+          -47.061,
+          -22.906
+        ],
+        [
+          -46.633,
+          -23.55
+        ],
+        [
+          -46.333,
+          -23.961
+        ]
+      ],
+      "refueling_points": {
+        "diesel": "140+ postos rodoviários",
+        "biomethane_cng": "Boa cobertura em SP-330 e polos do Triângulo Mineiro (Uberlândia/Uberaba), rarefeita em Goiás",
+        "electric_hpc": "Restrito ao eixo Campinas–SP–Santos e ponto isolado em Ribeirão Preto"
+      },
+      "powertrain_evaluations": {
+        "biometano": {
+          "feasibility_score": 89,
+          "feasibility_label": "Viável pelo Triângulo e SP",
+          "stops_description": "1 a 2 paradas (Uberlândia / Ribeirão Preto)",
+          "refuel_time_minutes": 25,
+          "payload_penalty_kg": -280.0,
+          "emission_reduction_percent": 91.8,
+          "recommendation": "Sinergia alta com usinas sucroenergéticas de MG e SP ao longo da BR-050 e Anhanguera. Trecho Goiânia–Uberlândia requer planejamento de autonomia."
+        },
+        "diesel": {
+          "feasibility_score": 100,
+          "feasibility_label": "Operacional Padrão",
+          "stops_description": "1 parada regular",
+          "refuel_time_minutes": 15,
+          "payload_penalty_kg": 0.0,
+          "emission_reduction_percent": 0.0,
+          "recommendation": "Rota tradicional de escoamento de grãos e manufaturados com ampla oferta de serviços."
+        },
+        "eletrico": {
+          "feasibility_score": 45,
+          "feasibility_label": "Restrito a Trechos Curtos em SP",
+          "stops_description": "3 a 4 recargas necessárias",
+          "refuel_time_minutes": 220,
+          "payload_penalty_kg": -2300.0,
+          "emission_reduction_percent": 89.0,
+          "recommendation": "Forte déficit de carregadores >150 kW no trecho entre Uberaba (MG) e Goiânia (GO)."
+        }
+      },
+      "source_ids": [
+        "I12",
+        "I07",
+        "V10"
+      ]
+    },
+    {
+      "id": "bh-sp",
+      "name": "Eixo Fernão Dias — BR-381 (MG–SP)",
+      "origin": "Belo Horizonte / Betim (MG)",
+      "destination": "São Paulo / Guarulhos (SP)",
+      "distance_km": 585.0,
+      "cargo_profile": "Siderurgia, autopeças, mineração processada e carga geral interestadual",
+      "typical_pbtc": "45t a 57t (Cavalo 6x2 / Vanderléia)",
+      "highways": [
+        "BR-381"
+      ],
+      "route_waypoints": [
+        [
+          -43.938,
+          -19.919
+        ],
+        [
+          -44.89,
+          -20.92
+        ],
+        [
+          -45.936,
+          -22.226
+        ],
+        [
+          -46.544,
+          -22.952
+        ],
+        [
+          -46.633,
+          -23.55
+        ]
+      ],
+      "refueling_points": {
+        "diesel": "70+ postos estruturados",
+        "biomethane_cng": "Oferta concentrada na RMBH (Betim) e RMSP (Guarulhos), com expansão no Sul de MG",
+        "electric_hpc": "Cobertura nas pontas (RMBH e RMSP) e lacuna na Serra da Mantiqueira"
+      },
+      "powertrain_evaluations": {
+        "biometano": {
+          "feasibility_score": 88,
+          "feasibility_label": "Viável com Abastecimento nas Pontas",
+          "stops_description": "Trecho direto com Bio-GNC (650+ km) ou 1 parada em Pouso Alegre",
+          "refuel_time_minutes": 20,
+          "payload_penalty_kg": -280.0,
+          "emission_reduction_percent": 90.0,
+          "recommendation": "Distância compatível com autonomia de caminhões a gás (650–900 km), permitindo operação entre os hubs Gasmig (Betim) e Comgás (Guarulhos)."
+        },
+        "diesel": {
+          "feasibility_score": 100,
+          "feasibility_label": "Operacional Padrão",
+          "stops_description": "1 parada rápida",
+          "refuel_time_minutes": 15,
+          "payload_penalty_kg": 0.0,
+          "emission_reduction_percent": 0.0,
+          "recommendation": "Operação consolidada em terreno montanhoso."
+        },
+        "eletrico": {
+          "feasibility_score": 60,
+          "feasibility_label": "Dependente de Reforço Intermediário",
+          "stops_description": "1 a 2 recargas em rota serrana",
+          "refuel_time_minutes": 110,
+          "payload_penalty_kg": -2100.0,
+          "emission_reduction_percent": 90.5,
+          "recommendation": "Aclives da Mantiqueira elevam o consumo específico; requer eletropostos rápidos intermediários em Pouso Alegre/Extrema."
+        }
+      },
+      "source_ids": [
+        "I12",
+        "I07",
+        "I01"
+      ]
+    },
+    {
+      "id": "bh-rj",
+      "name": "Eixo Siderúrgico & Portuário — BR-040 (MG–RJ)",
+      "origin": "Belo Horizonte (MG)",
+      "destination": "Rio de Janeiro (RJ)",
+      "distance_km": 438.0,
+      "cargo_profile": "Siderurgia, aço plano, autopeças e carga portuária para Itaguaí/Rio",
+      "typical_pbtc": "45t a 57t (Cavalo 6x2)",
+      "highways": [
+        "BR-040"
+      ],
+      "route_waypoints": [
+        [
+          -43.938,
+          -19.919
+        ],
+        [
+          -43.77,
+          -20.66
+        ],
+        [
+          -43.35,
+          -21.764
+        ],
+        [
+          -43.173,
+          -22.505
+        ],
+        [
+          -43.173,
+          -22.907
+        ]
+      ],
+      "refueling_points": {
+        "diesel": "55+ postos estruturados",
+        "biomethane_cng": "Hubs em Betim/RMBH, Juiz de Fora e Baixada Fluminense (Naturgy)",
+        "electric_hpc": "Pontos em RMBH e Rio de Janeiro; ausência de HPC intermediário na serra"
+      },
+      "powertrain_evaluations": {
+        "biometano": {
+          "feasibility_score": 90,
+          "feasibility_label": "Alta Viabilidade",
+          "stops_description": "1 parada curta em Juiz de Fora ou viagem direta",
+          "refuel_time_minutes": 15,
+          "payload_penalty_kg": -280.0,
+          "emission_reduction_percent": 90.2,
+          "recommendation": "Presença estratégica de ponto GNV em Juiz de Fora preenche o trecho intermediário entre BH e Rio de Janeiro."
+        },
+        "diesel": {
+          "feasibility_score": 100,
+          "feasibility_label": "Operacional Padrão",
+          "stops_description": "Sem paradas obrigatórias",
+          "refuel_time_minutes": 15,
+          "payload_penalty_kg": 0.0,
+          "emission_reduction_percent": 0.0,
+          "recommendation": "Eixo tradicional da logística siderúrgica mineira."
+        },
+        "eletrico": {
+          "feasibility_score": 65,
+          "feasibility_label": "Viável no Limite da Autonomia BEV",
+          "stops_description": "1 recarga rápida intermediária recomendada",
+          "refuel_time_minutes": 95,
+          "payload_penalty_kg": -2050.0,
+          "emission_reduction_percent": 90.8,
+          "recommendation": "Trecho de 438 km exige ponto HPC em Juiz de Fora/Três Rios para margem operacional segura de caminhões carregados."
+        }
+      },
+      "source_ids": [
+        "I12",
+        "I07",
+        "I01"
+      ]
+    },
+    {
+      "id": "sul-mercosul",
+      "name": "Eixo Litorâneo Sul — BR-290 / BR-101 / BR-376 (RS–SC–PR)",
+      "origin": "Porto Alegre (RS)",
+      "destination": "Curitiba (PR) via Florianópolis (SC)",
+      "distance_km": 715.0,
+      "cargo_profile": "Indústria automotiva, petroquímica, proteína animal, celulose e carga Mercosul",
+      "typical_pbtc": "45t a 57t (Cavalo 6x2 / Bitrem)",
+      "highways": [
+        "BR-290",
+        "BR-101",
+        "BR-376"
+      ],
+      "route_waypoints": [
+        [
+          -51.218,
+          -30.035
+        ],
+        [
+          -50.27,
+          -29.894
+        ],
+        [
+          -49.736,
+          -29.335
+        ],
+        [
+          -49.373,
+          -28.677
+        ],
+        [
+          -48.634,
+          -27.595
+        ],
+        [
+          -48.662,
+          -26.908
+        ],
+        [
+          -48.846,
+          -26.304
+        ],
+        [
+          -49.273,
+          -25.428
+        ]
+      ],
+      "refueling_points": {
+        "diesel": "85+ postos estruturados",
+        "biomethane_cng": "Malha contínua Sulgás + SCGÁS + Compagás ao longo de toda a faixa litorânea",
+        "electric_hpc": "Cobertura crescente entre Porto Alegre, Florianópolis, Joinville e Curitiba"
+      },
+      "powertrain_evaluations": {
+        "biometano": {
+          "feasibility_score": 95,
+          "feasibility_label": "Corredor Altamente Consolidado",
+          "stops_description": "1 parada estratégica (Criciúma, Itajaí ou Joinville)",
+          "refuel_time_minutes": 15,
+          "payload_penalty_kg": -280.0,
+          "emission_reduction_percent": 92.0,
+          "recommendation": "Um dos eixos mais bem servidos de gás natural e biometano do país, conectando Sulgás, SCGÁS e Compagás com sobreposição de cobertura."
+        },
+        "diesel": {
+          "feasibility_score": 100,
+          "feasibility_label": "Operacional Padrão",
+          "stops_description": "1 parada regular",
+          "refuel_time_minutes": 15,
+          "payload_penalty_kg": 0.0,
+          "emission_reduction_percent": 0.0,
+          "recommendation": "Eixo duplicado em grande extensão com plena disponibilidade."
+        },
+        "eletrico": {
+          "feasibility_score": 74,
+          "feasibility_label": "Viável em Etapas Regionais",
+          "stops_description": "2 recargas rápidas intermediárias",
+          "refuel_time_minutes": 100,
+          "payload_penalty_kg": -2000.0,
+          "emission_reduction_percent": 91.0,
+          "recommendation": "Boa presença de eletropostos nas capitais e polos industriais (Porto Alegre, Florianópolis, Joinville, Curitiba), com lacuna no extremo sul de SC."
+        }
+      },
+      "source_ids": [
+        "I12",
+        "I09",
+        "P09",
+        "I01"
+      ]
+    },
+    {
+      "id": "eixo-nordeste-litoral",
+      "name": "Eixo Litorâneo Nordeste — BR-324 / BR-101 / BR-116 (BA–PE–CE)",
+      "origin": "Salvador / Camaçari (BA)",
+      "destination": "Fortaleza / Pecém (CE) via Recife (PE)",
+      "distance_km": 1540.0,
+      "cargo_profile": "Petroquímica, bens de consumo, bebidas, logística portuária Suape–Pecém",
+      "typical_pbtc": "45t a 57t (Cavalo 6x2)",
+      "highways": [
+        "BR-324",
+        "BR-101",
+        "BR-116"
+      ],
+      "route_waypoints": [
+        [
+          -38.501,
+          -12.971
+        ],
+        [
+          -38.967,
+          -12.266
+        ],
+        [
+          -37.073,
+          -10.947
+        ],
+        [
+          -35.735,
+          -9.666
+        ],
+        [
+          -34.877,
+          -8.048
+        ],
+        [
+          -34.864,
+          -7.115
+        ],
+        [
+          -35.209,
+          -5.795
+        ],
+        [
+          -37.344,
+          -5.188
+        ],
+        [
+          -38.527,
+          -3.732
+        ]
+      ],
+      "refueling_points": {
+        "diesel": "130+ postos rodoviários",
+        "biomethane_cng": "Boa oferta nas capitais litorâneas (Bahiagás, Sergas, Algás, Copergás, Potigás, Cegás), com vãos no semiárido RN–CE",
+        "electric_hpc": "Cobertura ainda incipiente e isolada apenas em áreas metropolitanas"
+      },
+      "powertrain_evaluations": {
+        "biometano": {
+          "feasibility_score": 82,
+          "feasibility_label": "Viável com Paradas nas Capitais",
+          "stops_description": "2 a 3 paradas nas RMs litorâneas",
+          "refuel_time_minutes": 40,
+          "payload_penalty_kg": -280.0,
+          "emission_reduction_percent": 90.8,
+          "recommendation": "Rede sólida de GNV entre Salvador, Aracaju, Maceió, Recife e João Pessoa; trecho Mossoró–Fortaleza requer autonomia >= 650 km."
+        },
+        "diesel": {
+          "feasibility_score": 100,
+          "feasibility_label": "Operacional Padrão",
+          "stops_description": "2 paradas rápidas",
+          "refuel_time_minutes": 25,
+          "payload_penalty_kg": 0.0,
+          "emission_reduction_percent": 0.0,
+          "recommendation": "Infraestrutura tradicional consolidada ao longo da BR-101 e BR-116."
+        },
+        "eletrico": {
+          "feasibility_score": 38,
+          "feasibility_label": "Infraestrutura HPC Insuficiente",
+          "stops_description": "5+ recargas com trechos descobertos",
+          "refuel_time_minutes": 300,
+          "payload_penalty_kg": -2200.0,
+          "emission_reduction_percent": 89.5,
+          "recommendation": "Eletropostos de alta potência (>150 kW) restritos a hubs isolados em Salvador, Recife e Fortaleza, inviabilizando rotas contínuas de pesados."
+        }
+      },
+      "source_ids": [
+        "I12",
+        "I07",
+        "I01"
       ]
     }
   ]

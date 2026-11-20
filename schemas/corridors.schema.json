@@ -41,6 +41,41 @@
           "title": "Typical PBTC",
           "type": "string"
         },
+        "highways": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Principais rodovias que compõem o corredor.",
+          "title": "Highways"
+        },
+        "route_waypoints": {
+          "anyOf": [
+            {
+              "items": {
+                "items": {
+                  "type": "number"
+                },
+                "type": "array"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Sequência ordenada de coordenadas [longitude, latitude] representando o traçado esquemático do corredor.",
+          "title": "Route Waypoints"
+        },
         "refueling_points": {
           "$ref": "#/$defs/RefuelingPoints",
           "description": "Infraestrutura de abastecimento ao longo da rota.",

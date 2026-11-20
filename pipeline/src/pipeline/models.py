@@ -731,6 +731,16 @@ class FreightCorridor(BaseModel):
         description="Configuração veicular típica e PBTC.",
         title="Typical PBTC",
     )
+    highways: list[str] | None = Field(
+        default=None,
+        description="Principais rodovias que compõem o corredor.",
+        title="Highways",
+    )
+    route_waypoints: list[list[float]] | None = Field(
+        default=None,
+        description="Sequência ordenada de coordenadas [longitude, latitude] representando o traçado esquemático do corredor.",
+        title="Route Waypoints",
+    )
     refueling_points: RefuelingPoints = Field(
         ...,
         description="Infraestrutura de abastecimento ao longo da rota.",
@@ -775,119 +785,6 @@ class CorridorsCatalog(BaseModel):
 
     @classmethod
     def load(cls, path: Path) -> CorridorsCatalog:
-        content = path.read_text(encoding="utf-8")
-        data = json.loads(content)
-        return cls.model_validate(data)
-
-    def save(self, path: Path) -> None:
-        path.parent.mkdir(parents=True, exist_ok=True)
-        dump = self.model_dump(exclude_none=True, by_alias=True)
-        path.write_text(
-            json.dumps(dump, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
-        )
-
-
-# =============================================================================
-# Biomethane Plants Models
-# =============================================================================
-
-
-class BiomethanePlant(BaseModel):
-    """ANP-authorized biomethane production facility."""
-
-    model_config = ConfigDict(extra="forbid")
-
-    id: str = Field(
-        ...,
-        description="Identificador único da unidade produtora.",
-        title="Id",
-    )
-    name: str = Field(
-        ...,
-        description="Nome da usina ou unidade operacional.",
-        title="Name",
-    )
-    operator: str = Field(
-        ...,
-        description="Empresa ou grupo operador.",
-        title="Operator",
-    )
-    city: str = Field(
-        ...,
-        description="Município de localização.",
-        title="City",
-    )
-    state: str = Field(
-        ...,
-        description="Unidade Federativa (UF).",
-        title="State",
-    )
-    feedstock: str = Field(
-        ...,
-        description="Substrato agroindustrial ou resíduo base.",
-        title="Feedstock",
-    )
-    daily_capacity_nm3_day: int = Field(
-        ...,
-        gt=0,
-        description="Capacidade autorizada de produção diária em Nm³/dia.",
-        title="Daily Capacity (Nm³/day)",
-    )
-    logistics_modal: str = Field(
-        ...,
-        description="Modal logístico de escoamento.",
-        title="Logistics Modal",
-    )
-    status: str = Field(
-        ...,
-        description="Status de operação da usina.",
-        title="Status",
-    )
-    grid_connection: str = Field(
-        ...,
-        description="Conexão com a rede de gás canalizado ou transporte.",
-        title="Grid Connection",
-    )
-    source_id: Annotated[str, StringConstraints(pattern=r"^[A-Z][0-9]{2}$")] = Field(
-        ...,
-        description="ID da fonte no catálogo de fontes.",
-        title="Source Id",
-    )
-
-
-class BiomethanePlantsCatalog(BaseModel):
-    """Catalog of ANP-authorized biomethane production plants."""
-
-    model_config = ConfigDict(extra="forbid", populate_by_name=True)
-
-    dollar_schema: str | None = Field(
-        default="../../schemas/biomethane_plants.schema.json",
-        alias="$schema",
-        title="$schema",
-    )
-    schema_version: Literal[1] = Field(
-        default=1,
-        title="Schema Version",
-    )
-    generated_at: str = Field(
-        ...,
-        description="Data de geração do catálogo.",
-        title="Generated At",
-    )
-    total_installed_capacity_nm3_day: int = Field(
-        ...,
-        gt=0,
-        description="Capacidade diária total consolidada em Nm³/dia.",
-        title="Total Installed Capacity (Nm³/day)",
-    )
-    plants: list[BiomethanePlant] = Field(
-        ...,
-        description="Relação de usinas autorizadas pela ANP.",
-        title="Plants",
-    )
-
-    @classmethod
-    def load(cls, path: Path) -> BiomethanePlantsCatalog:
         content = path.read_text(encoding="utf-8")
         data = json.loads(content)
         return cls.model_validate(data)
@@ -1252,6 +1149,157 @@ class GlobalBenchmarksCatalog(BaseModel):
         )
 
 
+# =============================================================================
+# Corridor Fuel & Charging Infrastructure Models
+# =============================================================================
+
+StationTechnology = Literal["biomethane_cng", "electric_hpc"]
+StationStatus = Literal["Operacional", "Em Expansão", "Planejado"]
+
+
+class FuelStation(BaseModel):
+    """Georeferenced highway refueling or heavy-duty charging hub."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    id: str = Field(
+        ...,
+        min_length=1,
+        description="Identificador único do ponto ou hub rodoviário.",
+        title="Id",
+    )
+    name: str = Field(
+        ...,
+        min_length=1,
+        description="Nome operacional do hub/entroncamento rodoviário (sem PII/CNPJ).",
+        title="Name",
+    )
+    technology: StationTechnology = Field(
+        ...,
+        description="Tecnologia energética do ponto: 'biomethane_cng' ou 'electric_hpc'.",
+        title="Technology",
+    )
+    corridor_ids: list[str] = Field(
+        ...,
+        min_length=1,
+        description="Lista de IDs dos corredores logísticos atendidos.",
+        title="Corridor Ids",
+    )
+    highway: str = Field(
+        ...,
+        min_length=1,
+        description="Rodovia principal de localização (ex.: BR-163, SP-330, BR-116).",
+        title="Highway",
+    )
+    km_marker: float | None = Field(
+        default=None,
+        ge=0,
+        description="Quilômetro aproximado na rodovia de referência.",
+        title="KM Marker",
+    )
+    city: str = Field(
+        ...,
+        min_length=1,
+        description="Município de referência.",
+        title="City",
+    )
+    state: Annotated[str, StringConstraints(pattern=r"^[A-Z]{2}$")] = Field(
+        ...,
+        description="Sigla da Unidade Federativa (UF).",
+        title="State",
+    )
+    latitude: float = Field(
+        ...,
+        ge=-34.0,
+        le=6.0,
+        description="Latitude geográfica (graus decimais).",
+        title="Latitude",
+    )
+    longitude: float = Field(
+        ...,
+        ge=-75.0,
+        le=-32.0,
+        description="Longitude geográfica (graus decimais).",
+        title="Longitude",
+    )
+    capacity_spec: str = Field(
+        ...,
+        min_length=1,
+        description="Especificação de vazão ou potência instalada (ex.: 'GNC Alta Vazão' ou 'HPC 300 kW CCS2').",
+        title="Capacity Spec",
+    )
+    power_kw: float | None = Field(
+        default=None,
+        gt=0,
+        description="Potência elétrica nominal em kW (para eletropostos HPC >150 kW).",
+        title="Power (kW)",
+    )
+    high_flow_truck_ready: bool = Field(
+        default=True,
+        description="Indica se o ponto dispõe de acesso/bico/vaga compatível com caminhões pesados.",
+        title="High Flow Truck Ready",
+    )
+    operator_network: str | None = Field(
+        default=None,
+        description="Rede, concessionária ou distribuidora de referência.",
+        title="Operator Network",
+    )
+    status: StationStatus = Field(
+        default="Operacional",
+        description="Status operacional do ponto.",
+        title="Status",
+    )
+    badge: QualityBadge = Field(
+        ...,
+        description="Selo de qualidade do registro ('Primária', 'Adaptada' ou 'Ilustrativa').",
+        title="Badge",
+    )
+    source_id: Annotated[str, StringConstraints(pattern=r"^[A-Z][0-9]{2}$")] = Field(
+        ...,
+        description="ID da fonte no catálogo data/sources.json.",
+        title="Source Id",
+    )
+
+
+class CorridorFuelStationsCatalog(BaseModel):
+    """Catalog of georeferenced highway refueling and HPC charging hubs."""
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+    dollar_schema: str | None = Field(
+        default="../../schemas/corridor_fuel_stations.schema.json",
+        alias="$schema",
+        title="$schema",
+    )
+    schema_version: Literal[1] = Field(
+        default=1,
+        title="Schema Version",
+    )
+    generated_at: str = Field(
+        ...,
+        description="Data de geração do catálogo.",
+        title="Generated At",
+    )
+    stations: list[FuelStation] = Field(
+        ...,
+        description="Relação de postos/hubs rodoviários georreferenciados.",
+        title="Stations",
+    )
+
+    @classmethod
+    def load(cls, path: Path) -> CorridorFuelStationsCatalog:
+        content = path.read_text(encoding="utf-8")
+        data = json.loads(content)
+        return cls.model_validate(data)
+
+    def save(self, path: Path) -> None:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        dump = self.model_dump(exclude_none=True, by_alias=True)
+        path.write_text(
+            json.dumps(dump, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
+        )
+
+
 def export_all_schemas(schemas_dir: Path) -> dict[str, Path]:
     """Export JSON Schema for all models to target directory."""
     schemas_dir.mkdir(parents=True, exist_ok=True)
@@ -1262,7 +1310,7 @@ def export_all_schemas(schemas_dir: Path) -> dict[str, Path]:
         "sources.schema.json": SourcesCatalog,
         "prices_history.schema.json": PricesHistory,
         "corridors.schema.json": CorridorsCatalog,
-        "biomethane_plants.schema.json": BiomethanePlantsCatalog,
+        "corridor_fuel_stations.schema.json": CorridorFuelStationsCatalog,
         "local_pollutants.schema.json": LocalPollutantsCatalog,
         "global_benchmarks.schema.json": GlobalBenchmarksCatalog,
     }

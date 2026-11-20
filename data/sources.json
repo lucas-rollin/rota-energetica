@@ -479,6 +479,18 @@
       "terms": "Relatório institucional internacional",
       "attribution": "Fonte: IEA / ICCT.",
       "notes": "Comparativo internacional Well-to-Wheel de emissões da rede elétrica (Brasil SIN vs Europa, EUA e China) e incentivos como IRA e EU ETS."
+    },
+    {
+      "id": "I14",
+      "name": "Malha Territorial Digital das Unidades da Federação",
+      "publisher": "IBGE",
+      "description": "Limites geográficos simplificados das 27 Unidades da Federação (GeoJSON) para visualização cartográfica dos corredores",
+      "url": "https://www.ibge.gov.br/geociencias/organizacao-do-territorio/malhas-territoriais/15774-malhas.html",
+      "badge": "Primária",
+      "category": "B",
+      "terms": "Dados abertos governamentais (CC BY / uso livre com atribuição ao IBGE)",
+      "attribution": "Fonte: IBGE, Malha Territorial Digital (API de Malhas v3).",
+      "notes": "GeoJSON simplificado das 27 UFs obtido via servicodados.ibge.gov.br para base cartográfica estática do mapa de corredores."
     }
   ]
 }
