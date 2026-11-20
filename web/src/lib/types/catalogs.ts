@@ -1,3 +1,5 @@
+import type { QualityBadge } from './parameters';
+
 export interface RefuelingPoints {
   diesel: string;
   biomethane_cng: string;
@@ -22,6 +24,8 @@ export interface FreightCorridor {
   distance_km: number;
   cargo_profile: string;
   typical_pbtc: string;
+  highways?: string[];
+  route_waypoints?: [number, number][];
   refueling_points: RefuelingPoints;
   powertrain_evaluations: Record<string, PowertrainEvaluation>;
   source_ids: string[];
@@ -34,26 +38,34 @@ export interface CorridorsCatalog {
   corridors: FreightCorridor[];
 }
 
-export interface BiomethanePlant {
+export type StationTechnology = 'biomethane_cng' | 'electric_hpc';
+export type StationStatus = 'Operacional' | 'Em Expansão' | 'Planejado';
+
+export interface FuelStation {
   id: string;
   name: string;
-  operator: string;
+  technology: StationTechnology;
+  corridor_ids: string[];
+  highway: string;
+  km_marker?: number | null;
   city: string;
   state: string;
-  feedstock: string;
-  daily_capacity_nm3_day: number;
-  logistics_modal: string;
-  status: string;
-  grid_connection: string;
+  latitude: number;
+  longitude: number;
+  capacity_spec: string;
+  power_kw?: number | null;
+  high_flow_truck_ready: boolean;
+  operator_network?: string | null;
+  status: StationStatus;
+  badge: QualityBadge;
   source_id: string;
 }
 
-export interface BiomethanePlantsCatalog {
+export interface CorridorFuelStationsCatalog {
   $schema?: string;
   schema_version: number;
   generated_at: string;
-  total_installed_capacity_nm3_day: number;
-  plants: BiomethanePlant[];
+  stations: FuelStation[];
 }
 
 export interface LegalLimitsWhtc {
