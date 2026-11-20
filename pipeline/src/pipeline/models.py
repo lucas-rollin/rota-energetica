@@ -1152,6 +1152,35 @@ class RegionBenchmark(BaseModel):
         description="Intensidade de emissões de carbono da rede elétrica (gCO2eq/kWh).",
         title="Grid Carbon Intensity (gCO2eq/kWh)",
     )
+    diesel_price_usd_per_liter: float = Field(
+        ...,
+        ge=0,
+        description="Preço médio de bomba do diesel (US$/L).",
+        title="Diesel Price (US$/L)",
+    )
+    electricity_price_usd_per_kwh: float = Field(
+        ...,
+        ge=0,
+        description="Tarifa média comercial/industrial de eletricidade (US$/kWh).",
+        title="Electricity Price (US$/kWh)",
+    )
+    capex_subsidy_max_usd: float = Field(
+        ...,
+        ge=0,
+        description="Valor máximo de subsídio governamental direto por caminhão (US$).",
+        title="Max CAPEX Subsidy (US$)",
+    )
+    battery_weight_allowance_kg: float = Field(
+        ...,
+        ge=0,
+        description="Compensação legal de peso para baterias na balança (kg).",
+        title="Battery Weight Allowance (kg)",
+    )
+    dominant_pathway: str = Field(
+        ...,
+        description="Rota tecnológica prioritária na política pública do país.",
+        title="Dominant Pathway",
+    )
     wtw_emissions_g_co2eq_tkm: WtwEmissionsBenchmark = Field(
         ...,
         description="Emissões de ciclo de vida Well-to-Wheel (gCO2eq/t.km).",

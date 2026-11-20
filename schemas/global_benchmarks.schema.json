@@ -92,6 +92,35 @@
           "title": "Grid Carbon Intensity (gCO2eq/kWh)",
           "type": "number"
         },
+        "diesel_price_usd_per_liter": {
+          "description": "Preço médio de bomba do diesel (US$/L).",
+          "minimum": 0,
+          "title": "Diesel Price (US$/L)",
+          "type": "number"
+        },
+        "electricity_price_usd_per_kwh": {
+          "description": "Tarifa média comercial/industrial de eletricidade (US$/kWh).",
+          "minimum": 0,
+          "title": "Electricity Price (US$/kWh)",
+          "type": "number"
+        },
+        "capex_subsidy_max_usd": {
+          "description": "Valor máximo de subsídio governamental direto por caminhão (US$).",
+          "minimum": 0,
+          "title": "Max CAPEX Subsidy (US$)",
+          "type": "number"
+        },
+        "battery_weight_allowance_kg": {
+          "description": "Compensação legal de peso para baterias na balança (kg).",
+          "minimum": 0,
+          "title": "Battery Weight Allowance (kg)",
+          "type": "number"
+        },
+        "dominant_pathway": {
+          "description": "Rota tecnológica prioritária na política pública do país.",
+          "title": "Dominant Pathway",
+          "type": "string"
+        },
         "wtw_emissions_g_co2eq_tkm": {
           "$ref": "#/$defs/WtwEmissionsBenchmark",
           "description": "Emissões de ciclo de vida Well-to-Wheel (gCO2eq/t.km).",
@@ -125,6 +154,11 @@
         "flag",
         "renewable_grid_share_percent",
         "grid_carbon_intensity_g_kwh",
+        "diesel_price_usd_per_liter",
+        "electricity_price_usd_per_kwh",
+        "capex_subsidy_max_usd",
+        "battery_weight_allowance_kg",
+        "dominant_pathway",
         "wtw_emissions_g_co2eq_tkm",
         "energy_cost_levelized_mwh_eq",
         "regulatory_mechanism",
