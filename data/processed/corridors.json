@@ -1,0 +1,204 @@
+{
+  "$schema": "../../schemas/corridors.schema.json",
+  "schema_version": 1,
+  "generated_at": "2026-11-20",
+  "corridors": [
+    {
+      "id": "rondonopolis-santos",
+      "name": "Corredor Agro Centro-Oeste — BR-163 / SP-330",
+      "origin": "Rondonópolis (MT)",
+      "destination": "Porto de Santos (SP)",
+      "distance_km": 1680.0,
+      "cargo_profile": "Escoamento de safra de grãos (soja e milho) e retorno com fertilizantes",
+      "typical_pbtc": "74t (Rodotrem 9 eixos)",
+      "refueling_points": {
+        "diesel": "210+ postos rodoviários ao longo da rota",
+        "biomethane_cng": "18 postos certificados na rota e usinas com GNC móvel",
+        "electric_hpc": "2 pontos de recarga rápida >150kW (gargalo crítico)"
+      },
+      "powertrain_evaluations": {
+        "biometano": {
+          "feasibility_score": 96,
+          "feasibility_label": "Altamente Viável",
+          "stops_description": "2 a 3 paradas de abastecimento (~15 min cada)",
+          "refuel_time_minutes": 35,
+          "payload_penalty_kg": -280.0,
+          "emission_reduction_percent": 92.4,
+          "recommendation": "Excelente disponibilidade de postos GNC/Biometano em Goiás e interior paulista (SP-330). Autonomia de 900-1.000 km cobre os trechos com folga operacional."
+        },
+        "diesel": {
+          "feasibility_score": 100,
+          "feasibility_label": "Linha de Base Operacional",
+          "stops_description": "1 a 2 paradas rápidas",
+          "refuel_time_minutes": 20,
+          "payload_penalty_kg": 0.0,
+          "emission_reduction_percent": 0.0,
+          "recommendation": "Linha de base tradicional. Total cobertura de postos, porém com 100% de exposição à volatilidade do diesel fóssil e sem créditos de descarbonização (CBIO)."
+        },
+        "eletrico": {
+          "feasibility_score": 32,
+          "feasibility_label": "Inviável no Curto Prazo",
+          "stops_description": "5 a 7 horas de recarga acumulada",
+          "refuel_time_minutes": 360,
+          "payload_penalty_kg": -2400.0,
+          "emission_reduction_percent": 88.5,
+          "recommendation": "Gargalo Crítico: Perda de até 2.400 kg de carga líquida de grãos sob a Lei da Balança e escassez de infraestrutura de Megawatt Charging (MCS) inviabilizam economicamente o trecho rodoviário longo."
+        }
+      },
+      "source_ids": [
+        "I12",
+        "V01",
+        "V10",
+        "I05"
+      ]
+    },
+    {
+      "id": "curitiba-paranagua",
+      "name": "Corredor Sul Grãos & Proteína — BR-277",
+      "origin": "Curitiba e Campos Gerais (PR)",
+      "destination": "Porto de Paranaguá (PR)",
+      "distance_km": 98.0,
+      "cargo_profile": "Descida de serra com grãos, proteína animal congelada e contêineres",
+      "typical_pbtc": "45t a 57t (Cavalo mecânico 6x2 / 6x4)",
+      "refueling_points": {
+        "diesel": "25+ postos estruturados",
+        "biomethane_cng": "12 postos dedicados na BR-277 e rede Compagás",
+        "electric_hpc": "4 postos rápidos na descida da serra e pátios"
+      },
+      "powertrain_evaluations": {
+        "biometano": {
+          "feasibility_score": 94,
+          "feasibility_label": "Excelente Viabilidade",
+          "stops_description": "Abastecimento na base (bate-e-volta sem paradas no percurso)",
+          "refuel_time_minutes": 15,
+          "payload_penalty_kg": -280.0,
+          "emission_reduction_percent": 91.0,
+          "recommendation": "Distância curta permite ciclo duplo diário. Rede de gás e biometano da agroindústria suinícola paranaense viabilizam custo operacional atrativo."
+        },
+        "diesel": {
+          "feasibility_score": 100,
+          "feasibility_label": "Operacional Padrão",
+          "stops_description": "Sem paradas necessárias na descida",
+          "refuel_time_minutes": 15,
+          "payload_penalty_kg": 0.0,
+          "emission_reduction_percent": 0.0,
+          "recommendation": "Operação padrão sem risco de rota, porém com custos crescentes de combustíveis fósseis e pressão ESG de tradings exportadoras no Porto de Paranaguá."
+        },
+        "eletrico": {
+          "feasibility_score": 88,
+          "feasibility_label": "Alta Eficiência Regenerativa",
+          "stops_description": "Recarga nos pátios de triagem portuária",
+          "refuel_time_minutes": 45,
+          "payload_penalty_kg": -1900.0,
+          "emission_reduction_percent": 92.0,
+          "recommendation": "Perfil topográfico de serra ideal para frenagem regenerativa pesada, recuperando até 18% da carga da bateria na descida da BR-277."
+        }
+      },
+      "source_ids": [
+        "I12",
+        "I09",
+        "V10",
+        "E05"
+      ]
+    },
+    {
+      "id": "sp-rio",
+      "name": "Eixo Sudeste Industrial & Carga Fracionada — Via Dutra (BR-116)",
+      "origin": "São Paulo (SP)",
+      "destination": "Rio de Janeiro (RJ)",
+      "distance_km": 435.0,
+      "cargo_profile": "Manufatura, carga fracionada B2B, farmacêutico e e-commerce de alto valor agregado",
+      "typical_pbtc": "40t a 45t (Cavalo mecânico 4x2 e 6x2)",
+      "refueling_points": {
+        "diesel": "60+ postos rodoviários",
+        "biomethane_cng": "22 postos homologados com alto fluxo na Via Dutra",
+        "electric_hpc": "10 eletropostos rápidos >150kW operados por concessionárias e distribuidoras"
+      },
+      "powertrain_evaluations": {
+        "biometano": {
+          "feasibility_score": 91,
+          "feasibility_label": "Alta Viabilidade",
+          "stops_description": "1 parada curta (15 min)",
+          "refuel_time_minutes": 15,
+          "payload_penalty_kg": -280.0,
+          "emission_reduction_percent": 90.5,
+          "recommendation": "Corredor Dutra possui ampla rede de gás canalizado (NTS) e biometano de aterros sanitários (Paulínia e Seropédica). Excelente disponibilidade e custo."
+        },
+        "diesel": {
+          "feasibility_score": 100,
+          "feasibility_label": "Operacional Padrão",
+          "stops_description": "Sem paradas obrigatórias",
+          "refuel_time_minutes": 15,
+          "payload_penalty_kg": 0.0,
+          "emission_reduction_percent": 0.0,
+          "recommendation": "Corredor industrial de alto fluxo com custo estável de manutenção e oficinas autorizadas."
+        },
+        "eletrico": {
+          "feasibility_score": 84,
+          "feasibility_label": "Corredor Elétrico Mais Maduro do Brasil",
+          "stops_description": "1 recarga rápida intermediária (~45-50 min em hub 150kW-350kW)",
+          "refuel_time_minutes": 50,
+          "payload_penalty_kg": -2100.0,
+          "emission_reduction_percent": 90.2,
+          "recommendation": "Melhor infraestrutura de recarga rápida para pesados do Brasil. Ideal para frotas de e-commerce e bens de consumo com compromissos SBTi e Scope 1 zero."
+        }
+      },
+      "source_ids": [
+        "I12",
+        "I01",
+        "V10",
+        "E05"
+      ]
+    },
+    {
+      "id": "chapeco-itajai",
+      "name": "Corredor Agroindustrial Catarinense — BR-282 / BR-470 / BR-101 (SC)",
+      "origin": "Chapecó e Oeste Catarinense (SC)",
+      "destination": "Complexo Portuário de Itajaí e Navegantes (SC)",
+      "distance_km": 550.0,
+      "cargo_profile": "Frigoríficos, suínos e aves congeladas de exportação e insumos agroindustriais",
+      "typical_pbtc": "45t a 57t (Cavalo mecânico 6x2 / 6x4 frigorífico)",
+      "refueling_points": {
+        "diesel": "45+ postos estruturados ao longo da BR-470 e BR-282",
+        "biomethane_cng": "8 postos com GNV/GNC na malha SCGÁS no litoral e expansão no Oeste",
+        "electric_hpc": "3 hubs rápidos no litoral (Itajaí, Joinville e Florianópolis)"
+      },
+      "powertrain_evaluations": {
+        "biometano": {
+          "feasibility_score": 87,
+          "feasibility_label": "Alta Sinergia Regional",
+          "stops_description": "1 abastecimento na rota (base litorânea SCGÁS e base Oeste)",
+          "refuel_time_minutes": 20,
+          "payload_penalty_kg": -280.0,
+          "emission_reduction_percent": 93.0,
+          "recommendation": "Conecta o maior polo de dejetos agropecuários do Brasil (Oeste SC) aos portos exportadores de Itajaí e Navegantes. Fortíssima vocação para economia circular e biometano suinícola."
+        },
+        "diesel": {
+          "feasibility_score": 100,
+          "feasibility_label": "Operacional Padrão",
+          "stops_description": "1 parada regular",
+          "refuel_time_minutes": 15,
+          "payload_penalty_kg": 0.0,
+          "emission_reduction_percent": 0.0,
+          "recommendation": "Linha base do agronegócio de Santa Catarina com abastecimento garantido em todo o trecho da serra catarinense."
+        },
+        "eletrico": {
+          "feasibility_score": 68,
+          "feasibility_label": "Viável com Hubs Dedicados",
+          "stops_description": "1 a 2 recargas intermediárias no planalto serrano",
+          "refuel_time_minutes": 90,
+          "payload_penalty_kg": -2200.0,
+          "emission_reduction_percent": 91.5,
+          "recommendation": "Exige expansão de eletropostos pesados no trecho do Meio-Oeste da BR-282. Viabilidade já consolidada para o trecho final litorâneo (Joinville-Itajaí-Florianópolis)."
+        }
+      },
+      "source_ids": [
+        "I12",
+        "P09",
+        "V01",
+        "V10",
+        "E05"
+      ]
+    }
+  ]
+}

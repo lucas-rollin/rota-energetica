@@ -72,6 +72,16 @@
       "min": 1.5,
       "max": 6.0,
       "step": 0.1
+    },
+    "cbio_price": {
+      "value": 102.0,
+      "unit": "R$/CBIO",
+      "source_id": "P11",
+      "badge": "Primária",
+      "notes": "Preço médio negociado de CBIO na B3 nos últimos 12 meses (Painel ANP/B3)",
+      "min": 40.0,
+      "max": 200.0,
+      "step": 1.0
     }
   },
   "vehicles": {
@@ -156,6 +166,16 @@
         "min": 0.02,
         "max": 0.09,
         "step": 0.005
+      },
+      "payload_penalty_kg": {
+        "value": 0.0,
+        "unit": "kg",
+        "source_id": "V10",
+        "badge": "Primária",
+        "notes": "Linha de base de referência de capacidade de carga líquida útil (PBTC 45t a 74t)",
+        "min": 0.0,
+        "max": 0.0,
+        "step": 50.0
       }
     },
     "gnv": {
@@ -229,6 +249,16 @@
         "min": 0.15,
         "max": 0.75,
         "step": 0.05
+      },
+      "payload_penalty_kg": {
+        "value": -350.0,
+        "unit": "kg",
+        "source_id": "V10",
+        "badge": "Adaptada",
+        "notes": "Peso adicional dos cilindros de aço/compósito de GNV comprimido",
+        "min": -800.0,
+        "max": 0.0,
+        "step": 50.0
       }
     },
     "biometano": {
@@ -302,6 +332,16 @@
         "min": 0.15,
         "max": 0.75,
         "step": 0.05
+      },
+      "payload_penalty_kg": {
+        "value": -280.0,
+        "unit": "kg",
+        "source_id": "V10",
+        "badge": "Adaptada",
+        "notes": "Peso adicional do conjunto de cilindros de alta pressão (tipo 4 fibra de carbono)",
+        "min": -800.0,
+        "max": 0.0,
+        "step": 50.0
       }
     },
     "eletrico": {
@@ -385,6 +425,16 @@
         "min": 0.75,
         "max": 0.98,
         "step": 0.01
+      },
+      "payload_penalty_kg": {
+        "value": -2400.0,
+        "unit": "kg",
+        "source_id": "V10",
+        "badge": "Adaptada",
+        "notes": "Penalidade líquida de carga útil devido ao peso das baterias (pack de 540-588 kWh) sob a Lei da Balança sem tolerância especial de PBTC",
+        "min": -4000.0,
+        "max": -1000.0,
+        "step": 100.0
       }
     }
   }

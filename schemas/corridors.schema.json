@@ -1,0 +1,207 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "FreightCorridor": {
+      "additionalProperties": false,
+      "description": "Strategic heavy freight transportation corridor.",
+      "properties": {
+        "id": {
+          "description": "Identificador unívoco do corredor rodoviário.",
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "description": "Nome do corredor e rodovias principais.",
+          "title": "Name",
+          "type": "string"
+        },
+        "origin": {
+          "description": "Polo de origem da carga.",
+          "title": "Origin",
+          "type": "string"
+        },
+        "destination": {
+          "description": "Destino final da carga.",
+          "title": "Destination",
+          "type": "string"
+        },
+        "distance_km": {
+          "description": "Extensão total do trecho em quilômetros.",
+          "exclusiveMinimum": 0,
+          "title": "Distance (km)",
+          "type": "number"
+        },
+        "cargo_profile": {
+          "description": "Perfil predominante de carga e segmento.",
+          "title": "Cargo Profile",
+          "type": "string"
+        },
+        "typical_pbtc": {
+          "description": "Configuração veicular típica e PBTC.",
+          "title": "Typical PBTC",
+          "type": "string"
+        },
+        "refueling_points": {
+          "$ref": "#/$defs/RefuelingPoints",
+          "description": "Infraestrutura de abastecimento ao longo da rota.",
+          "title": "Refueling Points"
+        },
+        "powertrain_evaluations": {
+          "additionalProperties": {
+            "$ref": "#/$defs/PowertrainEvaluation"
+          },
+          "description": "Avaliação por tipo de trem de força.",
+          "title": "Powertrain Evaluations",
+          "type": "object"
+        },
+        "source_ids": {
+          "description": "Lista de IDs de fontes associadas no catálogo de fontes.",
+          "items": {
+            "pattern": "^[A-Z][0-9]{2}$",
+            "type": "string"
+          },
+          "title": "Source Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "origin",
+        "destination",
+        "distance_km",
+        "cargo_profile",
+        "typical_pbtc",
+        "refueling_points",
+        "powertrain_evaluations",
+        "source_ids"
+      ],
+      "title": "FreightCorridor",
+      "type": "object"
+    },
+    "PowertrainEvaluation": {
+      "additionalProperties": false,
+      "description": "Operational and environmental evaluation for a specific powertrain on a route.",
+      "properties": {
+        "feasibility_score": {
+          "description": "Nota de viabilidade operacional (0 a 100).",
+          "maximum": 100,
+          "minimum": 0,
+          "title": "Feasibility Score",
+          "type": "integer"
+        },
+        "feasibility_label": {
+          "description": "Rótulo qualitativo da viabilidade.",
+          "title": "Feasibility Label",
+          "type": "string"
+        },
+        "stops_description": {
+          "description": "Descrição das paradas necessárias para abastecimento/recarga.",
+          "title": "Stops Description",
+          "type": "string"
+        },
+        "refuel_time_minutes": {
+          "description": "Tempo total estimado de recarga/reabastecimento em minutos.",
+          "minimum": 0,
+          "title": "Refuel Time (minutes)",
+          "type": "integer"
+        },
+        "payload_penalty_kg": {
+          "description": "Impacto na capacidade líquida de carga útil em kg.",
+          "title": "Payload Penalty (kg)",
+          "type": "number"
+        },
+        "emission_reduction_percent": {
+          "description": "Redução percentual de emissões de GEE vs diesel.",
+          "title": "Emission Reduction Percent",
+          "type": "number"
+        },
+        "recommendation": {
+          "description": "Recomendação técnico-operacional para a rota.",
+          "title": "Recommendation",
+          "type": "string"
+        }
+      },
+      "required": [
+        "feasibility_score",
+        "feasibility_label",
+        "stops_description",
+        "refuel_time_minutes",
+        "payload_penalty_kg",
+        "emission_reduction_percent",
+        "recommendation"
+      ],
+      "title": "PowertrainEvaluation",
+      "type": "object"
+    },
+    "RefuelingPoints": {
+      "additionalProperties": false,
+      "description": "Heavy-duty fueling and charging infrastructure along a route.",
+      "properties": {
+        "diesel": {
+          "description": "Descrição e disponibilidade de postos a diesel.",
+          "title": "Diesel",
+          "type": "string"
+        },
+        "biomethane_cng": {
+          "description": "Disponibilidade de postos de biometano e GNV/GNC.",
+          "title": "Biomethane / CNG",
+          "type": "string"
+        },
+        "electric_hpc": {
+          "description": "Disponibilidade de postos de recarga rápida >150kW.",
+          "title": "Electric HPC",
+          "type": "string"
+        }
+      },
+      "required": [
+        "diesel",
+        "biomethane_cng",
+        "electric_hpc"
+      ],
+      "title": "RefuelingPoints",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Catalog of strategic Brazilian freight corridors.",
+  "properties": {
+    "$schema": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": "../../schemas/corridors.schema.json",
+      "title": "$schema"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "generated_at": {
+      "description": "Data de geração do catálogo.",
+      "title": "Generated At",
+      "type": "string"
+    },
+    "corridors": {
+      "description": "Lista de corredores mapeados.",
+      "items": {
+        "$ref": "#/$defs/FreightCorridor"
+      },
+      "title": "Corridors",
+      "type": "array"
+    }
+  },
+  "required": [
+    "generated_at",
+    "corridors"
+  ],
+  "title": "CorridorsCatalog",
+  "type": "object"
+}

@@ -1,0 +1,98 @@
+{
+  "$schema": "../../schemas/global_benchmarks.schema.json",
+  "schema_version": 1,
+  "generated_at": "2026-11-20",
+  "source_ids": [
+    "I13",
+    "E05",
+    "V10"
+  ],
+  "regions": {
+    "brasil": {
+      "name": "Brasil (Sistema Interligado Nacional)",
+      "code": "BR",
+      "currency": "BRL",
+      "flag": "🇧🇷",
+      "renewable_grid_share_percent": 86.2,
+      "grid_carbon_intensity_g_kwh": 52.0,
+      "wtw_emissions_g_co2eq_tkm": {
+        "diesel_baseline": 104.0,
+        "biomethane_vinasse": -18.4,
+        "bev_grid": 14.2
+      },
+      "energy_cost_levelized_mwh_eq": {
+        "biomethane": 286.0,
+        "offpeak_electricity": 390.0,
+        "diesel_s10": 548.0
+      },
+      "regulatory_mechanism": "RenovaBio (CBIOs na B3 a ~R$ 102/unid) e Mandato Lei 14.993/2024 (Combustível do Futuro)",
+      "capex_subsidy_status": "Sem subsídio direto a fundo perdido; financiamento via Finame BNDES Verde com taxa incentivada",
+      "battery_weight_regulation": "Sem compensação de PBTC para baterias na Lei da Balança (CONTRAN 882/2021). Penalidade líquida de até 2.400-3.800 kg de carga útil."
+    },
+    "uniao_europeia": {
+      "name": "União Europeia (Média Bloco EU-27)",
+      "code": "EU",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "renewable_grid_share_percent": 44.7,
+      "grid_carbon_intensity_g_kwh": 245.0,
+      "wtw_emissions_g_co2eq_tkm": {
+        "diesel_baseline": 104.0,
+        "biomethane_vinasse": 12.5,
+        "bev_grid": 38.6
+      },
+      "energy_cost_levelized_mwh_eq": {
+        "biomethane": 680.0,
+        "offpeak_electricity": 720.0,
+        "diesel_s10": 920.0,
+        "hpc_electricity": 1180.0
+      },
+      "regulatory_mechanism": "EU ETS (~€72/tCO2), Regulamento HDV CO2 Standards e Diretiva de Infraestrutura AFIR / TEN-T",
+      "capex_subsidy_status": "Subsídios nacionais agressivos (bônus de aquisição de até €80.000 por caminhão elétrico)",
+      "battery_weight_regulation": "Compensação legal de até +2.000 kg de PBTC na Diretiva de Pesos e Dimensões da UE para veículos ZEV."
+    },
+    "estados_unidos": {
+      "name": "Estados Unidos (Média Nacional US Grid)",
+      "code": "US",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "renewable_grid_share_percent": 22.4,
+      "grid_carbon_intensity_g_kwh": 385.0,
+      "wtw_emissions_g_co2eq_tkm": {
+        "diesel_baseline": 104.0,
+        "biomethane_vinasse": 8.0,
+        "bev_grid": 62.1
+      },
+      "energy_cost_levelized_mwh_eq": {
+        "biomethane": 490.0,
+        "offpeak_electricity": 450.0,
+        "diesel_s10": 610.0,
+        "commercial_electricity": 645.0
+      },
+      "regulatory_mechanism": "Inflation Reduction Act (IRA Seção 45W) e mercados estaduais LCFS (Califórnia ~US$ 78/crédito)",
+      "capex_subsidy_status": "Crédito tributário federal IRA de até US$ 40.000 por veículo pesado elétrico Classe 8",
+      "battery_weight_regulation": "Tolerância federal FAST Act de +2.000 lbs (~907 kg) no limite de peso bruto rodoviário para ZEV."
+    },
+    "china": {
+      "name": "China (Matriz Nacional Predominantemente Térmica)",
+      "code": "CN",
+      "currency": "CNY",
+      "flag": "🇨🇳",
+      "renewable_grid_share_percent": 31.8,
+      "grid_carbon_intensity_g_kwh": 550.0,
+      "wtw_emissions_g_co2eq_tkm": {
+        "diesel_baseline": 104.0,
+        "biomethane_vinasse": 22.0,
+        "bev_grid": 81.5
+      },
+      "energy_cost_levelized_mwh_eq": {
+        "biomethane": 420.0,
+        "offpeak_electricity": 310.0,
+        "diesel_s10": 580.0
+      },
+      "regulatory_mechanism": "Mandatos de cotas ZEV, política de eletrificação de portos e mineradoras e subsídios diretos na fabricação",
+      "capex_subsidy_status": "Subvenção na cadeia de baterias LFP e isenção de imposto de compra (NEV)",
+      "battery_weight_regulation": "Adoção em larga escala de Battery Swapping (BaaS) com mais de 3.800 estações operacionais de troca rápida (3 a 5 min)."
+    }
+  }
+}

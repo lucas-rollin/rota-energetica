@@ -1,0 +1,182 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "LegalLimitsWhtc": {
+      "additionalProperties": false,
+      "description": "Regulatory pollutant emission limits in WHTC test cycle.",
+      "properties": {
+        "nox_g_kwh": {
+          "description": "Limite regulatório de NOx em g/kWh (ciclo WHTC).",
+          "title": "NOx Limit (g/kWh)",
+          "type": "number"
+        },
+        "pm_g_kwh": {
+          "description": "Limite regulatório de Material Particulado em g/kWh.",
+          "title": "PM Limit (g/kWh)",
+          "type": "number"
+        },
+        "co_g_kwh": {
+          "description": "Limite regulatório de Monóxido de Carbono em g/kWh.",
+          "title": "CO Limit (g/kWh)",
+          "type": "number"
+        },
+        "ch4_slip_g_kwh": {
+          "description": "Limite regulatório de metano fugitivo (slip) em g/kWh.",
+          "title": "CH4 Slip Limit (g/kWh)",
+          "type": "number"
+        }
+      },
+      "required": [
+        "nox_g_kwh",
+        "pm_g_kwh",
+        "co_g_kwh",
+        "ch4_slip_g_kwh"
+      ],
+      "title": "LegalLimitsWhtc",
+      "type": "object"
+    },
+    "PowertrainPollutants": {
+      "additionalProperties": false,
+      "description": "Atmospheric criteria pollutant emissions for a specific powertrain.",
+      "properties": {
+        "label": {
+          "description": "Nome descritivo da propulsão.",
+          "title": "Label",
+          "type": "string"
+        },
+        "fossil_co2_g_km": {
+          "description": "Emissão fóssil direta de CO2 em g/km.",
+          "minimum": 0,
+          "title": "Fossil CO2 (g/km)",
+          "type": "number"
+        },
+        "methane_ch4_g_km": {
+          "description": "Emissão de metano não queimado em g/km.",
+          "minimum": 0,
+          "title": "Methane CH4 (g/km)",
+          "type": "number"
+        },
+        "nox_g_kwh": {
+          "description": "Emissão ponderada de óxidos de nitrogênio em g/kWh.",
+          "minimum": 0,
+          "title": "NOx (g/kWh)",
+          "type": "number"
+        },
+        "nox_g_km": {
+          "description": "Emissão estimada de NOx por quilômetro rodado.",
+          "minimum": 0,
+          "title": "NOx (g/km)",
+          "type": "number"
+        },
+        "pm25_g_kwh": {
+          "description": "Emissão de Material Particulado MP2.5 em g/kWh.",
+          "minimum": 0,
+          "title": "PM2.5 (g/kWh)",
+          "type": "number"
+        },
+        "pm25_g_km": {
+          "description": "Emissão estimada de MP2.5 em g/km.",
+          "minimum": 0,
+          "title": "PM2.5 (g/km)",
+          "type": "number"
+        },
+        "noise_db": {
+          "description": "Nível de ruído externo padronizado em dB(A).",
+          "minimum": 0,
+          "title": "Noise (dB)",
+          "type": "number"
+        },
+        "urban_impact": {
+          "description": "Classificação do impacto ambiental e na saúde urbana.",
+          "title": "Urban Impact",
+          "type": "string"
+        },
+        "nox_reduction_percent": {
+          "description": "Redução percentual de NOx em relação ao diesel Euro VI.",
+          "title": "NOx Reduction Percent",
+          "type": "number"
+        },
+        "pm_reduction_percent": {
+          "description": "Redução percentual de Material Particulado vs diesel Euro VI.",
+          "title": "PM Reduction Percent",
+          "type": "number"
+        }
+      },
+      "required": [
+        "label",
+        "fossil_co2_g_km",
+        "methane_ch4_g_km",
+        "nox_g_kwh",
+        "nox_g_km",
+        "pm25_g_kwh",
+        "pm25_g_km",
+        "noise_db",
+        "urban_impact",
+        "nox_reduction_percent",
+        "pm_reduction_percent"
+      ],
+      "title": "PowertrainPollutants",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Catalog of local air pollutants and vehicle emission standards.",
+  "properties": {
+    "$schema": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": "../../schemas/local_pollutants.schema.json",
+      "title": "$schema"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "generated_at": {
+      "description": "Data de geração do catálogo.",
+      "title": "Generated At",
+      "type": "string"
+    },
+    "reference_standard": {
+      "description": "Norma ambiental regulatória de referência.",
+      "title": "Reference Standard",
+      "type": "string"
+    },
+    "source_id": {
+      "description": "ID da fonte no catálogo de fontes.",
+      "pattern": "^[A-Z][0-9]{2}$",
+      "title": "Source Id",
+      "type": "string"
+    },
+    "legal_limits_whtc": {
+      "$ref": "#/$defs/LegalLimitsWhtc",
+      "description": "Limites máximos legais do Proconve P8 / Euro VI.",
+      "title": "Legal Limits WHTC"
+    },
+    "powertrains": {
+      "additionalProperties": {
+        "$ref": "#/$defs/PowertrainPollutants"
+      },
+      "description": "Emissões de poluentes locais por trem de força.",
+      "title": "Powertrains",
+      "type": "object"
+    }
+  },
+  "required": [
+    "generated_at",
+    "reference_standard",
+    "source_id",
+    "legal_limits_whtc",
+    "powertrains"
+  ],
+  "title": "LocalPollutantsCatalog",
+  "type": "object"
+}

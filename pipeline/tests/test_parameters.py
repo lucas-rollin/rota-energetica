@@ -7,6 +7,10 @@ import pytest
 from pydantic import ValidationError
 
 from pipeline.models import (
+    BiomethanePlantsCatalog,
+    CorridorsCatalog,
+    GlobalBenchmarksCatalog,
+    LocalPollutantsCatalog,
     Manifest,
     ParameterItem,
     SimulationParameters,
@@ -141,3 +145,55 @@ def test_export_parameters_schema(tmp_path: Path):
     schema_data = json.loads(schema_file.read_text(encoding="utf-8"))
     assert "$defs" in schema_data
     assert "SimulationParameters" in schema_data["$defs"] or "properties" in schema_data
+
+
+def test_load_and_validate_new_processed_datasets():
+    """Verify that all new processed datasets conform to their Pydantic schemas and sources."""
+    sources_catalog = SourcesCatalog.load(REPO_ROOT / "data" / "sources.json")
+    known_source_ids = {s.id for s in sources_catalog.sources}
+
+    # 1. Corridors
+    corridors_path = REPO_ROOT / "data" / "processed" / "corridors.json"
+    assert corridors_path.exists(), "data/processed/corridors.json must exist"
+    corridors = CorridorsCatalog.load(corridors_path)
+    assert corridors.schema_version == 1
+    assert len(corridors.corridors) == 4
+    for c in corridors.corridors:
+        for sid in c.source_ids:
+            assert sid in known_source_ids, f"Source '{sid}' in corridors missing from sources.json"
+        assert "biometano" in c.powertrain_evaluations
+        assert "diesel" in c.powertrain_evaluations
+        assert "eletrico" in c.powertrain_evaluations
+
+    # 2. Biomethane Plants
+    plants_path = REPO_ROOT / "data" / "processed" / "biomethane_plants.json"
+    assert plants_path.exists(), "data/processed/biomethane_plants.json must exist"
+    plants = BiomethanePlantsCatalog.load(plants_path)
+    assert plants.schema_version == 1
+    assert len(plants.plants) >= 8
+    for p in plants.plants:
+        assert p.source_id in known_source_ids, f"Source '{p.source_id}' in plants missing from sources.json"
+        assert p.daily_capacity_nm3_day > 0
+
+    # 3. Local Pollutants
+    pollutants_path = REPO_ROOT / "data" / "processed" / "local_pollutants.json"
+    assert pollutants_path.exists(), "data/processed/local_pollutants.json must exist"
+    pollutants = LocalPollutantsCatalog.load(pollutants_path)
+    assert pollutants.schema_version == 1
+    assert pollutants.source_id in known_source_ids
+    assert pollutants.legal_limits_whtc.nox_g_kwh == 0.40
+    assert "diesel" in pollutants.powertrains
+    assert "biometano" in pollutants.powertrains
+    assert "eletrico" in pollutants.powertrains
+
+    # 4. Global Benchmarks
+    benchmarks_path = REPO_ROOT / "data" / "processed" / "global_benchmarks.json"
+    assert benchmarks_path.exists(), "data/processed/global_benchmarks.json must exist"
+    benchmarks = GlobalBenchmarksCatalog.load(benchmarks_path)
+    assert benchmarks.schema_version == 1
+    for sid in benchmarks.source_ids:
+        assert sid in known_source_ids
+    assert "brasil" in benchmarks.regions
+    assert "uniao_europeia" in benchmarks.regions
+    assert "estados_unidos" in benchmarks.regions
+    assert "china" in benchmarks.regions

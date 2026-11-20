@@ -39,6 +39,19 @@
           "$ref": "#/$defs/ParameterItem",
           "description": "Preço de referência do ARLA 32 (R$/L).",
           "title": "ARLA 32 Price"
+        },
+        "cbio_price": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ParameterItem"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Preço de referência do crédito de descarbonização CBIO na B3 (R$/CBIO).",
+          "title": "CBIO Price"
         }
       },
       "required": [
@@ -215,6 +228,19 @@
           "default": null,
           "description": "Consumo de ARLA 32 por litro de diesel consumido (L/L).",
           "title": "ARLA Consumption Ratio"
+        },
+        "payload_penalty_kg": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ParameterItem"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Impacto da tara do trem de força na capacidade de carga líquida útil (kg em relação ao diesel).",
+          "title": "Payload Penalty (kg)"
         }
       },
       "required": [

@@ -349,6 +349,11 @@ class GeneralParameters(BaseModel):
         description="Preço de referência do ARLA 32 (R$/L).",
         title="ARLA 32 Price",
     )
+    cbio_price: ParameterItem | None = Field(
+        default=None,
+        description="Preço de referência do crédito de descarbonização CBIO na B3 (R$/CBIO).",
+        title="CBIO Price",
+    )
 
 
 class VehicleParameters(BaseModel):
@@ -405,6 +410,11 @@ class VehicleParameters(BaseModel):
         default=None,
         description="Consumo de ARLA 32 por litro de diesel consumido (L/L).",
         title="ARLA Consumption Ratio",
+    )
+    payload_penalty_kg: ParameterItem | None = Field(
+        default=None,
+        description="Impacto da tara do trem de força na capacidade de carga líquida útil (kg em relação ao diesel).",
+        title="Payload Penalty (kg)",
     )
 
 
@@ -608,6 +618,611 @@ class DefaultPricesCatalog(BaseModel):
         )
 
 
+# =============================================================================
+# Freight Corridors Models
+# =============================================================================
+
+
+class RefuelingPoints(BaseModel):
+    """Heavy-duty fueling and charging infrastructure along a route."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    diesel: str = Field(
+        ...,
+        description="Descrição e disponibilidade de postos a diesel.",
+        title="Diesel",
+    )
+    biomethane_cng: str = Field(
+        ...,
+        description="Disponibilidade de postos de biometano e GNV/GNC.",
+        title="Biomethane / CNG",
+    )
+    electric_hpc: str = Field(
+        ...,
+        description="Disponibilidade de postos de recarga rápida >150kW.",
+        title="Electric HPC",
+    )
+
+
+class PowertrainEvaluation(BaseModel):
+    """Operational and environmental evaluation for a specific powertrain on a route."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    feasibility_score: int = Field(
+        ...,
+        ge=0,
+        le=100,
+        description="Nota de viabilidade operacional (0 a 100).",
+        title="Feasibility Score",
+    )
+    feasibility_label: str = Field(
+        ...,
+        description="Rótulo qualitativo da viabilidade.",
+        title="Feasibility Label",
+    )
+    stops_description: str = Field(
+        ...,
+        description="Descrição das paradas necessárias para abastecimento/recarga.",
+        title="Stops Description",
+    )
+    refuel_time_minutes: int = Field(
+        ...,
+        ge=0,
+        description="Tempo total estimado de recarga/reabastecimento em minutos.",
+        title="Refuel Time (minutes)",
+    )
+    payload_penalty_kg: float = Field(
+        ...,
+        description="Impacto na capacidade líquida de carga útil em kg.",
+        title="Payload Penalty (kg)",
+    )
+    emission_reduction_percent: float = Field(
+        ...,
+        description="Redução percentual de emissões de GEE vs diesel.",
+        title="Emission Reduction Percent",
+    )
+    recommendation: str = Field(
+        ...,
+        description="Recomendação técnico-operacional para a rota.",
+        title="Recommendation",
+    )
+
+
+class FreightCorridor(BaseModel):
+    """Strategic heavy freight transportation corridor."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    id: str = Field(
+        ...,
+        description="Identificador unívoco do corredor rodoviário.",
+        title="Id",
+    )
+    name: str = Field(
+        ...,
+        description="Nome do corredor e rodovias principais.",
+        title="Name",
+    )
+    origin: str = Field(
+        ...,
+        description="Polo de origem da carga.",
+        title="Origin",
+    )
+    destination: str = Field(
+        ...,
+        description="Destino final da carga.",
+        title="Destination",
+    )
+    distance_km: float = Field(
+        ...,
+        gt=0,
+        description="Extensão total do trecho em quilômetros.",
+        title="Distance (km)",
+    )
+    cargo_profile: str = Field(
+        ...,
+        description="Perfil predominante de carga e segmento.",
+        title="Cargo Profile",
+    )
+    typical_pbtc: str = Field(
+        ...,
+        description="Configuração veicular típica e PBTC.",
+        title="Typical PBTC",
+    )
+    refueling_points: RefuelingPoints = Field(
+        ...,
+        description="Infraestrutura de abastecimento ao longo da rota.",
+        title="Refueling Points",
+    )
+    powertrain_evaluations: dict[str, PowertrainEvaluation] = Field(
+        ...,
+        description="Avaliação por tipo de trem de força.",
+        title="Powertrain Evaluations",
+    )
+    source_ids: list[Annotated[str, StringConstraints(pattern=r"^[A-Z][0-9]{2}$")]] = Field(
+        ...,
+        description="Lista de IDs de fontes associadas no catálogo de fontes.",
+        title="Source Ids",
+    )
+
+
+class CorridorsCatalog(BaseModel):
+    """Catalog of strategic Brazilian freight corridors."""
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+    dollar_schema: str | None = Field(
+        default="../../schemas/corridors.schema.json",
+        alias="$schema",
+        title="$schema",
+    )
+    schema_version: Literal[1] = Field(
+        default=1,
+        title="Schema Version",
+    )
+    generated_at: str = Field(
+        ...,
+        description="Data de geração do catálogo.",
+        title="Generated At",
+    )
+    corridors: list[FreightCorridor] = Field(
+        ...,
+        description="Lista de corredores mapeados.",
+        title="Corridors",
+    )
+
+    @classmethod
+    def load(cls, path: Path) -> CorridorsCatalog:
+        content = path.read_text(encoding="utf-8")
+        data = json.loads(content)
+        return cls.model_validate(data)
+
+    def save(self, path: Path) -> None:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        dump = self.model_dump(exclude_none=True, by_alias=True)
+        path.write_text(
+            json.dumps(dump, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
+        )
+
+
+# =============================================================================
+# Biomethane Plants Models
+# =============================================================================
+
+
+class BiomethanePlant(BaseModel):
+    """ANP-authorized biomethane production facility."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    id: str = Field(
+        ...,
+        description="Identificador único da unidade produtora.",
+        title="Id",
+    )
+    name: str = Field(
+        ...,
+        description="Nome da usina ou unidade operacional.",
+        title="Name",
+    )
+    operator: str = Field(
+        ...,
+        description="Empresa ou grupo operador.",
+        title="Operator",
+    )
+    city: str = Field(
+        ...,
+        description="Município de localização.",
+        title="City",
+    )
+    state: str = Field(
+        ...,
+        description="Unidade Federativa (UF).",
+        title="State",
+    )
+    feedstock: str = Field(
+        ...,
+        description="Substrato agroindustrial ou resíduo base.",
+        title="Feedstock",
+    )
+    daily_capacity_nm3_day: int = Field(
+        ...,
+        gt=0,
+        description="Capacidade autorizada de produção diária em Nm³/dia.",
+        title="Daily Capacity (Nm³/day)",
+    )
+    logistics_modal: str = Field(
+        ...,
+        description="Modal logístico de escoamento.",
+        title="Logistics Modal",
+    )
+    status: str = Field(
+        ...,
+        description="Status de operação da usina.",
+        title="Status",
+    )
+    grid_connection: str = Field(
+        ...,
+        description="Conexão com a rede de gás canalizado ou transporte.",
+        title="Grid Connection",
+    )
+    source_id: Annotated[str, StringConstraints(pattern=r"^[A-Z][0-9]{2}$")] = Field(
+        ...,
+        description="ID da fonte no catálogo de fontes.",
+        title="Source Id",
+    )
+
+
+class BiomethanePlantsCatalog(BaseModel):
+    """Catalog of ANP-authorized biomethane production plants."""
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+    dollar_schema: str | None = Field(
+        default="../../schemas/biomethane_plants.schema.json",
+        alias="$schema",
+        title="$schema",
+    )
+    schema_version: Literal[1] = Field(
+        default=1,
+        title="Schema Version",
+    )
+    generated_at: str = Field(
+        ...,
+        description="Data de geração do catálogo.",
+        title="Generated At",
+    )
+    total_installed_capacity_nm3_day: int = Field(
+        ...,
+        gt=0,
+        description="Capacidade diária total consolidada em Nm³/dia.",
+        title="Total Installed Capacity (Nm³/day)",
+    )
+    plants: list[BiomethanePlant] = Field(
+        ...,
+        description="Relação de usinas autorizadas pela ANP.",
+        title="Plants",
+    )
+
+    @classmethod
+    def load(cls, path: Path) -> BiomethanePlantsCatalog:
+        content = path.read_text(encoding="utf-8")
+        data = json.loads(content)
+        return cls.model_validate(data)
+
+    def save(self, path: Path) -> None:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        dump = self.model_dump(exclude_none=True, by_alias=True)
+        path.write_text(
+            json.dumps(dump, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
+        )
+
+
+# =============================================================================
+# Local Pollutants Models
+# =============================================================================
+
+
+class LegalLimitsWhtc(BaseModel):
+    """Regulatory pollutant emission limits in WHTC test cycle."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    nox_g_kwh: float = Field(
+        ...,
+        description="Limite regulatório de NOx em g/kWh (ciclo WHTC).",
+        title="NOx Limit (g/kWh)",
+    )
+    pm_g_kwh: float = Field(
+        ...,
+        description="Limite regulatório de Material Particulado em g/kWh.",
+        title="PM Limit (g/kWh)",
+    )
+    co_g_kwh: float = Field(
+        ...,
+        description="Limite regulatório de Monóxido de Carbono em g/kWh.",
+        title="CO Limit (g/kWh)",
+    )
+    ch4_slip_g_kwh: float = Field(
+        ...,
+        description="Limite regulatório de metano fugitivo (slip) em g/kWh.",
+        title="CH4 Slip Limit (g/kWh)",
+    )
+
+
+class PowertrainPollutants(BaseModel):
+    """Atmospheric criteria pollutant emissions for a specific powertrain."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    label: str = Field(
+        ...,
+        description="Nome descritivo da propulsão.",
+        title="Label",
+    )
+    fossil_co2_g_km: float = Field(
+        ...,
+        ge=0,
+        description="Emissão fóssil direta de CO2 em g/km.",
+        title="Fossil CO2 (g/km)",
+    )
+    methane_ch4_g_km: float = Field(
+        ...,
+        ge=0,
+        description="Emissão de metano não queimado em g/km.",
+        title="Methane CH4 (g/km)",
+    )
+    nox_g_kwh: float = Field(
+        ...,
+        ge=0,
+        description="Emissão ponderada de óxidos de nitrogênio em g/kWh.",
+        title="NOx (g/kWh)",
+    )
+    nox_g_km: float = Field(
+        ...,
+        ge=0,
+        description="Emissão estimada de NOx por quilômetro rodado.",
+        title="NOx (g/km)",
+    )
+    pm25_g_kwh: float = Field(
+        ...,
+        ge=0,
+        description="Emissão de Material Particulado MP2.5 em g/kWh.",
+        title="PM2.5 (g/kWh)",
+    )
+    pm25_g_km: float = Field(
+        ...,
+        ge=0,
+        description="Emissão estimada de MP2.5 em g/km.",
+        title="PM2.5 (g/km)",
+    )
+    noise_db: float = Field(
+        ...,
+        ge=0,
+        description="Nível de ruído externo padronizado em dB(A).",
+        title="Noise (dB)",
+    )
+    urban_impact: str = Field(
+        ...,
+        description="Classificação do impacto ambiental e na saúde urbana.",
+        title="Urban Impact",
+    )
+    nox_reduction_percent: float = Field(
+        ...,
+        description="Redução percentual de NOx em relação ao diesel Euro VI.",
+        title="NOx Reduction Percent",
+    )
+    pm_reduction_percent: float = Field(
+        ...,
+        description="Redução percentual de Material Particulado vs diesel Euro VI.",
+        title="PM Reduction Percent",
+    )
+
+
+class LocalPollutantsCatalog(BaseModel):
+    """Catalog of local air pollutants and vehicle emission standards."""
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+    dollar_schema: str | None = Field(
+        default="../../schemas/local_pollutants.schema.json",
+        alias="$schema",
+        title="$schema",
+    )
+    schema_version: Literal[1] = Field(
+        default=1,
+        title="Schema Version",
+    )
+    generated_at: str = Field(
+        ...,
+        description="Data de geração do catálogo.",
+        title="Generated At",
+    )
+    reference_standard: str = Field(
+        ...,
+        description="Norma ambiental regulatória de referência.",
+        title="Reference Standard",
+    )
+    source_id: Annotated[str, StringConstraints(pattern=r"^[A-Z][0-9]{2}$")] = Field(
+        ...,
+        description="ID da fonte no catálogo de fontes.",
+        title="Source Id",
+    )
+    legal_limits_whtc: LegalLimitsWhtc = Field(
+        ...,
+        description="Limites máximos legais do Proconve P8 / Euro VI.",
+        title="Legal Limits WHTC",
+    )
+    powertrains: dict[str, PowertrainPollutants] = Field(
+        ...,
+        description="Emissões de poluentes locais por trem de força.",
+        title="Powertrains",
+    )
+
+    @classmethod
+    def load(cls, path: Path) -> LocalPollutantsCatalog:
+        content = path.read_text(encoding="utf-8")
+        data = json.loads(content)
+        return cls.model_validate(data)
+
+    def save(self, path: Path) -> None:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        dump = self.model_dump(exclude_none=True, by_alias=True)
+        path.write_text(
+            json.dumps(dump, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
+        )
+
+
+# =============================================================================
+# Global Benchmarks Models
+# =============================================================================
+
+
+class WtwEmissionsBenchmark(BaseModel):
+    """Lifecycle Well-to-Wheel emissions benchmark by powertrain."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    diesel_baseline: float = Field(
+        ...,
+        description="Emissão WtW do diesel fóssil de referência (gCO2eq/t.km).",
+        title="Diesel Baseline",
+    )
+    biomethane_vinasse: float = Field(
+        ...,
+        description="Emissão WtW do biometano agroindustrial (gCO2eq/t.km).",
+        title="Biomethane Vinasse",
+    )
+    bev_grid: float = Field(
+        ...,
+        description="Emissão WtW de caminhão elétrico recarregado na rede local (gCO2eq/t.km).",
+        title="BEV Grid",
+    )
+
+
+class EnergyCostBenchmark(BaseModel):
+    """Levelized cost of mechanical energy at the crankshaft."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    biomethane: float = Field(
+        ...,
+        description="Custo nivelado do biometano útil no virabrequim (R$/MWh-eq).",
+        title="Biomethane",
+    )
+    offpeak_electricity: float = Field(
+        ...,
+        description="Custo de eletricidade fora ponta no virabrequim (R$/MWh-eq).",
+        title="Off-Peak Electricity",
+    )
+    diesel_s10: float = Field(
+        ...,
+        description="Custo do diesel fóssil útil no virabrequim (R$/MWh-eq).",
+        title="Diesel S10",
+    )
+    hpc_electricity: float | None = Field(
+        default=None,
+        description="Custo em eletroposto público de alta potência (R$/MWh-eq).",
+        title="HPC Electricity",
+    )
+    commercial_electricity: float | None = Field(
+        default=None,
+        description="Custo comercial de eletricidade (R$/MWh-eq).",
+        title="Commercial Electricity",
+    )
+
+
+class RegionBenchmark(BaseModel):
+    """Macroeconomic and decarbonization benchmark profile for a region."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    name: str = Field(
+        ...,
+        description="Nome descritivo da região/país.",
+        title="Name",
+    )
+    code: str = Field(
+        ...,
+        description="Código ISO ou sigla da região.",
+        title="Code",
+    )
+    currency: str = Field(
+        ...,
+        description="Moeda local.",
+        title="Currency",
+    )
+    flag: str = Field(
+        ...,
+        description="Emoji da bandeira nacional.",
+        title="Flag",
+    )
+    renewable_grid_share_percent: float = Field(
+        ...,
+        ge=0,
+        le=100,
+        description="Participação de renováveis na matriz elétrica (%).",
+        title="Renewable Grid Share (%)",
+    )
+    grid_carbon_intensity_g_kwh: float = Field(
+        ...,
+        ge=0,
+        description="Intensidade de emissões de carbono da rede elétrica (gCO2eq/kWh).",
+        title="Grid Carbon Intensity (gCO2eq/kWh)",
+    )
+    wtw_emissions_g_co2eq_tkm: WtwEmissionsBenchmark = Field(
+        ...,
+        description="Emissões de ciclo de vida Well-to-Wheel (gCO2eq/t.km).",
+        title="WtW Emissions (gCO2eq/t.km)",
+    )
+    energy_cost_levelized_mwh_eq: EnergyCostBenchmark = Field(
+        ...,
+        description="Custo da energia nivelada no eixo mecânico (R$/MWh-eq).",
+        title="Energy Cost Levelized (R$/MWh-eq)",
+    )
+    regulatory_mechanism: str = Field(
+        ...,
+        description="Instrumentos regulatórios e mercados de carbono em vigor.",
+        title="Regulatory Mechanism",
+    )
+    capex_subsidy_status: str = Field(
+        ...,
+        description="Políticas de incentivo e subsídios diretos na aquisição de veículos.",
+        title="CAPEX Subsidy Status",
+    )
+    battery_weight_regulation: str = Field(
+        ...,
+        description="Legislação sobre tolerância de peso e limites da balança.",
+        title="Battery Weight Regulation",
+    )
+
+
+class GlobalBenchmarksCatalog(BaseModel):
+    """Catalog of international heavy freight transition benchmarks."""
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+
+    dollar_schema: str | None = Field(
+        default="../../schemas/global_benchmarks.schema.json",
+        alias="$schema",
+        title="$schema",
+    )
+    schema_version: Literal[1] = Field(
+        default=1,
+        title="Schema Version",
+    )
+    generated_at: str = Field(
+        ...,
+        description="Data de geração do catálogo.",
+        title="Generated At",
+    )
+    source_ids: list[Annotated[str, StringConstraints(pattern=r"^[A-Z][0-9]{2}$")]] = Field(
+        ...,
+        description="Lista de IDs de fontes no catálogo de fontes.",
+        title="Source Ids",
+    )
+    regions: dict[str, RegionBenchmark] = Field(
+        ...,
+        description="Benchmarks regionais comparativos.",
+        title="Regions",
+    )
+
+    @classmethod
+    def load(cls, path: Path) -> GlobalBenchmarksCatalog:
+        content = path.read_text(encoding="utf-8")
+        data = json.loads(content)
+        return cls.model_validate(data)
+
+    def save(self, path: Path) -> None:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        dump = self.model_dump(exclude_none=True, by_alias=True)
+        path.write_text(
+            json.dumps(dump, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
+        )
+
+
 def export_all_schemas(schemas_dir: Path) -> dict[str, Path]:
     """Export JSON Schema for all models to target directory."""
     schemas_dir.mkdir(parents=True, exist_ok=True)
@@ -617,6 +1232,10 @@ def export_all_schemas(schemas_dir: Path) -> dict[str, Path]:
         "parameters.schema.json": SimulationParameters,
         "sources.schema.json": SourcesCatalog,
         "prices_history.schema.json": PricesHistory,
+        "corridors.schema.json": CorridorsCatalog,
+        "biomethane_plants.schema.json": BiomethanePlantsCatalog,
+        "local_pollutants.schema.json": LocalPollutantsCatalog,
+        "global_benchmarks.schema.json": GlobalBenchmarksCatalog,
     }
     for filename, model_cls in schema_map.items():
         out_file = schemas_dir / filename

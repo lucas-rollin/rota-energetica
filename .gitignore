@@ -4,6 +4,7 @@
 # Temporary
 *.tmp
 *.tmp.*
+tmp/
 
 # Data
 data/raw/

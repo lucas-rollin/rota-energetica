@@ -124,6 +124,18 @@
       "notes": "Segunda opção de estado (PR). Verificar com a Compagás/AGEPAR se há tarifa frotista homologada."
     },
     {
+      "id": "P11",
+      "name": "Cotação e Painel de Negociação de CBIOs (RenovaBio)",
+      "publisher": "B3 / ANP",
+      "description": "Preço de fechamento e histórico de negociação de Créditos de Descarbonização (CBIO) na B3",
+      "url": "https://www.b3.com.br/pt_br/produtos-e-servicos/negociacao/renda-variavel/creditos-de-descarbonizacao-cbio.htm",
+      "badge": "Primária",
+      "category": "B",
+      "terms": "Dados públicos de mercado e boletins diários B3 / ANP",
+      "attribution": "Fonte: B3 / ANP.",
+      "notes": "Preço de referência do CBIO na B3. 1 CBIO equivale a 1 tCO2eq evitada comprovada via RenovaBio."
+    },
+    {
       "id": "E01",
       "name": "Resolução CNPE nº 4/2026 (Metas do Mandato de Biometano)",
       "publisher": "CNPE",
@@ -193,6 +205,18 @@
       "terms": "Ato oficial (Lei nº 14.993/2024)",
       "attribution": "Fonte: Lei nº 14.993/2024 e resoluções do CNPE.",
       "notes": "Usar percentual vigente na data de publicação (atualmente B15: 0,15 v/v)."
+    },
+    {
+      "id": "E07",
+      "name": "Resolução CONAMA nº 490/2018 (PROCONVE Fase P8 / Euro VI)",
+      "publisher": "CONAMA / IBAMA",
+      "description": "Limites máximos de emissão de poluentes locais atmosféricos (NOx, MP 2.5, CO e HC) para pesados",
+      "url": "https://pesquisa.in.gov.br/imprensa/jsp/visualiza/index.jsp?data=30/11/2018&jornal=515&pagina=95",
+      "badge": "Primária",
+      "category": "A",
+      "terms": "Ato regulatório oficial federal",
+      "attribution": "Fonte: CONAMA / IBAMA.",
+      "notes": "Vigência plena desde 2023. Fixa limites de 0,40 g/kWh de NOx e 0,010 g/kWh de MP para veículos comerciais pesados."
     },
     {
       "id": "V01",
@@ -301,6 +325,18 @@
       "notes": "Modelo de reserva. 460 cv, 240 m³ de gás, ~550 km de autonomia."
     },
     {
+      "id": "V10",
+      "name": "Resolução CONTRAN nº 882/2021 e Lei nº 14.229/2021 (Lei da Balança)",
+      "publisher": "Ministério dos Transportes / CONTRAN",
+      "description": "Limites de Peso Bruto Total Combinado (PBTC), eixos e tolerâncias de balança rodoviária",
+      "url": "https://www.gov.br/transportes/pt-br/assuntos/transito/conteudo-contran/resolucoes/resolucao8822021.pdf",
+      "badge": "Primária",
+      "category": "A",
+      "terms": "Ato regulatório oficial federal",
+      "attribution": "Fonte: CONTRAN / Ministério dos Transportes.",
+      "notes": "Base legal para o cálculo do impacto da tara das baterias na carga líquida útil (penalidade de balança)."
+    },
+    {
       "id": "I01",
       "name": "Mapeamento Nacional de Eletropostos",
       "publisher": "ABVE / Plataforma Tupi",
@@ -407,6 +443,42 @@
       "terms": "Ato oficial (consulta pública ANEEL)",
       "attribution": "Fonte: ANEEL, Consulta Pública nº 42/2025.",
       "notes": "Discussão de norma nacional de conexão de carregadores de alta potência à rede das distribuidoras."
+    },
+    {
+      "id": "I11",
+      "name": "Painel Dinâmico de Produtores de Biocombustíveis e Autorizações de Biometano",
+      "publisher": "ANP",
+      "description": "Relação e cadastro de usinas produtoras de biometano autorizadas pela ANP para comercialização",
+      "url": "https://www.gov.br/anp/pt-br/centrais-de-conteudo/paineis-dinamicos-da-anp/painel-dinamico-de-produtores-de-biocombustiveis",
+      "badge": "Primária",
+      "category": "B",
+      "terms": "Dados abertos governamentais",
+      "attribution": "Fonte: ANP.",
+      "notes": "Localização geográfica, substratos agroindustriais (vinhaça, resíduos urbanos) e capacidade diária autorizada em Nm³/dia."
+    },
+    {
+      "id": "I12",
+      "name": "Plano Nacional de Logística 2035 (PNL) e Corredores de Carga Rodoviária",
+      "publisher": "EPE / Ministério dos Transportes",
+      "description": "Mapeamento territorial dos corredores logísticos estratégicos de transporte de carga pesada",
+      "url": "https://www.epe.gov.br/pt/areas-de-atuacao/planejamento-energetico/infraestrutura-e-logistica/plano-nacional-de-logistica-pnl",
+      "badge": "Primária",
+      "category": "B",
+      "terms": "Planejamento setorial público",
+      "attribution": "Fonte: EPE / Ministério dos Transportes.",
+      "notes": "Caracterização dos principais eixos de transporte (BR-163, BR-277, BR-116/Dutra, BR-010 e BR-101/470 SC)."
+    },
+    {
+      "id": "I13",
+      "name": "Global EV Outlook e Heavy-Duty Vehicle Decarbonization Benchmarks",
+      "publisher": "International Energy Agency (IEA) / ICCT",
+      "description": "Intensidade de emissões de matrizes elétricas internacionais e trajetórias de descarbonização de frotas",
+      "url": "https://www.iea.org/reports/global-ev-outlook-2024",
+      "badge": "Primária",
+      "category": "B",
+      "terms": "Relatório institucional internacional",
+      "attribution": "Fonte: IEA / ICCT.",
+      "notes": "Comparativo internacional Well-to-Wheel de emissões da rede elétrica (Brasil SIN vs Europa, EUA e China) e incentivos como IRA e EU ETS."
     }
   ]
 }

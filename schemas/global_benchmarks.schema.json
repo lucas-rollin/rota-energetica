@@ -1,0 +1,217 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "EnergyCostBenchmark": {
+      "additionalProperties": false,
+      "description": "Levelized cost of mechanical energy at the crankshaft.",
+      "properties": {
+        "biomethane": {
+          "description": "Custo nivelado do biometano útil no virabrequim (R$/MWh-eq).",
+          "title": "Biomethane",
+          "type": "number"
+        },
+        "offpeak_electricity": {
+          "description": "Custo de eletricidade fora ponta no virabrequim (R$/MWh-eq).",
+          "title": "Off-Peak Electricity",
+          "type": "number"
+        },
+        "diesel_s10": {
+          "description": "Custo do diesel fóssil útil no virabrequim (R$/MWh-eq).",
+          "title": "Diesel S10",
+          "type": "number"
+        },
+        "hpc_electricity": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Custo em eletroposto público de alta potência (R$/MWh-eq).",
+          "title": "HPC Electricity"
+        },
+        "commercial_electricity": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Custo comercial de eletricidade (R$/MWh-eq).",
+          "title": "Commercial Electricity"
+        }
+      },
+      "required": [
+        "biomethane",
+        "offpeak_electricity",
+        "diesel_s10"
+      ],
+      "title": "EnergyCostBenchmark",
+      "type": "object"
+    },
+    "RegionBenchmark": {
+      "additionalProperties": false,
+      "description": "Macroeconomic and decarbonization benchmark profile for a region.",
+      "properties": {
+        "name": {
+          "description": "Nome descritivo da região/país.",
+          "title": "Name",
+          "type": "string"
+        },
+        "code": {
+          "description": "Código ISO ou sigla da região.",
+          "title": "Code",
+          "type": "string"
+        },
+        "currency": {
+          "description": "Moeda local.",
+          "title": "Currency",
+          "type": "string"
+        },
+        "flag": {
+          "description": "Emoji da bandeira nacional.",
+          "title": "Flag",
+          "type": "string"
+        },
+        "renewable_grid_share_percent": {
+          "description": "Participação de renováveis na matriz elétrica (%).",
+          "maximum": 100,
+          "minimum": 0,
+          "title": "Renewable Grid Share (%)",
+          "type": "number"
+        },
+        "grid_carbon_intensity_g_kwh": {
+          "description": "Intensidade de emissões de carbono da rede elétrica (gCO2eq/kWh).",
+          "minimum": 0,
+          "title": "Grid Carbon Intensity (gCO2eq/kWh)",
+          "type": "number"
+        },
+        "wtw_emissions_g_co2eq_tkm": {
+          "$ref": "#/$defs/WtwEmissionsBenchmark",
+          "description": "Emissões de ciclo de vida Well-to-Wheel (gCO2eq/t.km).",
+          "title": "WtW Emissions (gCO2eq/t.km)"
+        },
+        "energy_cost_levelized_mwh_eq": {
+          "$ref": "#/$defs/EnergyCostBenchmark",
+          "description": "Custo da energia nivelada no eixo mecânico (R$/MWh-eq).",
+          "title": "Energy Cost Levelized (R$/MWh-eq)"
+        },
+        "regulatory_mechanism": {
+          "description": "Instrumentos regulatórios e mercados de carbono em vigor.",
+          "title": "Regulatory Mechanism",
+          "type": "string"
+        },
+        "capex_subsidy_status": {
+          "description": "Políticas de incentivo e subsídios diretos na aquisição de veículos.",
+          "title": "CAPEX Subsidy Status",
+          "type": "string"
+        },
+        "battery_weight_regulation": {
+          "description": "Legislação sobre tolerância de peso e limites da balança.",
+          "title": "Battery Weight Regulation",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "code",
+        "currency",
+        "flag",
+        "renewable_grid_share_percent",
+        "grid_carbon_intensity_g_kwh",
+        "wtw_emissions_g_co2eq_tkm",
+        "energy_cost_levelized_mwh_eq",
+        "regulatory_mechanism",
+        "capex_subsidy_status",
+        "battery_weight_regulation"
+      ],
+      "title": "RegionBenchmark",
+      "type": "object"
+    },
+    "WtwEmissionsBenchmark": {
+      "additionalProperties": false,
+      "description": "Lifecycle Well-to-Wheel emissions benchmark by powertrain.",
+      "properties": {
+        "diesel_baseline": {
+          "description": "Emissão WtW do diesel fóssil de referência (gCO2eq/t.km).",
+          "title": "Diesel Baseline",
+          "type": "number"
+        },
+        "biomethane_vinasse": {
+          "description": "Emissão WtW do biometano agroindustrial (gCO2eq/t.km).",
+          "title": "Biomethane Vinasse",
+          "type": "number"
+        },
+        "bev_grid": {
+          "description": "Emissão WtW de caminhão elétrico recarregado na rede local (gCO2eq/t.km).",
+          "title": "BEV Grid",
+          "type": "number"
+        }
+      },
+      "required": [
+        "diesel_baseline",
+        "biomethane_vinasse",
+        "bev_grid"
+      ],
+      "title": "WtwEmissionsBenchmark",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Catalog of international heavy freight transition benchmarks.",
+  "properties": {
+    "$schema": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": "../../schemas/global_benchmarks.schema.json",
+      "title": "$schema"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "generated_at": {
+      "description": "Data de geração do catálogo.",
+      "title": "Generated At",
+      "type": "string"
+    },
+    "source_ids": {
+      "description": "Lista de IDs de fontes no catálogo de fontes.",
+      "items": {
+        "pattern": "^[A-Z][0-9]{2}$",
+        "type": "string"
+      },
+      "title": "Source Ids",
+      "type": "array"
+    },
+    "regions": {
+      "additionalProperties": {
+        "$ref": "#/$defs/RegionBenchmark"
+      },
+      "description": "Benchmarks regionais comparativos.",
+      "title": "Regions",
+      "type": "object"
+    }
+  },
+  "required": [
+    "generated_at",
+    "source_ids",
+    "regions"
+  ],
+  "title": "GlobalBenchmarksCatalog",
+  "type": "object"
+}

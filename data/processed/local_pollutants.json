@@ -1,0 +1,67 @@
+{
+  "$schema": "../../schemas/local_pollutants.schema.json",
+  "schema_version": 1,
+  "generated_at": "2026-11-20",
+  "reference_standard": "PROCONVE Fase P8 (Resolução CONAMA nº 490/2018 / Euro VI)",
+  "source_id": "E07",
+  "legal_limits_whtc": {
+    "nox_g_kwh": 0.4,
+    "pm_g_kwh": 0.01,
+    "co_g_kwh": 4.0,
+    "ch4_slip_g_kwh": 0.5
+  },
+  "powertrains": {
+    "diesel": {
+      "label": "Diesel S10 B15 (Euro VI / P8)",
+      "fossil_co2_g_km": 912.4,
+      "methane_ch4_g_km": 0.04,
+      "nox_g_kwh": 0.38,
+      "nox_g_km": 1.45,
+      "pm25_g_kwh": 0.009,
+      "pm25_g_km": 0.035,
+      "noise_db": 78.5,
+      "urban_impact": "Severo (emissão de fuligem ultrafina e precursores de smog fotoquímico)",
+      "nox_reduction_percent": 0.0,
+      "pm_reduction_percent": 0.0
+    },
+    "gnv": {
+      "label": "Gás Natural Veicular (GNV / GNL)",
+      "fossil_co2_g_km": 745.0,
+      "methane_ch4_g_km": 0.18,
+      "nox_g_kwh": 0.14,
+      "nox_g_km": 0.52,
+      "pm25_g_kwh": 0.002,
+      "pm25_g_km": 0.007,
+      "noise_db": 73.0,
+      "urban_impact": "Baixo (redução de 80% em MP e 65% em NOx em relação ao diesel Euro VI)",
+      "nox_reduction_percent": 64.1,
+      "pm_reduction_percent": 80.0
+    },
+    "biometano": {
+      "label": "Biometano Purificado (Bio-GNC / Bio-GNL)",
+      "fossil_co2_g_km": 48.2,
+      "methane_ch4_g_km": 0.12,
+      "nox_g_kwh": 0.11,
+      "nox_g_km": 0.42,
+      "pm25_g_kwh": 0.001,
+      "pm25_g_km": 0.004,
+      "noise_db": 72.8,
+      "urban_impact": "Quase Nulo (redução de 90% em fuligem e 72% em NOx; ciclo Otto mais suave)",
+      "nox_reduction_percent": 71.0,
+      "pm_reduction_percent": 88.6
+    },
+    "eletrico": {
+      "label": "Caminhão Elétrico Pesado (BEV)",
+      "fossil_co2_g_km": 0.0,
+      "methane_ch4_g_km": 0.0,
+      "nox_g_kwh": 0.0,
+      "nox_g_km": 0.0,
+      "pm25_g_kwh": 0.0,
+      "pm25_g_km": 0.002,
+      "noise_db": 66.5,
+      "urban_impact": "Zero Local (sem emissão de escapamento; MP residual apenas por pneus e freios)",
+      "nox_reduction_percent": 100.0,
+      "pm_reduction_percent": 94.3
+    }
+  }
+}

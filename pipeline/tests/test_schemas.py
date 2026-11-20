@@ -4,6 +4,10 @@ import json
 from pathlib import Path
 
 from pipeline.models import (
+    BiomethanePlantsCatalog,
+    CorridorsCatalog,
+    GlobalBenchmarksCatalog,
+    LocalPollutantsCatalog,
     Manifest,
     PricesHistory,
     SimulationParameters,
@@ -21,6 +25,10 @@ def test_no_schema_drift():
         "parameters.schema.json": SimulationParameters,
         "sources.schema.json": SourcesCatalog,
         "prices_history.schema.json": PricesHistory,
+        "corridors.schema.json": CorridorsCatalog,
+        "biomethane_plants.schema.json": BiomethanePlantsCatalog,
+        "local_pollutants.schema.json": LocalPollutantsCatalog,
+        "global_benchmarks.schema.json": GlobalBenchmarksCatalog,
     }
 
     for filename, model_cls in schema_map.items():
