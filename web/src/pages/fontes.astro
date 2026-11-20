@@ -88,9 +88,7 @@ for (const [altId, vehicle] of Object.entries(paramsData.vehicles)) {
       <div class="breadcrumbs text-xs text-base-content/60 mb-2">
         <ul>
           <li>
-            <a href={baseUrl}>
-              Início
-            </a>
+            <a href={baseUrl}>Início</a>
           </li>
           <li>Fontes e Licenças</li>
         </ul>
@@ -136,7 +134,9 @@ for (const [altId, vehicle] of Object.entries(paramsData.vehicles)) {
             rel="noopener noreferrer"
             class="link link-primary text-xs font-semibold inline-flex items-center gap-1"
           >
-            <span>Consultar documento integral de governança de dados (LICENSE-DATA.md)</span>
+            <span>
+              Consultar documento integral de governança de dados (LICENSE-DATA.md)
+            </span>
             <ExternalLink className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
           </a>
         </p>
@@ -391,7 +391,10 @@ for (const [altId, vehicle] of Object.entries(paramsData.vehicles)) {
                     <details class="group bg-base-200/50 rounded-lg border border-base-200 overflow-hidden text-[11px]">
                       <summary class="cursor-pointer font-bold text-[10px] uppercase tracking-wider text-base-content/60 px-3 py-2 flex items-center justify-between select-none hover:bg-base-200/80 transition-colors">
                         <span>Notas Metodológicas</span>
-                        <ChevronDown className="w-3.5 h-3.5 text-base-content/50 transition-transform duration-200 group-open:rotate-180 shrink-0" aria-hidden="true" />
+                        <ChevronDown
+                          className="w-3.5 h-3.5 text-base-content/50 transition-transform duration-200 group-open:rotate-180 shrink-0"
+                          aria-hidden="true"
+                        />
                       </summary>
                       <div class="px-3 pb-2.5 pt-1 text-base-content/75 leading-relaxed border-t border-base-200/60">
                         {src.notes}

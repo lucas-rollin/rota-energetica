@@ -160,7 +160,9 @@ def test_load_and_validate_new_processed_datasets():
     assert len(corridors.corridors) >= 4
     for c in corridors.corridors:
         for sid in c.source_ids:
-            assert sid in known_source_ids, f"Source '{sid}' in corridors missing from sources.json"
+            assert sid in known_source_ids, (
+                f"Source '{sid}' in corridors missing from sources.json"
+            )
         assert "biometano" in c.powertrain_evaluations
         assert "diesel" in c.powertrain_evaluations
         assert "eletrico" in c.powertrain_evaluations
@@ -168,15 +170,21 @@ def test_load_and_validate_new_processed_datasets():
 
     # 2. Corridor Fuel Stations
     stations_path = REPO_ROOT / "data" / "processed" / "corridor_fuel_stations.json"
-    assert stations_path.exists(), "data/processed/corridor_fuel_stations.json must exist"
+    assert stations_path.exists(), (
+        "data/processed/corridor_fuel_stations.json must exist"
+    )
     stations = CorridorFuelStationsCatalog.load(stations_path)
     assert stations.schema_version == 1
     assert len(stations.stations) >= 20
     corridor_ids = {c.id for c in corridors.corridors}
     for s in stations.stations:
-        assert s.source_id in known_source_ids, f"Source '{s.source_id}' in stations missing from sources.json"
+        assert s.source_id in known_source_ids, (
+            f"Source '{s.source_id}' in stations missing from sources.json"
+        )
         for cid in s.corridor_ids:
-            assert cid in corridor_ids, f"Station '{s.id}' references unknown corridor '{cid}'"
+            assert cid in corridor_ids, (
+                f"Station '{s.id}' references unknown corridor '{cid}'"
+            )
     stations_raw_text = stations_path.read_text(encoding="utf-8")
     assert "CNPJ" not in stations_raw_text
     assert "CPF" not in stations_raw_text

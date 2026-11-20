@@ -100,11 +100,7 @@ describe('geo utilities', () => {
   });
 
   it('segments corridor polyline into covered and uncovered stretches', () => {
-    const segs = buildCorridorCoverageSegments(
-      MOCK_CORRIDOR,
-      [MOCK_STATION_SP],
-      150
-    );
+    const segs = buildCorridorCoverageSegments(MOCK_CORRIDOR, [MOCK_STATION_SP], 150);
     expect(segs.length).toBeGreaterThanOrEqual(2);
     expect(segs[0].covered).toBe(true);
     expect(segs[segs.length - 1].covered).toBe(false);

@@ -26,9 +26,7 @@ export const CorridorsDashboard: React.FC<CorridorsDashboardProps> = ({
   const [selectedPowertrain, setSelectedPowertrain] = useState<
     'biometano' | 'diesel' | 'eletrico'
   >('biometano');
-  const [viewportScope, setViewportScope] = useState<'corridor' | 'brazil'>(
-    'corridor'
-  );
+  const [viewportScope, setViewportScope] = useState<'corridor' | 'brazil'>('corridor');
   const [viewportTick, setViewportTick] = useState<number>(0);
 
   const handleCorridorChange = (corridorId: string) => {
@@ -58,22 +56,23 @@ export const CorridorsDashboard: React.FC<CorridorsDashboardProps> = ({
   return (
     <div className="space-y-8">
       {/* Route Feasibility Simulator Header Card */}
-      <div className="bg-base-100 rounded-xl border border-base-200 p-5 shadow-xs">
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-base-200 pb-4 mb-5">
+      <div className="bg-base-100 border-base-200 rounded-xl border p-5 shadow-xs">
+        <div className="border-base-200 mb-5 flex flex-col items-start justify-between gap-4 border-b pb-4 md:flex-row md:items-center">
           <div>
-            <h2 className="text-lg font-bold text-base-content tracking-tight">
+            <h2 className="text-base-content text-lg font-bold tracking-tight">
               Simulador de Viabilidade Operacional por Corredor
             </h2>
-            <p className="text-xs text-base-content/70 mt-0.5">
-              Avalie restrições físicas, tempos de reabastecimento/recarga e impacto da Lei da Balança nos principais eixos de frete rodoviário.
+            <p className="text-base-content/70 mt-0.5 text-xs">
+              Avalie restrições físicas, tempos de reabastecimento/recarga e impacto da
+              Lei da Balança nos principais eixos de frete rodoviário.
             </p>
           </div>
 
           {/* Corridor Selector Dropdown */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full md:w-auto">
+          <div className="flex w-full flex-col items-stretch gap-2 sm:flex-row sm:items-center md:w-auto">
             <label
               htmlFor="corridor-select"
-              className="text-xs font-semibold text-base-content/70 whitespace-nowrap"
+              className="text-base-content/70 text-xs font-semibold whitespace-nowrap"
             >
               Selecione o Eixo:
             </label>
@@ -81,7 +80,7 @@ export const CorridorsDashboard: React.FC<CorridorsDashboardProps> = ({
               id="corridor-select"
               value={selectedCorridorId}
               onChange={(e) => handleCorridorChange(e.target.value)}
-              className="select select-sm select-bordered font-medium text-xs w-full sm:w-auto max-w-sm"
+              className="select select-sm select-bordered w-full max-w-sm text-xs font-medium sm:w-auto"
             >
               {corridorsData.corridors.map((c) => (
                 <option key={c.id} value={c.id}>
@@ -93,19 +92,19 @@ export const CorridorsDashboard: React.FC<CorridorsDashboardProps> = ({
         </div>
 
         {/* Powertrain Selection Tabs (local to Simulator KPIs) */}
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 mb-6">
-          <div className="grid grid-cols-1 sm:grid-cols-3 lg:inline-flex lg:join w-full lg:w-auto gap-1.5 lg:gap-0">
+        <div className="mb-6 flex flex-col justify-between gap-3 lg:flex-row lg:items-center">
+          <div className="lg:join grid w-full grid-cols-1 gap-1.5 sm:grid-cols-3 lg:inline-flex lg:w-auto lg:gap-0">
             <button
               type="button"
               onClick={() => setSelectedPowertrain('biometano')}
-              className={`btn btn-sm h-auto min-h-8 py-1.5 px-3 text-xs leading-snug lg:join-item gap-1.5 ${
+              className={`btn btn-sm lg:join-item h-auto min-h-8 gap-1.5 px-3 py-1.5 text-xs leading-snug ${
                 selectedPowertrain === 'biometano'
                   ? FUEL_THEME.biometano.activeButtonClass
                   : 'btn-outline border-base-300'
               }`}
             >
               <span
-                className={`h-2 w-2 rounded-full shrink-0 ${
+                className={`h-2 w-2 shrink-0 rounded-full ${
                   selectedPowertrain === 'biometano'
                     ? 'bg-white'
                     : FUEL_THEME.biometano.dotClass
@@ -114,7 +113,7 @@ export const CorridorsDashboard: React.FC<CorridorsDashboardProps> = ({
               />
               <span>
                 Biometano{' '}
-                <span className="text-[10px] opacity-80 font-normal block sm:inline">
+                <span className="block text-[10px] font-normal opacity-80 sm:inline">
                   (Bio-GNC / GNL)
                 </span>
               </span>
@@ -122,14 +121,14 @@ export const CorridorsDashboard: React.FC<CorridorsDashboardProps> = ({
             <button
               type="button"
               onClick={() => setSelectedPowertrain('eletrico')}
-              className={`btn btn-sm h-auto min-h-8 py-1.5 px-3 text-xs leading-snug lg:join-item gap-1.5 ${
+              className={`btn btn-sm lg:join-item h-auto min-h-8 gap-1.5 px-3 py-1.5 text-xs leading-snug ${
                 selectedPowertrain === 'eletrico'
                   ? FUEL_THEME.eletrico.activeButtonClass
                   : 'btn-outline border-base-300'
               }`}
             >
               <span
-                className={`h-2 w-2 rounded-full shrink-0 ${
+                className={`h-2 w-2 shrink-0 rounded-full ${
                   selectedPowertrain === 'eletrico'
                     ? 'bg-white'
                     : FUEL_THEME.eletrico.dotClass
@@ -138,7 +137,7 @@ export const CorridorsDashboard: React.FC<CorridorsDashboardProps> = ({
               />
               <span>
                 Elétrico Pesado{' '}
-                <span className="text-[10px] opacity-80 font-normal block sm:inline">
+                <span className="block text-[10px] font-normal opacity-80 sm:inline">
                   (BEV)
                 </span>
               </span>
@@ -146,14 +145,14 @@ export const CorridorsDashboard: React.FC<CorridorsDashboardProps> = ({
             <button
               type="button"
               onClick={() => setSelectedPowertrain('diesel')}
-              className={`btn btn-sm h-auto min-h-8 py-1.5 px-3 text-xs leading-snug lg:join-item gap-1.5 ${
+              className={`btn btn-sm lg:join-item h-auto min-h-8 gap-1.5 px-3 py-1.5 text-xs leading-snug ${
                 selectedPowertrain === 'diesel'
                   ? FUEL_THEME.diesel.activeButtonClass
                   : 'btn-outline border-base-300'
               }`}
             >
               <span
-                className={`h-2 w-2 rounded-full shrink-0 ${
+                className={`h-2 w-2 shrink-0 rounded-full ${
                   selectedPowertrain === 'diesel'
                     ? 'bg-white'
                     : FUEL_THEME.diesel.dotClass
@@ -162,59 +161,59 @@ export const CorridorsDashboard: React.FC<CorridorsDashboardProps> = ({
               />
               <span>
                 Diesel S10 B15{' '}
-                <span className="text-[10px] opacity-80 font-normal block sm:inline">
+                <span className="block text-[10px] font-normal opacity-80 sm:inline">
                   (Baseline)
                 </span>
               </span>
             </button>
           </div>
 
-          <div className="text-xs text-base-content/70 shrink-0 self-start lg:self-auto bg-base-200/50 sm:bg-transparent px-2.5 py-1 sm:p-0 rounded-lg">
+          <div className="text-base-content/70 bg-base-200/50 shrink-0 self-start rounded-lg px-2.5 py-1 text-xs sm:bg-transparent sm:p-0 lg:self-auto">
             PBTC típico da rota:{' '}
-            <span className="font-bold text-base-content">
+            <span className="text-base-content font-bold">
               {selectedCorridor.typical_pbtc}
             </span>
           </div>
         </div>
 
         {/* Selected Route Evaluation Result */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
           {/* Column 1: Corridor Physical Profile */}
-          <div className="bg-base-200/50 rounded-lg p-4 border border-base-300 space-y-3">
-            <div className="flex justify-between items-start gap-2">
+          <div className="bg-base-200/50 border-base-300 space-y-3 rounded-lg border p-4">
+            <div className="flex items-start justify-between gap-2">
               <div>
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-neutral text-neutral-content text-[11px] font-medium leading-tight max-w-full mb-1">
+                <span className="bg-neutral text-neutral-content mb-1 inline-flex max-w-full items-center gap-1 rounded-md px-2 py-0.5 text-[11px] leading-tight font-medium">
                   <span>{selectedCorridor.origin}</span>
                   <span className="text-neutral-content/60 font-mono">➔</span>
                   <span>{selectedCorridor.destination}</span>
                 </span>
-                <h3 className="text-sm font-bold text-base-content">
+                <h3 className="text-base-content text-sm font-bold">
                   {selectedCorridor.name}
                 </h3>
               </div>
-              <span className="font-mono text-sm font-black text-primary shrink-0">
+              <span className="text-primary shrink-0 font-mono text-sm font-black">
                 {formatNumber(selectedCorridor.distance_km, 0)} km
               </span>
             </div>
 
-            <p className="text-xs text-base-content/75 leading-relaxed">
+            <p className="text-base-content/75 text-xs leading-relaxed">
               <strong>Perfil de Carga:</strong> {selectedCorridor.cargo_profile}.
             </p>
 
-            <div className="pt-2 border-t border-base-300 space-y-2 text-xs">
-              <div className="font-bold text-[11px] uppercase tracking-wider text-base-content/60">
+            <div className="border-base-300 space-y-2 border-t pt-2 text-xs">
+              <div className="text-base-content/60 text-[11px] font-bold tracking-wider uppercase">
                 Rede de Suprimento Identificada
               </div>
               <div>
-                <span className="text-base-content/60 text-[11px] block">
+                <span className="text-base-content/60 block text-[11px]">
                   Postos Diesel Rodoviários:
                 </span>
-                <span className="font-medium text-base-content">
+                <span className="text-base-content font-medium">
                   {selectedCorridor.refueling_points.diesel}
                 </span>
               </div>
               <div>
-                <span className="text-base-content/60 text-[11px] block">
+                <span className="text-base-content/60 block text-[11px]">
                   Rede Gás / Biometano:
                 </span>
                 <span className="font-medium text-emerald-600 dark:text-emerald-400">
@@ -222,7 +221,7 @@ export const CorridorsDashboard: React.FC<CorridorsDashboardProps> = ({
                 </span>
               </div>
               <div>
-                <span className="text-base-content/60 text-[11px] block">
+                <span className="text-base-content/60 block text-[11px]">
                   Eletropostos Rápidos (&gt;150kW):
                 </span>
                 <span className="font-medium text-cyan-600 dark:text-cyan-400">
@@ -235,18 +234,18 @@ export const CorridorsDashboard: React.FC<CorridorsDashboardProps> = ({
           {/* Column 2: Feasibility & Logistics KPIs */}
           <div className="space-y-4">
             <div
-              className={`p-4 rounded-lg border flex items-center justify-between ${getScoreColor(evalData.feasibility_score)}`}
+              className={`flex items-center justify-between rounded-lg border p-4 ${getScoreColor(evalData.feasibility_score)}`}
             >
               <div>
-                <div className="text-[11px] font-bold uppercase tracking-wider">
+                <div className="text-[11px] font-bold tracking-wider uppercase">
                   Índice de Viabilidade da Rota
                 </div>
-                <div className="text-xl font-black mt-0.5">
+                <div className="mt-0.5 text-xl font-black">
                   {evalData.feasibility_score}% — {evalData.feasibility_label}
                 </div>
               </div>
               <div
-                className="radial-progress text-current font-bold font-mono text-xs"
+                className="radial-progress font-mono text-xs font-bold text-current"
                 style={
                   {
                     '--value': evalData.feasibility_score,
@@ -259,20 +258,20 @@ export const CorridorsDashboard: React.FC<CorridorsDashboardProps> = ({
             </div>
 
             <div className="grid grid-cols-2 gap-3 text-xs">
-              <div className="bg-base-200/40 p-3 rounded-lg border border-base-200">
-                <span className="text-base-content/60 text-[11px] block">
+              <div className="bg-base-200/40 border-base-200 rounded-lg border p-3">
+                <span className="text-base-content/60 block text-[11px]">
                   Tempo de Reabastecimento:
                 </span>
-                <span className="font-mono font-bold text-base-content">
+                <span className="text-base-content font-mono font-bold">
                   ~{evalData.refuel_time_minutes} min
                 </span>
-                <span className="text-[10px] text-base-content/50 block mt-0.5">
+                <span className="text-base-content/50 mt-0.5 block text-[10px]">
                   {evalData.stops_description}
                 </span>
               </div>
 
-              <div className="bg-base-200/40 p-3 rounded-lg border border-base-200">
-                <span className="text-base-content/60 text-[11px] block">
+              <div className="bg-base-200/40 border-base-200 rounded-lg border p-3">
+                <span className="text-base-content/60 block text-[11px]">
                   Impacto na Carga Útil:
                 </span>
                 <span
@@ -281,14 +280,14 @@ export const CorridorsDashboard: React.FC<CorridorsDashboardProps> = ({
                   {evalData.payload_penalty_kg > 0 ? '+' : ''}
                   {formatNumber(evalData.payload_penalty_kg, 0)} kg
                 </span>
-                <span className="text-[10px] text-base-content/50 block mt-0.5">
+                <span className="text-base-content/50 mt-0.5 block text-[10px]">
                   Lei da Balança (PBTC)
                 </span>
               </div>
             </div>
 
-            <div className="bg-base-200/40 p-3 rounded-lg border border-base-200 text-xs">
-              <div className="flex justify-between items-center mb-1">
+            <div className="bg-base-200/40 border-base-200 rounded-lg border p-3 text-xs">
+              <div className="mb-1 flex items-center justify-between">
                 <span className="text-base-content/70">
                   Abatimento de Emissões vs Diesel:
                 </span>
@@ -296,9 +295,9 @@ export const CorridorsDashboard: React.FC<CorridorsDashboardProps> = ({
                   -{formatNumber(evalData.emission_reduction_percent, 1)}%
                 </span>
               </div>
-              <div className="w-full bg-base-300 h-2 rounded-full overflow-hidden">
+              <div className="bg-base-300 h-2 w-full overflow-hidden rounded-full">
                 <div
-                  className="bg-emerald-500 h-full"
+                  className="h-full bg-emerald-500"
                   style={{ width: `${evalData.emission_reduction_percent}%` }}
                 />
               </div>
@@ -306,19 +305,23 @@ export const CorridorsDashboard: React.FC<CorridorsDashboardProps> = ({
           </div>
 
           {/* Column 3: Operational Recommendation */}
-          <div className="bg-base-200/50 rounded-lg p-4 border border-base-300 flex flex-col justify-between">
+          <div className="bg-base-200/50 border-base-300 flex flex-col justify-between rounded-lg border p-4">
             <div>
-              <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-base-content/70 mb-2">
-                <Info className="w-4 h-4 text-primary shrink-0" aria-hidden="true" />
+              <div className="text-base-content/70 mb-2 flex items-center gap-1.5 text-xs font-bold tracking-wider uppercase">
+                <Info className="text-primary h-4 w-4 shrink-0" aria-hidden="true" />
                 Diagnóstico &amp; Recomendação Técnica
               </div>
-              <p className="text-xs text-base-content/85 leading-relaxed">
+              <p className="text-base-content/85 text-xs leading-relaxed">
                 {evalData.recommendation}
               </p>
             </div>
 
-            <div className="mt-4 pt-3 border-t border-base-300 text-[11px] text-base-content/60 leading-relaxed">
-              Fontes: EPE Plano Nacional de Logística <SourceRef id="I12" context="Corredores Logísticos (PNL 2035)" />, CONTRAN Res. 882/2021 <SourceRef id="V10" context="Lei da Balança / Tolerância PBTC" /> e ANTT <SourceRef id="V01" context="Piso Mínimo de Frete Rodoviário" />.
+            <div className="border-base-300 text-base-content/60 mt-4 border-t pt-3 text-[11px] leading-relaxed">
+              Fontes: EPE Plano Nacional de Logística{' '}
+              <SourceRef id="I12" context="Corredores Logísticos (PNL 2035)" />, CONTRAN
+              Res. 882/2021{' '}
+              <SourceRef id="V10" context="Lei da Balança / Tolerância PBTC" /> e ANTT{' '}
+              <SourceRef id="V01" context="Piso Mínimo de Frete Rodoviário" />.
             </div>
           </div>
         </div>

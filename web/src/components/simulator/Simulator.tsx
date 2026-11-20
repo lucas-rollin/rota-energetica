@@ -185,20 +185,24 @@ export const Simulator: React.FC<SimulatorProps> = ({ defaults }) => {
         <div
           role="status"
           aria-live="polite"
-          className="bg-amber-500/10 border border-amber-500/30 text-amber-900 dark:text-amber-200 rounded-2xl p-3.5 shadow-xs flex items-start gap-3 text-xs"
+          className="flex items-start gap-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-3.5 text-xs text-amber-900 shadow-xs dark:text-amber-200"
         >
-          <TriangleAlert className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" aria-hidden="true" />
+          <TriangleAlert
+            className="mt-0.5 h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400"
+            aria-hidden="true"
+          />
           <div className="space-y-1">
-            <span className="font-semibold block text-base-content">
+            <span className="text-base-content block font-semibold">
               Cenário de Sensibilidade — Parâmetro fora da faixa de referência:
             </span>
-            <ul className="list-disc list-inside text-base-content/80 text-[11px] space-y-0.5">
+            <ul className="text-base-content/80 list-inside list-disc space-y-0.5 text-[11px]">
               {simulationWarnings.map((w, idx) => (
                 <li key={idx}>{w}</li>
               ))}
             </ul>
-            <p className="text-[10px] text-base-content/60 pt-0.5">
-              Os gráficos e métricas de TCO continuam sendo calculados e apresentados normalmente com base no valor personalizado.
+            <p className="text-base-content/60 pt-0.5 text-[10px]">
+              Os gráficos e métricas de TCO continuam sendo calculados e apresentados
+              normalmente com base no valor personalizado.
             </p>
           </div>
         </div>
@@ -206,7 +210,7 @@ export const Simulator: React.FC<SimulatorProps> = ({ defaults }) => {
 
       {/* Fatal Calculation Error Alert if any */}
       {simulationError && (
-        <div role="alert" className="alert alert-error rounded-2xl shadow-lg text-xs">
+        <div role="alert" className="alert alert-error rounded-2xl text-xs shadow-lg">
           <span className="font-bold">Erro no cálculo:</span>
           <span>{simulationError}</span>
         </div>

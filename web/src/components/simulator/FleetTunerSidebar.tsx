@@ -282,7 +282,9 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
                     </div>
 
                     <div className="bg-base-100 border-base-300 flex items-center gap-1 rounded border px-1.5 py-0.5">
-                      <span className="text-base-content/50 font-mono text-[10px]">R$</span>
+                      <span className="text-base-content/50 font-mono text-[10px]">
+                        R$
+                      </span>
                       <input
                         type="number"
                         step={fuel.step}
@@ -304,7 +306,7 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
                   </div>
 
                   {isOutOfRange && (
-                    <div className="text-[10px] text-amber-700 dark:text-amber-300 flex items-center justify-between font-mono pt-0.5 border-t border-amber-300/30">
+                    <div className="flex items-center justify-between border-t border-amber-300/30 pt-0.5 font-mono text-[10px] text-amber-700 dark:text-amber-300">
                       <span>Aviso: fora da ref. ANP/ANEEL</span>
                       <span>
                         [{minVal} - {maxVal}]
@@ -353,7 +355,13 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
                         }`}
                         aria-hidden="true"
                       />
-                      <span>{alt === 'eletrico' ? 'Elétr.' : alt === 'biometano' ? 'Bio' : alt}</span>
+                      <span>
+                        {alt === 'eletrico'
+                          ? 'Elétr.'
+                          : alt === 'biometano'
+                            ? 'Bio'
+                            : alt}
+                      </span>
                     </button>
                   )
                 )}

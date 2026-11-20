@@ -140,7 +140,7 @@ export const VehicleParametersPanel: React.FC<VehicleParametersPanelProps> = ({
             defaultItem={defaultParameters.charging_efficiency}
             onChange={(val) => onChange('charging_efficiency', val)}
             onReset={() => onReset('charging_efficiency')}
-            />
+          />
         )}
 
         {parameters.arla_consumption_ratio &&
@@ -152,7 +152,7 @@ export const VehicleParametersPanel: React.FC<VehicleParametersPanelProps> = ({
               defaultItem={defaultParameters.arla_consumption_ratio}
               onChange={(val) => onChange('arla_consumption_ratio', val)}
               onReset={() => onReset('arla_consumption_ratio')}
-                />
+            />
           )}
       </div>
     </div>

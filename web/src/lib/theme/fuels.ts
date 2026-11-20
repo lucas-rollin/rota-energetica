@@ -46,8 +46,7 @@ export const FUEL_THEME: Record<AlternativeId, FuelThemeConfig> = {
     dotClass: 'bg-emerald-500',
     textClass: 'text-emerald-700 dark:text-emerald-400',
     borderAccent: 'border-l-4 border-l-emerald-500',
-    pillClass:
-      'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 font-semibold',
+    pillClass: 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 font-semibold',
     barClass: 'bg-emerald-500',
     barSecondaryClass: 'bg-emerald-600',
     activeButtonClass:

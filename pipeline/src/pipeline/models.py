@@ -751,10 +751,12 @@ class FreightCorridor(BaseModel):
         description="Avaliação por tipo de trem de força.",
         title="Powertrain Evaluations",
     )
-    source_ids: list[Annotated[str, StringConstraints(pattern=r"^[A-Z][0-9]{2}$")]] = Field(
-        ...,
-        description="Lista de IDs de fontes associadas no catálogo de fontes.",
-        title="Source Ids",
+    source_ids: list[Annotated[str, StringConstraints(pattern=r"^[A-Z][0-9]{2}$")]] = (
+        Field(
+            ...,
+            description="Lista de IDs de fontes associadas no catálogo de fontes.",
+            title="Source Ids",
+        )
     )
 
 
@@ -1124,10 +1126,12 @@ class GlobalBenchmarksCatalog(BaseModel):
         description="Data de geração do catálogo.",
         title="Generated At",
     )
-    source_ids: list[Annotated[str, StringConstraints(pattern=r"^[A-Z][0-9]{2}$")]] = Field(
-        ...,
-        description="Lista de IDs de fontes no catálogo de fontes.",
-        title="Source Ids",
+    source_ids: list[Annotated[str, StringConstraints(pattern=r"^[A-Z][0-9]{2}$")]] = (
+        Field(
+            ...,
+            description="Lista de IDs de fontes no catálogo de fontes.",
+            title="Source Ids",
+        )
     )
     regions: dict[str, RegionBenchmark] = Field(
         ...,

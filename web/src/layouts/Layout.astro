@@ -61,7 +61,6 @@ const navItems = [
   <body class="min-h-screen flex flex-col bg-base-200/40 text-base-content antialiased">
     <!-- Extension Project Header Notice -->
     <header class="w-full bg-base-100 border-b border-base-200 sticky top-0 z-30 shadow-xs">
-
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-16">
           <div class="flex items-center gap-3">
@@ -103,24 +102,25 @@ const navItems = [
             </a>
           </div>
 
-          <nav aria-label="Navegação principal" class="flex items-center gap-1 sm:gap-1.5 overflow-x-auto py-1 max-w-full">
-            {
-              navItems.map((item) => {
-                const active = item.match(currentPath);
-                return (
-                  <a
-                    href={item.href}
-                    class={`btn btn-sm text-xs font-semibold whitespace-nowrap transition-colors ${
-                      active
-                        ? 'btn-neutral text-primary font-bold shadow-xs'
-                        : 'btn-ghost text-base-content/85 hover:text-base-content'
-                    }`}
-                  >
-                    {item.label}
-                  </a>
-                );
-              })
-            }
+          <nav
+            aria-label="Navegação principal"
+            class="flex items-center gap-1 sm:gap-1.5 overflow-x-auto py-1 max-w-full"
+          >
+            {navItems.map((item) => {
+              const active = item.match(currentPath);
+              return (
+                <a
+                  href={item.href}
+                  class={`btn btn-sm text-xs font-semibold whitespace-nowrap transition-colors ${
+                    active
+                      ? 'btn-neutral text-primary font-bold shadow-xs'
+                      : 'btn-ghost text-base-content/85 hover:text-base-content'
+                  }`}
+                >
+                  {item.label}
+                </a>
+              );
+            })}
             <a
               href="https://github.com/lucas-rollin/rota-energetica"
               target="_blank"

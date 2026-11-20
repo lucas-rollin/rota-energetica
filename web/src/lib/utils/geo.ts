@@ -6,28 +6,19 @@ const MERCATOR_MAX_LAT = 85.05112878;
 /**
  * Conformal Web Mercator forward projection matching ECharts geo screen space (Y down).
  */
-export function projectWebMercator([lon, lat]: [number, number]): [
-  number,
-  number,
-] {
+export function projectWebMercator([lon, lat]: [number, number]): [number, number] {
   const clampedLat = Math.max(-MERCATOR_MAX_LAT, Math.min(MERCATOR_MAX_LAT, lat));
   const x = (lon * Math.PI) / 180;
-  const y = -Math.log(
-    Math.tan(Math.PI / 4 + (clampedLat * Math.PI) / 360)
-  );
+  const y = -Math.log(Math.tan(Math.PI / 4 + (clampedLat * Math.PI) / 360));
   return [x, y];
 }
 
 /**
  * Conformal Web Mercator inverse projection back to [longitude, latitude].
  */
-export function unprojectWebMercator([x, y]: [number, number]): [
-  number,
-  number,
-] {
+export function unprojectWebMercator([x, y]: [number, number]): [number, number] {
   const lon = (x * 180) / Math.PI;
-  const lat =
-    (2 * Math.atan(Math.exp(-y)) - Math.PI / 2) * (180 / Math.PI);
+  const lat = (2 * Math.atan(Math.exp(-y)) - Math.PI / 2) * (180 / Math.PI);
   return [lon, lat];
 }
 
@@ -108,15 +99,10 @@ export function createGeodesicCircleCoords(
   const coords: [number, number][] = [];
   for (let i = 0; i <= steps; i++) {
     const theta = (i / steps) * 2 * Math.PI;
-    const lat2 = Math.asin(
-      sinLat1 * cosAng + cosLat1 * sinAng * Math.cos(theta)
-    );
+    const lat2 = Math.asin(sinLat1 * cosAng + cosLat1 * sinAng * Math.cos(theta));
     const lon2 =
       lon1 +
-      Math.atan2(
-        Math.sin(theta) * sinAng * cosLat1,
-        cosAng - sinLat1 * Math.sin(lat2)
-      );
+      Math.atan2(Math.sin(theta) * sinAng * cosLat1, cosAng - sinLat1 * Math.sin(lat2));
 
     coords.push([(lon2 * 180) / Math.PI, (lat2 * 180) / Math.PI]);
   }
@@ -275,9 +261,7 @@ export function buildCorridorCoverageSegments(
 /**
  * Compute ECharts Geo center & zoom to frame a selected corridor or full Brazil.
  */
-export function getCorridorViewport(
-  corridor: FreightCorridor | null
-): MapViewport {
+export function getCorridorViewport(corridor: FreightCorridor | null): MapViewport {
   const brazilDefault: MapViewport = {
     center: [-52.5, -14.8],
     zoom: 1.12,

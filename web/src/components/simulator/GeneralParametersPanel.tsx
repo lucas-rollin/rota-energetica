@@ -98,7 +98,7 @@ export const GeneralParametersPanel: React.FC<GeneralParametersPanelProps> = ({
             defaultItem={defaultParameters.cbio_price}
             onChange={(val) => onChange('cbio_price', val)}
             onReset={() => onReset('cbio_price')}
-            />
+          />
         )}
       </div>
     </div>

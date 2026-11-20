@@ -23,7 +23,9 @@ export const SourceRef: React.FC<SourceRefProps> = ({
 }) => {
   const source = getSource(id);
   const sizeClasses =
-    size === 'sm' ? 'px-2 py-0.5 text-xs leading-tight' : 'px-1.5 py-0.5 text-[10px] leading-none';
+    size === 'sm'
+      ? 'px-2 py-0.5 text-xs leading-tight'
+      : 'px-1.5 py-0.5 text-[10px] leading-none';
 
   if (!source) {
     return (

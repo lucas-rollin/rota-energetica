@@ -190,7 +190,9 @@ describe('Calculator Engine Unit Tests', () => {
       const warnings = getParameterWarnings(invalidParams);
       expect(warnings.length).toBe(2);
       expect(warnings.some((w) => w.includes('Taxa de desconto'))).toBe(true);
-      expect(warnings.some((w) => w.includes('Preço do combustível (Diesel B)'))).toBe(true);
+      expect(warnings.some((w) => w.includes('Preço do combustível (Diesel B)'))).toBe(
+        true
+      );
 
       // Simulation continues to calculate smoothly without disrupting charts
       const results = simulate(invalidParams);
@@ -199,9 +201,7 @@ describe('Calculator Engine Unit Tests', () => {
     });
 
     it('rejects non-finite numerical parameters', () => {
-      const nanParams: SimulationParameters = JSON.parse(
-        JSON.stringify(defaultParams)
-      );
+      const nanParams: SimulationParameters = JSON.parse(JSON.stringify(defaultParams));
       nanParams.general.discount_rate.value = NaN;
 
       expect(() => simulate(nanParams)).toThrow(/must be a finite number/);

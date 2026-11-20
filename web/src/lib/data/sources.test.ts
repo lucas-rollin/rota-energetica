@@ -97,11 +97,17 @@ describe('sources integrity', () => {
     }
     for (const corridor of corridorsJson.corridors) {
       for (const id of corridor.source_ids) {
-        expect(getSource(id), `Corridor '${corridor.id}' source '${id}' not found`).toBeDefined();
+        expect(
+          getSource(id),
+          `Corridor '${corridor.id}' source '${id}' not found`
+        ).toBeDefined();
       }
     }
     for (const station of corridorFuelStationsJson.stations) {
-      expect(getSource(station.source_id), `Station '${station.id}' source '${station.source_id}' not found`).toBeDefined();
+      expect(
+        getSource(station.source_id),
+        `Station '${station.id}' source '${station.source_id}' not found`
+      ).toBeDefined();
     }
   });
 });
