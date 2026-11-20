@@ -1,6 +1,5 @@
 import React, { useMemo, useState } from 'react';
 import { TriangleAlert } from 'lucide-react';
-import { getSource } from '../../lib/data/sources';
 import { getParameterWarnings, simulate } from '../../lib/calc';
 import type {
   AlternativeId,
@@ -8,12 +7,10 @@ import type {
   SimulationParameters,
   VehicleParameters,
 } from '../../lib/types/parameters';
-import type { SourceItem } from '../../lib/types/sources';
 import { FleetImpactBanner } from './FleetImpactBanner';
 import { FleetTunerSidebar } from './FleetTunerSidebar';
 import { ResultCards } from './ResultCards';
 import { ScenarioPresets } from './ScenarioPresets';
-import { SourceModal } from './SourceModal';
 import { PaybackTimelineChart } from './charts/PaybackTimelineChart';
 import { TcoComparisonChart } from './charts/TcoComparisonChart';
 
@@ -29,8 +26,6 @@ export const Simulator: React.FC<SimulatorProps> = ({ defaults }) => {
 
   const [activePresetId, setActivePresetId] = useState<string>('default');
   const [fleetSize, setFleetSize] = useState<number>(1);
-  const [selectedSource, setSelectedSource] = useState<SourceItem | null>(null);
-  const [selectedParamLabel, setSelectedParamLabel] = useState<string>('');
 
   // Count altered parameters
   const alteredCount = useMemo(() => {
@@ -145,15 +140,6 @@ export const Simulator: React.FC<SimulatorProps> = ({ defaults }) => {
     setFleetSize(1);
   };
 
-  // Open source dialog
-  const handleOpenSource = (sourceId: string, paramLabel: string) => {
-    const src = getSource(sourceId);
-    if (src) {
-      setSelectedSource(src);
-      setSelectedParamLabel(paramLabel);
-    }
-  };
-
   // Vehicle acquisition prices for card deltas
   const vehiclePurchasePrices: Record<AlternativeId, number> = {
     diesel: params.vehicles.diesel.vehicle_purchase_price.value,
@@ -250,7 +236,6 @@ export const Simulator: React.FC<SimulatorProps> = ({ defaults }) => {
             onVehicleChange={handleVehicleChange}
             onResetAll={handleResetAll}
             alteredCount={alteredCount}
-            onOpenSource={handleOpenSource}
           />
         </div>
 
@@ -283,13 +268,6 @@ export const Simulator: React.FC<SimulatorProps> = ({ defaults }) => {
           )}
         </div>
       </div>
-
-      {/* 4. Native Source Details Modal Dialog */}
-      <SourceModal
-        source={selectedSource}
-        paramLabel={selectedParamLabel}
-        onClose={() => setSelectedSource(null)}
-      />
     </div>
   );
 };

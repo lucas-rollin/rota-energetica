@@ -2,6 +2,7 @@ import React from 'react';
 import { DollarSign, Fuel, Globe, Leaf, Scale, Zap, ShieldCheck } from 'lucide-react';
 import type { GlobalBenchmarksCatalog, RegionBenchmark } from '../../lib/types/catalogs';
 import { formatNumber } from '../../lib/utils/format';
+import { SourceRef } from '../common/SourceRef';
 
 interface GlobalBenchmarkDashboardProps {
   benchmarksData: GlobalBenchmarksCatalog;
@@ -313,7 +314,12 @@ export const GlobalBenchmarkDashboard: React.FC<GlobalBenchmarkDashboardProps> =
         </div>
 
         <div className="mt-3 pt-3 border-t border-base-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-[11px] text-base-content/60">
-          <span>Dados compilados de IEA Energy Prices 2024, ANP, Eurostat e ICCT Global Commercial Vehicle Policies.</span>
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span>Dados compilados de IEA Energy Prices 2024, ANP, Eurostat e ICCT Global Commercial Vehicle Policies.</span>
+            {benchmarksData.source_ids?.map((id) => (
+              <SourceRef key={id} id={id} context="Comparativo Internacional" />
+            ))}
+          </div>
           <span className="font-mono">Valores de diesel e eletricidade convertidos pela média de câmbio PPA 2026</span>
         </div>
       </div>

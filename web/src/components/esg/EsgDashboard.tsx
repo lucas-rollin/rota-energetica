@@ -3,6 +3,7 @@ import type { LocalPollutantsCatalog } from '../../lib/types/catalogs';
 import type { AlternativeId, SimulationParameters } from '../../lib/types/parameters';
 import { FUEL_THEME } from '../../lib/theme/fuels';
 import { formatCurrency, formatNumber } from '../../lib/utils/format';
+import { SourceRef } from '../common/SourceRef';
 
 interface EsgDashboardProps {
   parameters: SimulationParameters;
@@ -324,9 +325,10 @@ export const EsgDashboard: React.FC<EsgDashboardProps> = ({
             {/* Biometano */}
             <div>
               <div className="flex justify-between text-xs mb-1">
-                <span className={`font-semibold inline-flex items-center gap-1.5 ${FUEL_THEME.biometano.textClass}`}>
+                <span className={`font-semibold inline-flex items-center gap-1.5 flex-wrap ${FUEL_THEME.biometano.textClass}`}>
                   <span className={`h-2 w-2 rounded-full ${FUEL_THEME.biometano.dotClass}`} aria-hidden="true" />
-                  2. Biometano Purificado (Mandato CNPE 4/2026)
+                  <span>2. Biometano Purificado (Mandato CNPE 4/2026)</span>
+                  <SourceRef id="E01" context="Mandato CNPE 4/2026 — Biometano" />
                 </span>
                 <span className={`font-mono font-bold ${FUEL_THEME.biometano.textClass}`}>
                   {formatNumber(biometanoCi, 2)} gCO₂eq/MJ ({formatDeltaVsDiesel(biometanoCi)})
@@ -361,8 +363,10 @@ export const EsgDashboard: React.FC<EsgDashboardProps> = ({
                   WtT 100% (Rede Elétrica SIN)
                 </div>
               </div>
-              <div className="text-[10px] text-base-content/60 mt-1">
-                Zero emissões de escapamento no ponto de uso; impacto restrito à geração da rede (MCTI/SIRENE).
+              <div className="text-[10px] text-base-content/60 mt-1 flex flex-wrap items-center gap-1">
+                <span>Zero emissões de escapamento no ponto de uso; impacto restrito à geração da rede (MCTI/SIRENE)</span>
+                <SourceRef id="E02" context="Fator de emissão do SIN (MCTI/SIRENE)" />
+                <span>.</span>
               </div>
             </div>
 
@@ -435,9 +439,12 @@ export const EsgDashboard: React.FC<EsgDashboardProps> = ({
             </div>
           </div>
 
-          <div className="mt-4 pt-3 border-t border-base-200 flex items-center justify-between text-xs text-base-content/60">
-            <span>Metodologia: GHG Protocol Brasil & ISO 14040/44</span>
-            <span className="badge badge-xs badge-outline">Fator SIN 2024</span>
+          <div className="mt-4 pt-3 border-t border-base-200 flex items-center justify-between gap-2 text-xs text-base-content/60">
+            <span>Metodologia: GHG Protocol Brasil &amp; ISO 14040/44</span>
+            <span className="inline-flex items-center gap-1.5">
+              <span className="badge badge-xs badge-outline">Fator SIN 2024</span>
+              <SourceRef id="E02" context="Escopo 2 — Fator SIN (MCTI/SIRENE)" />
+            </span>
           </div>
         </div>
       </div>
@@ -510,9 +517,12 @@ export const EsgDashboard: React.FC<EsgDashboardProps> = ({
           </table>
         </div>
 
-        <div className="mt-3 text-[11px] text-base-content/60 flex items-center justify-between">
+        <div className="mt-3 text-[11px] text-base-content/60 flex flex-wrap items-center justify-between gap-2">
           <span>Limites legais Conama P8 (ciclo WHTC): NOx ≤ 0,40 g/kWh | Material Particulado ≤ 0,010 g/kWh</span>
-          <span>Fonte: CONAMA Res. 490/2018 (E07)</span>
+          <span className="inline-flex items-center gap-1.5">
+            <span>Fonte: CONAMA Res. 490/2018</span>
+            <SourceRef id={pollutantsData.source_id} context="Poluentes Locais (PROCONVE P8 / Euro VI)" />
+          </span>
         </div>
       </div>
     </div>

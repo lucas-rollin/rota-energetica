@@ -6,6 +6,7 @@ import type {
 } from '../../lib/types/catalogs';
 import { FUEL_THEME } from '../../lib/theme/fuels';
 import { formatNumber } from '../../lib/utils/format';
+import { SourceRef } from '../common/SourceRef';
 import { CorridorInfrastructureMap } from './CorridorInfrastructureMap';
 
 interface CorridorsDashboardProps {
@@ -316,8 +317,8 @@ export const CorridorsDashboard: React.FC<CorridorsDashboardProps> = ({
               </p>
             </div>
 
-            <div className="mt-4 pt-3 border-t border-base-300 text-[11px] text-base-content/60">
-              Fontes: EPE Plano Nacional de Logística (I12), CONTRAN Res. 882/2021 (V10) e ANTT (V01).
+            <div className="mt-4 pt-3 border-t border-base-300 text-[11px] text-base-content/60 leading-relaxed">
+              Fontes: EPE Plano Nacional de Logística <SourceRef id="I12" context="Corredores Logísticos (PNL 2035)" />, CONTRAN Res. 882/2021 <SourceRef id="V10" context="Lei da Balança / Tolerância PBTC" /> e ANTT <SourceRef id="V01" context="Piso Mínimo de Frete Rodoviário" />.
             </div>
           </div>
         </div>

@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import parametersJson from '../../../../data/parameters.json';
+import corridorFuelStationsJson from '../../../../data/processed/corridor_fuel_stations.json';
+import corridorsJson from '../../../../data/processed/corridors.json';
+import globalBenchmarksJson from '../../../../data/processed/global_benchmarks.json';
+import localPollutantsJson from '../../../../data/processed/local_pollutants.json';
 import type {
   AlternativeId,
   ParameterItem,
@@ -64,6 +68,40 @@ describe('sources integrity', () => {
           ).toBeDefined();
         }
       }
+    }
+  });
+
+  it('guarantees that all dashboard citation IDs and processed catalogs resolve in sources.json', () => {
+    const dashboardCitedIds = [
+      'P01',
+      'P07',
+      'P09',
+      'E01',
+      'E02',
+      'E07',
+      'V01',
+      'V10',
+      'I01',
+      'I07',
+      'I09',
+      'I12',
+      'I14',
+    ];
+    for (const id of dashboardCitedIds) {
+      expect(getSource(id), `Dashboard source '${id}' not found`).toBeDefined();
+    }
+
+    expect(getSource(localPollutantsJson.source_id)).toBeDefined();
+    for (const id of globalBenchmarksJson.source_ids) {
+      expect(getSource(id), `Benchmark source '${id}' not found`).toBeDefined();
+    }
+    for (const corridor of corridorsJson.corridors) {
+      for (const id of corridor.source_ids) {
+        expect(getSource(id), `Corridor '${corridor.id}' source '${id}' not found`).toBeDefined();
+      }
+    }
+    for (const station of corridorFuelStationsJson.stations) {
+      expect(getSource(station.source_id), `Station '${station.id}' source '${station.source_id}' not found`).toBeDefined();
     }
   });
 });

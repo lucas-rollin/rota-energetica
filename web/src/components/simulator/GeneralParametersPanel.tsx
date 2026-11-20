@@ -7,7 +7,6 @@ interface GeneralParametersPanelProps {
   defaultParameters: GeneralParameters;
   onChange: <K extends keyof GeneralParameters>(key: K, value: number) => void;
   onReset: <K extends keyof GeneralParameters>(key: K) => void;
-  onOpenSource: (sourceId: string, paramLabel: string) => void;
 }
 
 export const GeneralParametersPanel: React.FC<GeneralParametersPanelProps> = ({
@@ -15,7 +14,6 @@ export const GeneralParametersPanel: React.FC<GeneralParametersPanelProps> = ({
   defaultParameters,
   onChange,
   onReset,
-  onOpenSource,
 }) => {
   return (
     <div className="space-y-4">
@@ -36,7 +34,6 @@ export const GeneralParametersPanel: React.FC<GeneralParametersPanelProps> = ({
           defaultItem={defaultParameters.annual_distance_km}
           onChange={(val) => onChange('annual_distance_km', val)}
           onReset={() => onReset('annual_distance_km')}
-          onOpenSource={onOpenSource}
         />
 
         <ParameterControl
@@ -46,7 +43,6 @@ export const GeneralParametersPanel: React.FC<GeneralParametersPanelProps> = ({
           defaultItem={defaultParameters.horizon_years}
           onChange={(val) => onChange('horizon_years', val)}
           onReset={() => onReset('horizon_years')}
-          onOpenSource={onOpenSource}
         />
 
         <ParameterControl
@@ -56,7 +52,6 @@ export const GeneralParametersPanel: React.FC<GeneralParametersPanelProps> = ({
           defaultItem={defaultParameters.discount_rate}
           onChange={(val) => onChange('discount_rate', val)}
           onReset={() => onReset('discount_rate')}
-          onOpenSource={onOpenSource}
         />
 
         <ParameterControl
@@ -66,7 +61,6 @@ export const GeneralParametersPanel: React.FC<GeneralParametersPanelProps> = ({
           defaultItem={defaultParameters.biodiesel_blend}
           onChange={(val) => onChange('biodiesel_blend', val)}
           onReset={() => onReset('biodiesel_blend')}
-          onOpenSource={onOpenSource}
         />
 
         <ParameterControl
@@ -76,7 +70,6 @@ export const GeneralParametersPanel: React.FC<GeneralParametersPanelProps> = ({
           defaultItem={defaultParameters.diesel_fossil_carbon_intensity}
           onChange={(val) => onChange('diesel_fossil_carbon_intensity', val)}
           onReset={() => onReset('diesel_fossil_carbon_intensity')}
-          onOpenSource={onOpenSource}
         />
 
         <ParameterControl
@@ -86,7 +79,6 @@ export const GeneralParametersPanel: React.FC<GeneralParametersPanelProps> = ({
           defaultItem={defaultParameters.biodiesel_carbon_intensity}
           onChange={(val) => onChange('biodiesel_carbon_intensity', val)}
           onReset={() => onReset('biodiesel_carbon_intensity')}
-          onOpenSource={onOpenSource}
         />
 
         <ParameterControl
@@ -96,7 +88,6 @@ export const GeneralParametersPanel: React.FC<GeneralParametersPanelProps> = ({
           defaultItem={defaultParameters.arla_price}
           onChange={(val) => onChange('arla_price', val)}
           onReset={() => onReset('arla_price')}
-          onOpenSource={onOpenSource}
         />
 
         {parameters.cbio_price && defaultParameters.cbio_price && (
@@ -107,8 +98,7 @@ export const GeneralParametersPanel: React.FC<GeneralParametersPanelProps> = ({
             defaultItem={defaultParameters.cbio_price}
             onChange={(val) => onChange('cbio_price', val)}
             onReset={() => onReset('cbio_price')}
-            onOpenSource={onOpenSource}
-          />
+            />
         )}
       </div>
     </div>

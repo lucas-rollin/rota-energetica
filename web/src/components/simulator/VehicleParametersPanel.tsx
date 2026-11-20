@@ -10,7 +10,6 @@ interface VehicleParametersPanelProps {
   dieselPurchasePrice: number;
   onChange: <K extends keyof VehicleParameters>(key: K, value: number) => void;
   onReset: <K extends keyof VehicleParameters>(key: K) => void;
-  onOpenSource: (sourceId: string, paramLabel: string) => void;
 }
 
 export const VehicleParametersPanel: React.FC<VehicleParametersPanelProps> = ({
@@ -20,7 +19,6 @@ export const VehicleParametersPanel: React.FC<VehicleParametersPanelProps> = ({
   dieselPurchasePrice,
   onChange,
   onReset,
-  onOpenSource,
 }) => {
   const currentPurchasePrice = parameters.vehicle_purchase_price.value;
   const isDiesel = alternativeId === 'diesel';
@@ -78,7 +76,6 @@ export const VehicleParametersPanel: React.FC<VehicleParametersPanelProps> = ({
           defaultItem={defaultParameters.vehicle_purchase_price}
           onChange={(val) => onChange('vehicle_purchase_price', val)}
           onReset={() => onReset('vehicle_purchase_price')}
-          onOpenSource={onOpenSource}
         />
 
         <ParameterControl
@@ -88,7 +85,6 @@ export const VehicleParametersPanel: React.FC<VehicleParametersPanelProps> = ({
           defaultItem={defaultParameters.energy_price}
           onChange={(val) => onChange('energy_price', val)}
           onReset={() => onReset('energy_price')}
-          onOpenSource={onOpenSource}
         />
 
         <ParameterControl
@@ -98,7 +94,6 @@ export const VehicleParametersPanel: React.FC<VehicleParametersPanelProps> = ({
           defaultItem={defaultParameters.consumption}
           onChange={(val) => onChange('consumption', val)}
           onReset={() => onReset('consumption')}
-          onOpenSource={onOpenSource}
         />
 
         <ParameterControl
@@ -108,7 +103,6 @@ export const VehicleParametersPanel: React.FC<VehicleParametersPanelProps> = ({
           defaultItem={defaultParameters.energy_density}
           onChange={(val) => onChange('energy_density', val)}
           onReset={() => onReset('energy_density')}
-          onOpenSource={onOpenSource}
         />
 
         <ParameterControl
@@ -118,7 +112,6 @@ export const VehicleParametersPanel: React.FC<VehicleParametersPanelProps> = ({
           defaultItem={defaultParameters.carbon_intensity}
           onChange={(val) => onChange('carbon_intensity', val)}
           onReset={() => onReset('carbon_intensity')}
-          onOpenSource={onOpenSource}
         />
 
         <ParameterControl
@@ -128,7 +121,6 @@ export const VehicleParametersPanel: React.FC<VehicleParametersPanelProps> = ({
           defaultItem={defaultParameters.maintenance_cost_per_km}
           onChange={(val) => onChange('maintenance_cost_per_km', val)}
           onReset={() => onReset('maintenance_cost_per_km')}
-          onOpenSource={onOpenSource}
         />
 
         <ParameterControl
@@ -138,7 +130,6 @@ export const VehicleParametersPanel: React.FC<VehicleParametersPanelProps> = ({
           defaultItem={defaultParameters.residual_value_ratio}
           onChange={(val) => onChange('residual_value_ratio', val)}
           onReset={() => onReset('residual_value_ratio')}
-          onOpenSource={onOpenSource}
         />
 
         {parameters.charging_efficiency && defaultParameters.charging_efficiency && (
@@ -149,8 +140,7 @@ export const VehicleParametersPanel: React.FC<VehicleParametersPanelProps> = ({
             defaultItem={defaultParameters.charging_efficiency}
             onChange={(val) => onChange('charging_efficiency', val)}
             onReset={() => onReset('charging_efficiency')}
-            onOpenSource={onOpenSource}
-          />
+            />
         )}
 
         {parameters.arla_consumption_ratio &&
@@ -162,8 +152,7 @@ export const VehicleParametersPanel: React.FC<VehicleParametersPanelProps> = ({
               defaultItem={defaultParameters.arla_consumption_ratio}
               onChange={(val) => onChange('arla_consumption_ratio', val)}
               onReset={() => onReset('arla_consumption_ratio')}
-              onOpenSource={onOpenSource}
-            />
+                />
           )}
       </div>
     </div>

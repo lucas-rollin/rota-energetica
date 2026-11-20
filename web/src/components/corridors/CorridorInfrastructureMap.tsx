@@ -24,6 +24,7 @@ import type {
 } from '../../lib/types/catalogs';
 import { FUEL_THEME } from '../../lib/theme/fuels';
 import { formatNumber } from '../../lib/utils/format';
+import { SourceRef } from '../common/SourceRef';
 import {
   buildCorridorCoverageSegments,
   computeCorridorCoverageStats,
@@ -1154,8 +1155,11 @@ export const CorridorInfrastructureMap: React.FC<
                     {st.capacity_spec}
                   </td>
                   <td className="text-xs whitespace-nowrap">{st.status}</td>
-                  <td className="text-xs font-mono whitespace-nowrap">
-                    {st.source_id} ({st.badge})
+                  <td className="text-xs whitespace-nowrap">
+                    <div className="inline-flex items-center gap-1.5">
+                      <SourceRef id={st.source_id} context={`${st.name} (${st.highway})`} />
+                      <span className="text-base-content/60 text-[11px]">({st.badge})</span>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -1169,8 +1173,12 @@ export const CorridorInfrastructureMap: React.FC<
         <span>
           Nota: Pontos rodoviários agregados em nível de hub/entroncamento (sem exposição de dados cadastrais individuais).
         </span>
-        <span>
-          Fontes: IBGE Malha UF (I14), ANP (I07), Compagás (I09), SCGÁS (P09) &amp; ABVE/Tupi (I01)
+        <span className="leading-relaxed">
+          Fontes: IBGE Malha UF <SourceRef id="I14" context="Malha Territorial UF (Mapa)" />, ANP{' '}
+          <SourceRef id="I07" context="Revendedores de Combustíveis e GNV" />, Compagás{' '}
+          <SourceRef id="I09" context="Corredores Sustentáveis do Paraná" />, SCGÁS{' '}
+          <SourceRef id="P09" context="Rede de Postos GNV/Biometano SCGÁS" /> &amp; ABVE/Tupi{' '}
+          <SourceRef id="I01" context="Mapeamento Nacional de Eletropostos" />
         </span>
       </div>
     </section>

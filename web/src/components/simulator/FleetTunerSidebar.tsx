@@ -7,6 +7,7 @@ import type {
   SimulationParameters,
   VehicleParameters,
 } from '../../lib/types/parameters';
+import { SourceRef } from '../common/SourceRef';
 
 interface FleetTunerSidebarProps {
   params: SimulationParameters;
@@ -20,7 +21,6 @@ interface FleetTunerSidebarProps {
   ) => void;
   onResetAll: () => void;
   alteredCount: number;
-  onOpenSource: (sourceId: string, paramLabel: string) => void;
 }
 
 export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
@@ -31,7 +31,6 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
   onVehicleChange,
   onResetAll,
   alteredCount,
-  onOpenSource,
 }) => {
   const [showVehicleDetails, setShowVehicleDetails] = useState(false);
   const [selectedAltTab, setSelectedAltTab] = useState<AlternativeId>('eletrico');
@@ -279,14 +278,7 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
                       <span className="text-base-content text-xs font-medium">
                         {fuel.label}
                       </span>
-                      <button
-                        type="button"
-                        onClick={() => onOpenSource(fuel.sourceId, fuel.label)}
-                        className="text-primary font-mono text-[9px] hover:underline"
-                        title="Ver fonte oficial deste dado"
-                      >
-                        [{fuel.sourceId}]
-                      </button>
+                      <SourceRef id={fuel.sourceId} context={fuel.label} />
                     </div>
 
                     <div className="bg-base-100 border-base-300 flex items-center gap-1 rounded border px-1.5 py-0.5">

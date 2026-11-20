@@ -1,5 +1,6 @@
 import React, { useId } from 'react';
 import type { ParameterItem } from '../../lib/types/parameters';
+import { SourceRef } from '../common/SourceRef';
 
 interface ParameterControlProps {
   id?: string;
@@ -8,7 +9,6 @@ interface ParameterControlProps {
   defaultItem: ParameterItem;
   onChange: (value: number) => void;
   onReset?: () => void;
-  onOpenSource: (sourceId: string, paramLabel: string) => void;
 }
 
 export const ParameterControl: React.FC<ParameterControlProps> = ({
@@ -18,7 +18,6 @@ export const ParameterControl: React.FC<ParameterControlProps> = ({
   defaultItem,
   onChange,
   onReset,
-  onOpenSource,
 }) => {
   const generatedId = useId();
   const inputId = id || generatedId;
@@ -102,15 +101,7 @@ export const ParameterControl: React.FC<ParameterControlProps> = ({
             {item.badge}
           </span>
 
-          <button
-            type="button"
-            onClick={() => onOpenSource(item.source_id, label)}
-            title={`Ver fonte ${item.source_id}`}
-            aria-label={`Ver informações da fonte ${item.source_id} para ${label}`}
-            className="btn btn-xs btn-outline btn-neutral hover:btn-primary h-5 min-h-0 rounded px-1.5 font-mono text-[10px]"
-          >
-            {item.source_id}
-          </button>
+          <SourceRef id={item.source_id} context={label} />
         </div>
       </div>
 

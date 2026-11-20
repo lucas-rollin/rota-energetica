@@ -1,16 +1,44 @@
-import React, { useEffect, useRef } from 'react';
-import { X, ExternalLink } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
+import { ExternalLink, X } from 'lucide-react';
+import { getSource } from '../../lib/data/sources';
 import type { SourceItem } from '../../lib/types/sources';
+
+export const OPEN_SOURCE_MODAL_EVENT = 'rota:open-source';
+
+export interface OpenSourceModalDetail {
+  sourceId: string;
+  contextLabel?: string;
+}
+
+/**
+ * Dispatches a global browser event to open the source metadata modal for a catalog ID.
+ */
+export function openSourceModal(sourceId: string, contextLabel?: string): boolean {
+  const source = getSource(sourceId);
+  if (!source) return false;
+
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(
+      new CustomEvent<OpenSourceModalDetail>(OPEN_SOURCE_MODAL_EVENT, {
+        detail: { sourceId, contextLabel },
+      })
+    );
+  }
+  return true;
+}
 
 interface SourceModalProps {
   source: SourceItem | null;
-  paramLabel?: string;
+  contextLabel?: string;
   onClose: () => void;
 }
 
+/**
+ * Accessible native dialog displaying provenance, methodology, license, and links for a data source.
+ */
 export const SourceModal: React.FC<SourceModalProps> = ({
   source,
-  paramLabel,
+  contextLabel,
   onClose,
 }) => {
   const dialogRef = useRef<HTMLDialogElement | null>(null);
@@ -23,10 +51,8 @@ export const SourceModal: React.FC<SourceModalProps> = ({
       if (!dialog.open) {
         dialog.showModal();
       }
-    } else {
-      if (dialog.open) {
-        dialog.close();
-      }
+    } else if (dialog.open) {
+      dialog.close();
     }
   }, [source]);
 
@@ -40,9 +66,9 @@ export const SourceModal: React.FC<SourceModalProps> = ({
 
   const badgeColorClass =
     source.badge === 'Primária'
-      ? 'badge-success text-white'
+      ? 'badge-success'
       : source.badge === 'Adaptada'
-        ? 'badge-info text-white'
+        ? 'badge-info'
         : 'badge-warning';
 
   return (
@@ -69,9 +95,9 @@ export const SourceModal: React.FC<SourceModalProps> = ({
             <h3 id="source-dialog-title" className="text-base-content text-xl font-bold">
               {source.name}
             </h3>
-            {paramLabel && (
+            {contextLabel && (
               <p className="text-primary mt-0.5 text-xs font-medium">
-                Parâmetro associado: {paramLabel}
+                Referência: {contextLabel}
               </p>
             )}
           </div>
@@ -139,7 +165,7 @@ export const SourceModal: React.FC<SourceModalProps> = ({
                       className="link link-primary inline-flex items-center gap-1"
                     >
                       <span>Ver termos</span>
-                      <ExternalLink className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+                      <ExternalLink className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
                     </a>
                   </>
                 )}
@@ -158,7 +184,7 @@ export const SourceModal: React.FC<SourceModalProps> = ({
                   className="link link-primary inline-flex items-center gap-1 text-xs font-medium break-all"
                 >
                   <span>Acessar página oficial</span>
-                  <ExternalLink className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+                  <ExternalLink className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
                 </a>
               ) : (
                 <span className="text-base-content/50 text-xs italic">
@@ -181,5 +207,44 @@ export const SourceModal: React.FC<SourceModalProps> = ({
         </button>
       </form>
     </dialog>
+  );
+};
+
+/**
+ * Page-level listener island mounted once in Layout.astro so any SourceRef button can open SourceModal.
+ */
+export const GlobalSourceModal: React.FC = () => {
+  const [modalState, setModalState] = useState<{
+    source: SourceItem;
+    contextLabel?: string;
+  } | null>(null);
+
+  useEffect(() => {
+    const handleOpen = (event: Event) => {
+      const customEvent = event as CustomEvent<OpenSourceModalDetail>;
+      const detail = customEvent.detail;
+      if (!detail?.sourceId) return;
+
+      const source = getSource(detail.sourceId);
+      if (source) {
+        setModalState({
+          source,
+          contextLabel: detail.contextLabel,
+        });
+      }
+    };
+
+    window.addEventListener(OPEN_SOURCE_MODAL_EVENT, handleOpen);
+    return () => {
+      window.removeEventListener(OPEN_SOURCE_MODAL_EVENT, handleOpen);
+    };
+  }, []);
+
+  return (
+    <SourceModal
+      source={modalState?.source ?? null}
+      contextLabel={modalState?.contextLabel}
+      onClose={() => setModalState(null)}
+    />
   );
 };

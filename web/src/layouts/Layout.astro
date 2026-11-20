@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import { GlobalSourceModal } from '../components/common/SourceModal';
 
 interface Props {
   title?: string;
@@ -187,5 +188,7 @@ const navItems = [
         </div>
       </div>
     </footer>
+
+    <GlobalSourceModal client:load />
   </body>
 </html>
