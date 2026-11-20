@@ -1,5 +1,5 @@
 import React from 'react';
-import { DollarSign, Fuel, Globe, Leaf, Scale, Zap, ShieldCheck, HelpCircle } from 'lucide-react';
+import { DollarSign, Fuel, Globe, Leaf, Scale, Zap, ShieldCheck } from 'lucide-react';
 import type { GlobalBenchmarksCatalog, RegionBenchmark } from '../../lib/types/catalogs';
 import { formatNumber } from '../../lib/utils/format';
 
@@ -18,7 +18,7 @@ export const GlobalBenchmarkDashboard: React.FC<GlobalBenchmarkDashboardProps> =
     <div className="space-y-8">
       {/* 1. TOP MACRO KPI SUMMARY TILES */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <div className="bg-base-100 rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-4 shadow-xs">
+        <div className="bg-base-100 rounded-xl border border-emerald-500/30 p-4 shadow-xs">
           <div className="flex items-center gap-1.5 text-emerald-700 dark:text-emerald-400 text-xs font-bold uppercase tracking-wider mb-1">
             <Leaf className="w-4 h-4 shrink-0" aria-hidden="true" />
             <span>Matriz Elétrica BR</span>
@@ -31,7 +31,7 @@ export const GlobalBenchmarkDashboard: React.FC<GlobalBenchmarkDashboardProps> =
           </p>
         </div>
 
-        <div className="bg-base-100 rounded-xl border border-primary/30 bg-primary/5 p-4 shadow-xs">
+        <div className="bg-base-100 rounded-xl border border-primary/30 p-4 shadow-xs">
           <div className="flex items-center gap-1.5 text-primary text-xs font-bold uppercase tracking-wider mb-1">
             <Globe className="w-4 h-4 shrink-0" aria-hidden="true" />
             <span>WtW Biometano BR</span>
@@ -44,20 +44,21 @@ export const GlobalBenchmarkDashboard: React.FC<GlobalBenchmarkDashboardProps> =
           </p>
         </div>
 
-        <div className="bg-base-100 rounded-xl border border-cyan-500/30 bg-cyan-500/5 p-4 shadow-xs">
-          <div className="flex items-center gap-1.5 text-cyan-700 dark:text-cyan-400 text-xs font-bold uppercase tracking-wider mb-1">
+        <div className="bg-base-100 rounded-xl border border-emerald-500/30 p-4 shadow-xs">
+          <div className="flex items-center gap-1.5 text-emerald-700 dark:text-emerald-400 text-xs font-bold uppercase tracking-wider mb-1">
             <Zap className="w-4 h-4 shrink-0" aria-hidden="true" />
             <span>Energia Útil Mecânica</span>
           </div>
-          <div className="text-2xl font-black text-cyan-600 dark:text-cyan-400 font-mono">
-            R$ 286 <span className="text-xs font-normal text-base-content/60">/MWh-eq</span>
+          <div className="text-2xl font-black text-emerald-600 dark:text-emerald-400 font-mono">
+            R$ {formatNumber(regions.brasil.energy_cost_levelized_mwh_eq.biomethane, 0)}{' '}
+            <span className="text-xs font-normal text-base-content/60">/MWh-eq</span>
           </div>
           <p className="text-[11px] text-base-content/70 mt-1">
-            Biometano no virabrequim é a fonte mais barata entre todos os blocos globais.
+            Biometano no virabrequim supera eletricidade B3 e diesel no Brasil.
           </p>
         </div>
 
-        <div className="bg-base-100 rounded-xl border border-amber-500/30 bg-amber-500/5 p-4 shadow-xs">
+        <div className="bg-base-100 rounded-xl border border-amber-500/30 p-4 shadow-xs">
           <div className="flex items-center gap-1.5 text-amber-700 dark:text-amber-400 text-xs font-bold uppercase tracking-wider mb-1">
             <DollarSign className="w-4 h-4 shrink-0" aria-hidden="true" />
             <span>Subsídio Direto BR</span>
@@ -88,7 +89,7 @@ export const GlobalBenchmarkDashboard: React.FC<GlobalBenchmarkDashboardProps> =
 
         {/* Responsive Table Matrix */}
         <div className="overflow-x-auto -mx-2 sm:mx-0">
-          <table className="table table-xs sm:table-sm w-full min-w-[700px] border-collapse">
+          <table className="table table-xs sm:table-sm w-full border-collapse">
             <thead>
               <tr className="border-b border-base-200 text-xs">
                 <th className="w-1/4 bg-base-200/50 py-3 px-3 text-base-content/70 font-semibold uppercase tracking-wider">
@@ -446,7 +447,7 @@ export const GlobalBenchmarkDashboard: React.FC<GlobalBenchmarkDashboardProps> =
             Custo Nivelado de Energia Útil no Virabrequim (R$/MWh-eq)
           </h2>
           <p className="text-xs text-base-content/70 mt-0.5">
-            Normalização na ponta mecânica motriz, considerando a eficiência termodinâmica de motores térmicos (~42%) versus motores elétricos (~90%).
+            Normalização na ponta mecânica motriz, considerando a eficiência termodinâmica de motores térmicos (~42%) versus conjunto carregador/motor elétrico (~81% rede-eixo).
           </p>
         </div>
 
@@ -455,13 +456,13 @@ export const GlobalBenchmarkDashboard: React.FC<GlobalBenchmarkDashboardProps> =
             <div>
               <div className="flex items-center justify-between mb-1">
                 <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400">🇧🇷 Biometano Brasil</span>
-                <span className="badge badge-xs badge-success">Menor Custo</span>
+                <span className="badge badge-xs badge-success">Menor Custo BR</span>
               </div>
-              <span className="text-[11px] text-base-content/70 block">Gás purificado canalizado / GNC no agronegócio</span>
+              <span className="text-[11px] text-base-content/70 block">Gás purificado canalizado / GNC (R$ 4,60/m³)</span>
             </div>
             <div className="mt-3">
               <span className="font-mono font-black text-emerald-600 dark:text-emerald-400 text-xl">
-                R$ 286
+                R$ {formatNumber(regions.brasil.energy_cost_levelized_mwh_eq.biomethane, 0)}
               </span>
               <span className="text-[10px] text-base-content/60 ml-1">/MWh-eq</span>
             </div>
@@ -470,14 +471,14 @@ export const GlobalBenchmarkDashboard: React.FC<GlobalBenchmarkDashboardProps> =
           <div className="p-3.5 bg-cyan-500/5 rounded-xl border border-cyan-500/30 flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between mb-1">
-                <span className="text-xs font-bold text-cyan-700 dark:text-cyan-400">🇧🇷 Eletricidade Fora-Ponta</span>
+                <span className="text-xs font-bold text-cyan-700 dark:text-cyan-400">🇧🇷 Eletricidade B3 (Base Própria)</span>
                 <span className="badge badge-xs badge-info">Pátio Próprio</span>
               </div>
-              <span className="text-[11px] text-base-content/70 block">Recarga lenta noturna (AC/DC baixa potência)</span>
+              <span className="text-[11px] text-base-content/70 block">Tarifa CELESC com tributos (~R$ 1,01/kWh)</span>
             </div>
             <div className="mt-3">
               <span className="font-mono font-black text-cyan-600 dark:text-cyan-400 text-xl">
-                R$ 390
+                R$ {formatNumber(regions.brasil.energy_cost_levelized_mwh_eq.offpeak_electricity, 0)}
               </span>
               <span className="text-[10px] text-base-content/60 ml-1">/MWh-eq</span>
             </div>
@@ -493,7 +494,7 @@ export const GlobalBenchmarkDashboard: React.FC<GlobalBenchmarkDashboardProps> =
             </div>
             <div className="mt-3">
               <span className="font-mono font-black text-base-content text-xl">
-                R$ 645
+                R$ {formatNumber(regions.estados_unidos.energy_cost_levelized_mwh_eq.commercial_electricity ?? 0, 0)}
               </span>
               <span className="text-[10px] text-base-content/60 ml-1">/MWh-eq</span>
             </div>
@@ -509,7 +510,7 @@ export const GlobalBenchmarkDashboard: React.FC<GlobalBenchmarkDashboardProps> =
             </div>
             <div className="mt-3">
               <span className="font-mono font-black text-base-content text-xl">
-                R$ 1.180
+                R$ {formatNumber(regions.uniao_europeia.energy_cost_levelized_mwh_eq.hpc_electricity ?? 0, 0)}
               </span>
               <span className="text-[10px] text-base-content/60 ml-1">/MWh-eq</span>
             </div>

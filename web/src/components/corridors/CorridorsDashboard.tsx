@@ -4,6 +4,7 @@ import type {
   CorridorFuelStationsCatalog,
   CorridorsCatalog,
 } from '../../lib/types/catalogs';
+import { FUEL_THEME } from '../../lib/theme/fuels';
 import { formatNumber } from '../../lib/utils/format';
 import { CorridorInfrastructureMap } from './CorridorInfrastructureMap';
 
@@ -48,7 +49,8 @@ export const CorridorsDashboard: React.FC<CorridorsDashboardProps> = ({
   const getScoreColor = (score: number) => {
     if (score >= 85)
       return 'text-emerald-600 dark:text-emerald-400 border-emerald-500 bg-emerald-500/10';
-    if (score >= 60) return 'text-secondary border-secondary bg-secondary/10';
+    if (score >= 60)
+      return 'text-amber-600 dark:text-amber-400 border-amber-500 bg-amber-500/10';
     return 'text-rose-600 dark:text-rose-400 border-rose-500 bg-rose-500/10';
   };
 
@@ -95,12 +97,20 @@ export const CorridorsDashboard: React.FC<CorridorsDashboardProps> = ({
             <button
               type="button"
               onClick={() => setSelectedPowertrain('biometano')}
-              className={`btn btn-sm h-auto min-h-8 py-1.5 px-3 text-xs leading-snug lg:join-item ${
+              className={`btn btn-sm h-auto min-h-8 py-1.5 px-3 text-xs leading-snug lg:join-item gap-1.5 ${
                 selectedPowertrain === 'biometano'
-                  ? 'btn-primary shadow-xs'
-                  : 'btn-outline'
+                  ? FUEL_THEME.biometano.activeButtonClass
+                  : 'btn-outline border-base-300'
               }`}
             >
+              <span
+                className={`h-2 w-2 rounded-full shrink-0 ${
+                  selectedPowertrain === 'biometano'
+                    ? 'bg-white'
+                    : FUEL_THEME.biometano.dotClass
+                }`}
+                aria-hidden="true"
+              />
               <span>
                 Biometano{' '}
                 <span className="text-[10px] opacity-80 font-normal block sm:inline">
@@ -111,12 +121,20 @@ export const CorridorsDashboard: React.FC<CorridorsDashboardProps> = ({
             <button
               type="button"
               onClick={() => setSelectedPowertrain('eletrico')}
-              className={`btn btn-sm h-auto min-h-8 py-1.5 px-3 text-xs leading-snug lg:join-item ${
+              className={`btn btn-sm h-auto min-h-8 py-1.5 px-3 text-xs leading-snug lg:join-item gap-1.5 ${
                 selectedPowertrain === 'eletrico'
-                  ? 'btn-primary shadow-xs'
-                  : 'btn-outline'
+                  ? FUEL_THEME.eletrico.activeButtonClass
+                  : 'btn-outline border-base-300'
               }`}
             >
+              <span
+                className={`h-2 w-2 rounded-full shrink-0 ${
+                  selectedPowertrain === 'eletrico'
+                    ? 'bg-white'
+                    : FUEL_THEME.eletrico.dotClass
+                }`}
+                aria-hidden="true"
+              />
               <span>
                 Elétrico Pesado{' '}
                 <span className="text-[10px] opacity-80 font-normal block sm:inline">
@@ -127,12 +145,20 @@ export const CorridorsDashboard: React.FC<CorridorsDashboardProps> = ({
             <button
               type="button"
               onClick={() => setSelectedPowertrain('diesel')}
-              className={`btn btn-sm h-auto min-h-8 py-1.5 px-3 text-xs leading-snug lg:join-item ${
+              className={`btn btn-sm h-auto min-h-8 py-1.5 px-3 text-xs leading-snug lg:join-item gap-1.5 ${
                 selectedPowertrain === 'diesel'
-                  ? 'btn-primary shadow-xs'
-                  : 'btn-outline'
+                  ? FUEL_THEME.diesel.activeButtonClass
+                  : 'btn-outline border-base-300'
               }`}
             >
+              <span
+                className={`h-2 w-2 rounded-full shrink-0 ${
+                  selectedPowertrain === 'diesel'
+                    ? 'bg-white'
+                    : FUEL_THEME.diesel.dotClass
+                }`}
+                aria-hidden="true"
+              />
               <span>
                 Diesel S10 B15{' '}
                 <span className="text-[10px] opacity-80 font-normal block sm:inline">

@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import type { LocalPollutantsCatalog } from '../../lib/types/catalogs';
-import type { SimulationParameters } from '../../lib/types/parameters';
+import type { AlternativeId, SimulationParameters } from '../../lib/types/parameters';
+import { FUEL_THEME } from '../../lib/theme/fuels';
 import { formatCurrency, formatNumber } from '../../lib/utils/format';
 
 interface EsgDashboardProps {
@@ -43,14 +44,26 @@ export const EsgDashboard: React.FC<EsgDashboardProps> = ({
   const totalCbioRevenue = totalFleetTonsAvoided * cbioPrice;
   const dieselLitersAvoided = (annualDistance / dieselConsumption) * fleetSize;
 
-  // Percentage reduction
+  // Percentage reduction (positive = reduction vs diesel)
   const reductionPercent = ((annualDieselEmissionsTonPerTruck - annualAltEmissionsTonPerTruck) / annualDieselEmissionsTonPerTruck) * 100;
+
+  // Well-to-Wheel carbon intensities directly from parameters.json
+  const dieselCi = parameters.vehicles.diesel.carbon_intensity.value;
+  const biometanoCi = parameters.vehicles.biometano.carbon_intensity.value;
+  const eletricoCi = parameters.vehicles.eletrico.carbon_intensity.value;
+  const gnvCi = parameters.vehicles.gnv.carbon_intensity.value;
+
+  const formatDeltaVsDiesel = (ci: number) => {
+    const pct = ((ci - dieselCi) / dieselCi) * 100;
+    return `${pct > 0 ? '+' : ''}${formatNumber(pct, 1)}%`;
+  };
 
   // Scope 1, 2, 3 calculations
   const scopeBreakdown = useMemo(() => {
-    const dieselScope1 = (annualDistance * (dieselDensity * 75.45 / dieselConsumption) / 1000000) * fleetSize;
+    const dieselScope1 = (annualDistance * (dieselDensity * dieselCi / dieselConsumption) / 1000000) * fleetSize;
     if (targetFuel === 'eletrico') {
-      const scope2 = ((annualDistance / effectiveAltConsumption) * 0.052) * fleetSize; // 0.052 kgCO2/kWh MCTI
+      const elecKgPerKwh = (eletricoCi * 3.6) / 1000;
+      const scope2 = ((annualDistance / effectiveAltConsumption) * elecKgPerKwh) * fleetSize;
       return {
         scope1: 0,
         scope2: Math.round(scope2),
@@ -59,29 +72,35 @@ export const EsgDashboard: React.FC<EsgDashboardProps> = ({
       };
     } else if (targetFuel === 'biometano') {
       return {
-        scope1: Math.round(totalFleetTonsAvoided * 0.05), // biogenic / minor slip
+        scope1: Math.round(annualAltEmissionsTonPerTruck * fleetSize * 0.6),
         scope2: 0,
-        scope3: Math.round(totalFleetTonsAvoided * 0.02),
-        reductionScope1: 95,
+        scope3: Math.round(annualAltEmissionsTonPerTruck * fleetSize * 0.4),
+        reductionScope1: Math.round(reductionPercent),
       };
     } else {
       return {
         scope1: Math.round(annualAltEmissionsTonPerTruck * fleetSize),
         scope2: 0,
         scope3: Math.round(dieselScope1 * 0.12),
-        reductionScope1: 18,
+        reductionScope1: Math.round(reductionPercent),
       };
     }
-  }, [targetFuel, fleetSize, annualDistance, effectiveAltConsumption, dieselDensity, dieselConsumption, totalFleetTonsAvoided, annualAltEmissionsTonPerTruck]);
+  }, [targetFuel, fleetSize, annualDistance, effectiveAltConsumption, dieselDensity, dieselConsumption, dieselCi, eletricoCi, annualAltEmissionsTonPerTruck, reductionPercent]);
 
   return (
     <div className="space-y-8">
       {/* Header Stat Overview */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-base-100 rounded-xl border border-base-200 p-4 shadow-xs">
-          <div className="text-xs font-semibold text-base-content/70">Redução de GEE da Frota</div>
-          <div className="text-2xl font-black text-emerald-600 dark:text-emerald-400 font-mono mt-1">
-            -{formatNumber(reductionPercent, 1)}%
+          <div className="text-xs font-semibold text-base-content/70">Variação de GEE da Frota</div>
+          <div
+            className={`text-2xl font-black font-mono mt-1 ${
+              reductionPercent >= 0
+                ? 'text-emerald-600 dark:text-emerald-400'
+                : 'text-amber-600 dark:text-amber-400'
+            }`}
+          >
+            {reductionPercent >= 0 ? `-${formatNumber(reductionPercent, 1)}%` : `+${formatNumber(Math.abs(reductionPercent), 1)}%`}
           </div>
           <div className="text-[11px] text-base-content/60 mt-1">
             vs linha de base Diesel S10 B15
@@ -137,23 +156,53 @@ export const EsgDashboard: React.FC<EsgDashboardProps> = ({
               <button
                 type="button"
                 onClick={() => setTargetFuel('biometano')}
-                className={`join-item btn btn-xs ${targetFuel === 'biometano' ? 'btn-primary' : 'btn-outline'}`}
+                className={`join-item btn btn-xs gap-1.5 ${
+                  targetFuel === 'biometano'
+                    ? FUEL_THEME.biometano.activeButtonClass
+                    : 'btn-outline border-base-300'
+                }`}
               >
-                Biometano (Bio-GNC)
+                <span
+                  className={`h-2 w-2 rounded-full ${
+                    targetFuel === 'biometano' ? 'bg-white' : FUEL_THEME.biometano.dotClass
+                  }`}
+                  aria-hidden="true"
+                />
+                <span>Biometano (Bio-GNC)</span>
               </button>
               <button
                 type="button"
                 onClick={() => setTargetFuel('eletrico')}
-                className={`join-item btn btn-xs ${targetFuel === 'eletrico' ? 'btn-primary' : 'btn-outline'}`}
+                className={`join-item btn btn-xs gap-1.5 ${
+                  targetFuel === 'eletrico'
+                    ? FUEL_THEME.eletrico.activeButtonClass
+                    : 'btn-outline border-base-300'
+                }`}
               >
-                Elétrico (BEV)
+                <span
+                  className={`h-2 w-2 rounded-full ${
+                    targetFuel === 'eletrico' ? 'bg-white' : FUEL_THEME.eletrico.dotClass
+                  }`}
+                  aria-hidden="true"
+                />
+                <span>Elétrico (BEV)</span>
               </button>
               <button
                 type="button"
                 onClick={() => setTargetFuel('gnv')}
-                className={`join-item btn btn-xs ${targetFuel === 'gnv' ? 'btn-primary' : 'btn-outline'}`}
+                className={`join-item btn btn-xs gap-1.5 ${
+                  targetFuel === 'gnv'
+                    ? FUEL_THEME.gnv.activeButtonClass
+                    : 'btn-outline border-base-300'
+                }`}
               >
-                Gás Natural (GNV)
+                <span
+                  className={`h-2 w-2 rounded-full ${
+                    targetFuel === 'gnv' ? 'bg-white' : FUEL_THEME.gnv.dotClass
+                  }`}
+                  aria-hidden="true"
+                />
+                <span>Gás Natural (GNV)</span>
               </button>
             </div>
           </div>
@@ -251,14 +300,19 @@ export const EsgDashboard: React.FC<EsgDashboardProps> = ({
             {/* Diesel */}
             <div>
               <div className="flex justify-between text-xs mb-1">
-                <span className="font-semibold text-base-content">1. Diesel Comercial B15 (Linha de Base)</span>
-                <span className="font-mono font-bold text-base-content">75,45 gCO₂eq/MJ</span>
+                <span className={`font-semibold inline-flex items-center gap-1.5 ${FUEL_THEME.diesel.textClass}`}>
+                  <span className={`h-2 w-2 rounded-full ${FUEL_THEME.diesel.dotClass}`} aria-hidden="true" />
+                  1. Diesel Comercial B15 (Linha de Base)
+                </span>
+                <span className="font-mono font-bold text-base-content">
+                  {formatNumber(dieselCi, 2)} gCO₂eq/MJ
+                </span>
               </div>
               <div className="w-full h-4 bg-base-200 rounded-full flex overflow-hidden">
-                <div className="bg-slate-400 h-full text-[9px] text-white flex items-center justify-center" style={{ width: '22%' }} title="Poço ao Tanque: 22%">
+                <div className={`${FUEL_THEME.diesel.barClass} h-full text-[9px] text-white flex items-center justify-center`} style={{ width: '22%' }} title="Poço ao Tanque: 22%">
                   WtT 22%
                 </div>
-                <div className="bg-slate-600 h-full text-[9px] text-white flex items-center justify-center" style={{ width: '78%' }} title="Tanque à Roda: 78%">
+                <div className={`${FUEL_THEME.diesel.barSecondaryClass} h-full text-[9px] text-white flex items-center justify-center`} style={{ width: '78%' }} title="Tanque à Roda: 78%">
                   TtW 78%
                 </div>
               </div>
@@ -270,14 +324,19 @@ export const EsgDashboard: React.FC<EsgDashboardProps> = ({
             {/* Biometano */}
             <div>
               <div className="flex justify-between text-xs mb-1">
-                <span className="font-semibold text-emerald-700 dark:text-emerald-400">2. Biometano Purificado (Bio-GNC de Vinhaça / Aterro)</span>
-                <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">14,20 gCO₂eq/MJ (-81%)</span>
+                <span className={`font-semibold inline-flex items-center gap-1.5 ${FUEL_THEME.biometano.textClass}`}>
+                  <span className={`h-2 w-2 rounded-full ${FUEL_THEME.biometano.dotClass}`} aria-hidden="true" />
+                  2. Biometano Purificado (Mandato CNPE 4/2026)
+                </span>
+                <span className={`font-mono font-bold ${FUEL_THEME.biometano.textClass}`}>
+                  {formatNumber(biometanoCi, 2)} gCO₂eq/MJ ({formatDeltaVsDiesel(biometanoCi)})
+                </span>
               </div>
               <div className="w-full h-4 bg-base-200 rounded-full flex overflow-hidden">
-                <div className="bg-emerald-500 h-full text-[9px] text-white flex items-center justify-center" style={{ width: '18%' }} title="Processamento e compressão">
+                <div className={`${FUEL_THEME.biometano.barClass} h-full text-[9px] text-white flex items-center justify-center`} style={{ width: '18%' }} title="Processamento e compressão">
                   WtT 18%
                 </div>
-                <div className="bg-emerald-600 h-full text-[9px] text-white flex items-center justify-center" style={{ width: '82%' }} title="Ciclo biogênico neutro">
+                <div className={`${FUEL_THEME.biometano.barSecondaryClass} h-full text-[9px] text-white flex items-center justify-center`} style={{ width: '82%' }} title="Ciclo biogênico neutro">
                   Bio-TtW Neutro
                 </div>
               </div>
@@ -289,35 +348,45 @@ export const EsgDashboard: React.FC<EsgDashboardProps> = ({
             {/* Elétrico */}
             <div>
               <div className="flex justify-between text-xs mb-1">
-                <span className="font-semibold text-cyan-700 dark:text-cyan-400">3. Caminhão Elétrico Pesado (Matriz SIN Brasil)</span>
-                <span className="font-mono font-bold text-cyan-600 dark:text-cyan-400">14,44 gCO₂eq/MJ (-81%)</span>
+                <span className={`font-semibold inline-flex items-center gap-1.5 ${FUEL_THEME.eletrico.textClass}`}>
+                  <span className={`h-2 w-2 rounded-full ${FUEL_THEME.eletrico.dotClass}`} aria-hidden="true" />
+                  3. Caminhão Elétrico Pesado (Matriz SIN Brasil)
+                </span>
+                <span className={`font-mono font-bold ${FUEL_THEME.eletrico.textClass}`}>
+                  {formatNumber(eletricoCi, 2)} gCO₂eq/MJ ({formatDeltaVsDiesel(eletricoCi)})
+                </span>
               </div>
               <div className="w-full h-4 bg-base-200 rounded-full flex overflow-hidden">
-                <div className="bg-cyan-500 h-full text-[9px] text-white flex items-center justify-center" style={{ width: '100%' }} title="Emissão concentrada na geração e transmissão">
+                <div className={`${FUEL_THEME.eletrico.barClass} h-full text-[9px] text-white flex items-center justify-center`} style={{ width: '100%' }} title="Emissão concentrada na geração e transmissão">
                   WtT 100% (Rede Elétrica SIN)
                 </div>
               </div>
               <div className="text-[10px] text-base-content/60 mt-1">
-                Zero emissões de escapamento no ponto de uso; impacto restrito à geração da rede (86% renovável no Brasil).
+                Zero emissões de escapamento no ponto de uso; impacto restrito à geração da rede (MCTI/SIRENE).
               </div>
             </div>
 
             {/* GNV */}
             <div>
               <div className="flex justify-between text-xs mb-1">
-                <span className="font-semibold text-amber-700 dark:text-amber-400">4. Gás Natural Veicular Fóssil (GNV)</span>
-                <span className="font-mono font-bold text-amber-600 dark:text-amber-400">68,00 gCO₂eq/MJ (-10%)</span>
+                <span className={`font-semibold inline-flex items-center gap-1.5 ${FUEL_THEME.gnv.textClass}`}>
+                  <span className={`h-2 w-2 rounded-full ${FUEL_THEME.gnv.dotClass}`} aria-hidden="true" />
+                  4. Gás Natural Veicular Fóssil (GNV)
+                </span>
+                <span className={`font-mono font-bold ${FUEL_THEME.gnv.textClass}`}>
+                  {formatNumber(gnvCi, 2)} gCO₂eq/MJ ({formatDeltaVsDiesel(gnvCi)})
+                </span>
               </div>
               <div className="w-full h-4 bg-base-200 rounded-full flex overflow-hidden">
-                <div className="bg-amber-400 h-full text-[9px] text-white flex items-center justify-center" style={{ width: '25%' }} title="Extração e distribuição">
+                <div className={`${FUEL_THEME.gnv.barClass} h-full text-[9px] text-slate-950 font-semibold flex items-center justify-center`} style={{ width: '25%' }} title="Extração e distribuição">
                   WtT 25%
                 </div>
-                <div className="bg-amber-600 h-full text-[9px] text-white flex items-center justify-center" style={{ width: '75%' }} title="Combustão">
+                <div className={`${FUEL_THEME.gnv.barSecondaryClass} h-full text-[9px] text-white flex items-center justify-center`} style={{ width: '75%' }} title="Combustão">
                   TtW 75%
                 </div>
               </div>
               <div className="text-[10px] text-base-content/60 mt-1">
-                Combustível de transição fóssil; menor emissão de carbono por MJ que o diesel, com expressiva redução de particulados.
+                Combustível de transição fóssil; intensidade regulatória próxima ao diesel por MJ, com expressiva redução de poluentes locais (NOx e MP).
               </div>
             </div>
           </div>
@@ -399,11 +468,17 @@ export const EsgDashboard: React.FC<EsgDashboardProps> = ({
             <tbody>
               {Object.entries(pollutantsData.powertrains).map(([key, p]) => {
                 const isDiesel = key === 'diesel';
+                const theme = FUEL_THEME[key as AlternativeId];
                 return (
                   <tr key={key} className={`border-b border-base-200/60 ${isDiesel ? 'bg-base-200/30' : ''}`}>
                     <td className="font-bold text-xs">
-                      {p.label}
-                      {isDiesel && <span className="ml-2 badge badge-xs badge-neutral">Base</span>}
+                      <span className="inline-flex items-center gap-2">
+                        {theme && (
+                          <span className={`h-2.5 w-2.5 rounded-full shrink-0 ${theme.dotClass}`} aria-hidden="true" />
+                        )}
+                        <span>{p.label}</span>
+                        {isDiesel && <span className="badge badge-xs badge-neutral">Base</span>}
+                      </span>
                     </td>
                     <td className="text-right font-mono text-xs">{formatNumber(p.fossil_co2_g_km, 1)}</td>
                     <td className="text-right font-mono text-xs">

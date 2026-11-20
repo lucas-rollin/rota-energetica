@@ -56,6 +56,16 @@ export const TcoComparisonChart: React.FC<TcoComparisonChartProps> = ({
   const chartRef = useRef<HTMLDivElement>(null);
   const chartInstance = useRef<echarts.ECharts | null>(null);
   const [metricMode, setMetricMode] = useState<MetricMode>('total');
+  const [isDark, setIsDark] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const mq = window.matchMedia('(prefers-color-scheme: dark)');
+    const update = () => setIsDark(mq.matches);
+    update();
+    mq.addEventListener('change', update);
+    return () => mq.removeEventListener('change', update);
+  }, []);
 
   const isTotal = metricMode === 'total';
   const multiplier = isTotal ? fleetSize : 1;
@@ -171,6 +181,13 @@ export const TcoComparisonChart: React.FC<TcoComparisonChartProps> = ({
         : res.tcoBreakdown.pvArla / (res.levelizedKm || 1);
     });
 
+    const tooltipBg = isDark ? '#0f172a' : '#ffffff';
+    const tooltipBorder = isDark ? '#334155' : '#e2e8f0';
+    const tooltipText = isDark ? '#f8fafc' : '#0f172a';
+    const tooltipMuted = isDark ? '#94a3b8' : '#64748b';
+    const axisBorder = isDark ? '#475569' : '#cbd5e1';
+    const gridLine = isDark ? '#334155' : '#e2e8f0';
+
     const option: echarts.EChartsCoreOption = {
       aria: {
         enabled: true,
@@ -180,6 +197,9 @@ export const TcoComparisonChart: React.FC<TcoComparisonChartProps> = ({
       },
       tooltip: {
         trigger: 'axis',
+        backgroundColor: tooltipBg,
+        borderColor: tooltipBorder,
+        textStyle: { color: tooltipText },
         axisPointer: {
           type: 'shadow',
         },
@@ -198,7 +218,7 @@ export const TcoComparisonChart: React.FC<TcoComparisonChartProps> = ({
           }
 
           let html = `<div style="font-family: inherit; font-size: 12px; min-width: 180px;">`;
-          html += `<div style="font-weight: bold; margin-bottom: 6px; border-bottom: 1px solid #ddd; padding-bottom: 4px;">${title}</div>`;
+          html += `<div style="font-weight: bold; margin-bottom: 6px; border-bottom: 1px solid ${tooltipBorder}; padding-bottom: 4px;">${title}</div>`;
 
           for (const item of items) {
             if (item.value <= 0) continue;
@@ -209,16 +229,16 @@ export const TcoComparisonChart: React.FC<TcoComparisonChartProps> = ({
 
             html += `<div style="display: flex; justify-content: space-between; gap: 12px; margin-bottom: 3px;">
               <span><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background-color:${item.color};margin-right:6px;"></span>${item.seriesName}</span>
-              <span style="font-weight: 600; font-family: monospace;">${valStr} <span style="font-weight: normal; color: #666;">(${pct}%)</span></span>
+              <span style="font-weight: 600; font-family: monospace;">${valStr} <span style="font-weight: normal; color: ${tooltipMuted};">(${pct}%)</span></span>
             </div>`;
           }
 
           const sumStr = isTotal
             ? formatCurrency(sum, 0)
             : `R$ ${formatNumber(sum, 2)}/km`;
-          html += `<div style="border-top: 1px solid #ddd; margin-top: 6px; padding-top: 4px; display: flex; justify-content: space-between; font-weight: bold;">
+          html += `<div style="border-top: 1px solid ${tooltipBorder}; margin-top: 6px; padding-top: 4px; display: flex; justify-content: space-between; font-weight: bold;">
             <span>TCO Total</span>
-            <span style="font-family: monospace; color: #0284c7;">${sumStr}</span>
+            <span style="font-family: monospace; color: #06b6d4;">${sumStr}</span>
           </div>`;
           html += `</div>`;
           return html;
@@ -253,7 +273,7 @@ export const TcoComparisonChart: React.FC<TcoComparisonChartProps> = ({
           color: 'currentColor',
         },
         axisLine: {
-          lineStyle: { color: '#cbd5e1' },
+          lineStyle: { color: axisBorder },
         },
       },
       yAxis: {
@@ -282,7 +302,7 @@ export const TcoComparisonChart: React.FC<TcoComparisonChartProps> = ({
         splitLine: {
           lineStyle: {
             type: 'dashed',
-            color: '#e2e8f0',
+            color: gridLine,
           },
         },
       },
@@ -336,7 +356,7 @@ export const TcoComparisonChart: React.FC<TcoComparisonChartProps> = ({
     return () => {
       resizeObserver.disconnect();
     };
-  }, [results, isTotal, multiplier, fleetSize]);
+  }, [results, isTotal, multiplier, fleetSize, isDark]);
 
   useEffect(() => {
     return () => {

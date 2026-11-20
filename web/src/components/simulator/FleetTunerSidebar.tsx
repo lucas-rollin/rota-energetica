@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { SlidersHorizontal } from 'lucide-react';
+import { FUEL_THEME } from '../../lib/theme/fuels';
 import type {
   AlternativeId,
   GeneralParameters,
@@ -51,7 +52,7 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
       alt: 'diesel',
       label: 'Diesel B15',
       unit: 'R$/L',
-      dotColor: 'bg-slate-400',
+      dotColor: FUEL_THEME.diesel.dotClass,
       sourceId: params.vehicles.diesel.energy_price.source_id,
       step: 0.05,
     },
@@ -59,7 +60,7 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
       alt: 'biometano',
       label: 'Biometano',
       unit: 'R$/m³',
-      dotColor: 'bg-emerald-500',
+      dotColor: FUEL_THEME.biometano.dotClass,
       sourceId: params.vehicles.biometano.energy_price.source_id,
       step: 0.05,
     },
@@ -67,7 +68,7 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
       alt: 'eletrico',
       label: 'Energia Elétrica',
       unit: 'R$/kWh',
-      dotColor: 'bg-purple-500',
+      dotColor: FUEL_THEME.eletrico.dotClass,
       sourceId: params.vehicles.eletrico.energy_price.source_id,
       step: 0.02,
     },
@@ -75,7 +76,7 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
       alt: 'gnv',
       label: 'GNV',
       unit: 'R$/m³',
-      dotColor: 'bg-amber-500',
+      dotColor: FUEL_THEME.gnv.dotClass,
       sourceId: params.vehicles.gnv.energy_price.source_id,
       step: 0.05,
     },
@@ -348,13 +349,19 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
                       key={alt}
                       type="button"
                       onClick={() => setSelectedAltTab(alt)}
-                      className={`rounded py-1 text-[10px] font-bold uppercase transition-colors ${
+                      className={`inline-flex items-center justify-center gap-1 rounded py-1 text-[10px] font-bold uppercase transition-colors ${
                         selectedAltTab === alt
-                          ? 'bg-primary text-primary-content'
+                          ? FUEL_THEME[alt].activeButtonClass
                           : 'bg-base-100 text-base-content/70 hover:bg-base-200'
                       }`}
                     >
-                      {alt === 'eletrico' ? 'Elétr.' : alt === 'biometano' ? 'Bio' : alt}
+                      <span
+                        className={`h-1.5 w-1.5 rounded-full ${
+                          selectedAltTab === alt ? 'bg-white' : FUEL_THEME[alt].dotClass
+                        }`}
+                        aria-hidden="true"
+                      />
+                      <span>{alt === 'eletrico' ? 'Elétr.' : alt === 'biometano' ? 'Bio' : alt}</span>
                     </button>
                   )
                 )}

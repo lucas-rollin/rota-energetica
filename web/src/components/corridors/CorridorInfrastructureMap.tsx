@@ -22,6 +22,7 @@ import type {
   FreightCorridor,
   FuelStation,
 } from '../../lib/types/catalogs';
+import { FUEL_THEME } from '../../lib/theme/fuels';
 import { formatNumber } from '../../lib/utils/format';
 import {
   buildCorridorCoverageSegments,
@@ -66,12 +67,12 @@ const AUTONOMY_PRESETS = [
 ] as const;
 
 const COLORS = {
-  biomethane: '#10b981',
-  biomethaneUnifiedFill: 'rgba(16, 185, 129, 0.16)',
-  biomethaneStroke: 'rgba(16, 185, 129, 0.52)',
-  electric: '#06b6d4',
-  electricUnifiedFill: 'rgba(6, 182, 212, 0.18)',
-  electricStroke: 'rgba(6, 182, 212, 0.56)',
+  biomethane: FUEL_THEME.biometano.hex,
+  biomethaneUnifiedFill: FUEL_THEME.biometano.fillRgba,
+  biomethaneStroke: FUEL_THEME.biometano.strokeRgba,
+  electric: FUEL_THEME.eletrico.hex,
+  electricUnifiedFill: FUEL_THEME.eletrico.fillRgba,
+  electricStroke: FUEL_THEME.eletrico.strokeRgba,
   corridorCovered: '#059669',
   corridorCoveredElectric: '#0891b2',
   corridorCoveredMixed: '#2563eb',
@@ -436,7 +437,9 @@ export const CorridorInfrastructureMap: React.FC<
           const st = item.data?.station;
           if (st) {
             const badgeColor =
-              st.technology === 'biomethane_cng' ? '#10b981' : '#06b6d4';
+              st.technology === 'biomethane_cng'
+                ? FUEL_THEME.biometano.hex
+                : FUEL_THEME.eletrico.hex;
             const techLabel =
               st.technology === 'biomethane_cng'
                 ? 'GNV / Biometano'
@@ -1129,11 +1132,11 @@ export const CorridorInfrastructureMap: React.FC<
                   </td>
                   <td className="text-xs whitespace-nowrap">
                     {st.technology === 'biomethane_cng' ? (
-                      <span className="badge badge-xs badge-success text-white">
+                      <span className="badge badge-xs badge-success">
                         GNV / Biometano
                       </span>
                     ) : (
-                      <span className="badge badge-xs badge-info text-white">
+                      <span className="badge badge-xs badge-info">
                         HPC &gt;150 kW
                       </span>
                     )}

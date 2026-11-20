@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import * as echarts from 'echarts/core';
 import { LineChart } from 'echarts/charts';
 import {
@@ -12,6 +12,7 @@ import { SVGRenderer } from 'echarts/renderers';
 import type { AlternativeId, SimulationParameters } from '../../../lib/types/parameters';
 import type { SimulationResults } from '../../../lib/types/scenario';
 import { calculateAnnuityDiscountFactor } from '../../../lib/calc/tco';
+import { FUEL_THEME } from '../../../lib/theme/fuels';
 import { formatCurrency, formatNumber } from '../../../lib/utils/format';
 import { ChartContainer, type ChartTableData } from './ChartContainer';
 
@@ -32,10 +33,10 @@ interface PaybackTimelineChartProps {
 }
 
 const ALTERNATIVES: { id: AlternativeId; name: string; color: string }[] = [
-  { id: 'diesel', name: 'Diesel B15', color: '#1e293b' },
-  { id: 'gnv', name: 'GNV', color: '#0284c7' },
-  { id: 'biometano', name: 'Biometano', color: '#16a34a' },
-  { id: 'eletrico', name: 'Elétrico', color: '#8b5cf6' },
+  { id: 'diesel', name: 'Diesel B15', color: FUEL_THEME.diesel.hex },
+  { id: 'gnv', name: 'GNV', color: FUEL_THEME.gnv.hex },
+  { id: 'biometano', name: 'Biometano', color: FUEL_THEME.biometano.hex },
+  { id: 'eletrico', name: 'Elétrico', color: FUEL_THEME.eletrico.hex },
 ];
 
 export const PaybackTimelineChart: React.FC<PaybackTimelineChartProps> = ({
@@ -45,6 +46,16 @@ export const PaybackTimelineChart: React.FC<PaybackTimelineChartProps> = ({
 }) => {
   const chartRef = useRef<HTMLDivElement>(null);
   const chartInstance = useRef<echarts.ECharts | null>(null);
+  const [isDark, setIsDark] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const mq = window.matchMedia('(prefers-color-scheme: dark)');
+    const update = () => setIsDark(mq.matches);
+    update();
+    mq.addEventListener('change', update);
+    return () => mq.removeEventListener('change', update);
+  }, []);
 
   const horizonYears = Math.max(1, Math.round(params.general.horizon_years.value));
   const discountRate = params.general.discount_rate.value;
@@ -94,28 +105,34 @@ export const PaybackTimelineChart: React.FC<PaybackTimelineChartProps> = ({
     return { years, seriesData };
   }, [results, params, horizonYears, discountRate, fleetSize]);
 
-  // Compute crossover / payback estimates vs Diesel
+  // Compute crossover / payback estimates vs Diesel for all alternatives
   const paybackText = useMemo(() => {
     const dieselSeries = yearlyData.seriesData.diesel;
-    const eletricoSeries = yearlyData.seriesData.eletrico;
-    if (!dieselSeries.length || !eletricoSeries.length) return '';
+    if (!dieselSeries.length) return '';
 
-    let crossYear: number | null = null;
-    for (let t = 1; t <= horizonYears; t++) {
-      if (eletricoSeries[t] <= dieselSeries[t]) {
-        // Linear interpolation for fractional year
-        const prevDiff = eletricoSeries[t - 1] - dieselSeries[t - 1];
-        const currDiff = eletricoSeries[t] - dieselSeries[t];
-        const frac = prevDiff / (prevDiff - currDiff);
-        crossYear = t - 1 + frac;
-        break;
+    const estimates: string[] = [];
+    for (const alt of ALTERNATIVES) {
+      if (alt.id === 'diesel') continue;
+      const altSeries = yearlyData.seriesData[alt.id];
+      if (!altSeries.length) continue;
+
+      for (let t = 1; t <= horizonYears; t++) {
+        if (altSeries[t] <= dieselSeries[t]) {
+          const prevDiff = altSeries[t - 1] - dieselSeries[t - 1];
+          const currDiff = altSeries[t] - dieselSeries[t];
+          const denom = prevDiff - currDiff;
+          const frac = Math.abs(denom) > 1e-9 ? prevDiff / denom : 0;
+          const crossYear = Math.max(0, t - 1 + frac);
+          estimates.push(`${alt.name}: ~${formatNumber(crossYear, 1)} anos`);
+          break;
+        }
       }
     }
 
-    if (crossYear !== null) {
-      return `O caminhão Elétrico atinge o ponto de equilíbrio com o Diesel em aproximadamente ${formatNumber(crossYear, 1)} anos de operação.`;
+    if (estimates.length > 0) {
+      return `Ponto de equilíbrio (payback) frente ao Diesel — ${estimates.join(' · ')}.`;
     }
-    return `No cenário configurado, o sobrepreço inicial do elétrico não é totalmente compensado dentro do horizonte de ${horizonYears} anos.`;
+    return `No cenário configurado, o sobrepreço inicial das alternativas não é compensado dentro do horizonte de ${horizonYears} anos.`;
   }, [yearlyData, horizonYears]);
 
   // Table Data for accessibility
@@ -161,6 +178,12 @@ export const PaybackTimelineChart: React.FC<PaybackTimelineChartProps> = ({
       symbolSize: 6,
     }));
 
+    const tooltipBg = isDark ? '#0f172a' : '#ffffff';
+    const tooltipBorder = isDark ? '#334155' : '#e2e8f0';
+    const tooltipText = isDark ? '#f8fafc' : '#0f172a';
+    const axisBorder = isDark ? '#475569' : '#cbd5e1';
+    const gridLine = isDark ? '#334155' : '#e2e8f0';
+
     const option: echarts.EChartsCoreOption = {
       aria: {
         enabled: true,
@@ -170,6 +193,9 @@ export const PaybackTimelineChart: React.FC<PaybackTimelineChartProps> = ({
       },
       tooltip: {
         trigger: 'axis',
+        backgroundColor: tooltipBg,
+        borderColor: tooltipBorder,
+        textStyle: { color: tooltipText },
         formatter: (params: unknown) => {
           const items = params as {
             seriesName: string;
@@ -181,7 +207,7 @@ export const PaybackTimelineChart: React.FC<PaybackTimelineChartProps> = ({
           const year = items[0].axisValueLabel;
 
           let html = `<div style="font-family: inherit; font-size: 12px; min-width: 170px;">`;
-          html += `<div style="font-weight: bold; margin-bottom: 6px; border-bottom: 1px solid #ddd; padding-bottom: 4px;">${
+          html += `<div style="font-weight: bold; margin-bottom: 6px; border-bottom: 1px solid ${tooltipBorder}; padding-bottom: 4px;">${
             year === '0' ? 'Ano 0 (Investimento Inicial)' : `Ano ${year}`
           }</div>`;
 
@@ -220,7 +246,7 @@ export const PaybackTimelineChart: React.FC<PaybackTimelineChartProps> = ({
           formatter: (val: string) => (val === '0' ? '0' : `${val}`),
         },
         axisLine: {
-          lineStyle: { color: '#cbd5e1' },
+          lineStyle: { color: axisBorder },
         },
       },
       yAxis: {
@@ -245,7 +271,7 @@ export const PaybackTimelineChart: React.FC<PaybackTimelineChartProps> = ({
         splitLine: {
           lineStyle: {
             type: 'dashed',
-            color: '#e2e8f0',
+            color: gridLine,
           },
         },
       },
@@ -266,7 +292,7 @@ export const PaybackTimelineChart: React.FC<PaybackTimelineChartProps> = ({
     return () => {
       resizeObserver.disconnect();
     };
-  }, [yearlyData, fleetSize]);
+  }, [yearlyData, fleetSize, isDark]);
 
   useEffect(() => {
     return () => {

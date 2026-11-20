@@ -9,6 +9,10 @@ import type { SourcesData } from '../lib/types/sources';
 const paramsData = parametersJson as unknown as SimulationParameters;
 const sourcesData = sourcesJson as unknown as SourcesData;
 
+const baseUrl = import.meta.env.BASE_URL.endsWith('/')
+  ? import.meta.env.BASE_URL
+  : `${import.meta.env.BASE_URL}/`;
+
 const sources = sourcesData.sources;
 
 // Flatten parameters for the reference table
@@ -84,13 +88,7 @@ for (const [altId, vehicle] of Object.entries(paramsData.vehicles)) {
       <div class="breadcrumbs text-xs text-base-content/60 mb-2">
         <ul>
           <li>
-            <a
-              href={
-                Astro.url.pathname.includes('/rota-energetica')
-                  ? '/rota-energetica/'
-                  : '/'
-              }
-            >
+            <a href={baseUrl}>
               Início
             </a>
           </li>

@@ -8,7 +8,6 @@ import {
   calculateTco,
   getParameterWarnings,
   simulate,
-  validateBounds,
 } from './index';
 
 const defaultParams = defaultParametersJson as unknown as SimulationParameters;

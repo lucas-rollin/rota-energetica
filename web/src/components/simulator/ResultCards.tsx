@@ -2,6 +2,7 @@ import React from 'react';
 import { Fuel, Leaf, Zap, Flame } from 'lucide-react';
 import type { AlternativeId } from '../../lib/types/parameters';
 import type { MetricComparison, SimulationResults } from '../../lib/types/scenario';
+import { FUEL_THEME } from '../../lib/theme/fuels';
 import { formatCurrency, formatNumber, formatPercent } from '../../lib/utils/format';
 
 interface ResultCardsProps {
@@ -55,31 +56,30 @@ const POWERTRAIN_CONFIG: Record<
   diesel: {
     icon: <Fuel className="h-4 w-4 text-slate-500" aria-hidden="true" />,
     tag: 'Linha de Base',
-    borderAccent: 'border-l-4 border-l-slate-400 dark:border-l-slate-600',
+    borderAccent: FUEL_THEME.diesel.borderAccent,
     highlightText: 'Referência de Mercado',
-    highlightClass: 'bg-base-200/60 text-base-content/70',
+    highlightClass: FUEL_THEME.diesel.pillClass,
   },
   biometano: {
     icon: <Leaf className="h-4 w-4 text-emerald-500" aria-hidden="true" />,
     tag: 'Bioenergia Agro',
-    borderAccent: 'border-l-4 border-l-emerald-500',
+    borderAccent: FUEL_THEME.biometano.borderAccent,
     highlightText: 'Menor TCO Acumulado',
-    highlightClass:
-      'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 font-semibold',
+    highlightClass: FUEL_THEME.biometano.pillClass,
   },
   eletrico: {
-    icon: <Zap className="h-4 w-4 text-purple-500" aria-hidden="true" />,
+    icon: <Zap className="h-4 w-4 text-cyan-500" aria-hidden="true" />,
     tag: 'Tração Elétrica',
-    borderAccent: 'border-l-4 border-l-purple-500',
+    borderAccent: FUEL_THEME.eletrico.borderAccent,
     highlightText: 'Zero Emissão Local (Escopo 1)',
-    highlightClass: 'bg-purple-500/10 text-purple-700 dark:text-purple-400 font-semibold',
+    highlightClass: FUEL_THEME.eletrico.pillClass,
   },
   gnv: {
     icon: <Flame className="h-4 w-4 text-amber-500" aria-hidden="true" />,
     tag: 'Gás de Transição',
-    borderAccent: 'border-l-4 border-l-amber-500',
-    highlightText: 'Redução Imediata de CO₂',
-    highlightClass: 'bg-amber-500/10 text-amber-700 dark:text-amber-400 font-semibold',
+    borderAccent: FUEL_THEME.gnv.borderAccent,
+    highlightText: 'Redução Imediata de Particulados',
+    highlightClass: FUEL_THEME.gnv.pillClass,
   },
 };
 
