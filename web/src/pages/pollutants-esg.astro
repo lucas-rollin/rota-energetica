@@ -1,0 +1,41 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { EsgDashboard } from '../components/esg/EsgDashboard';
+import parametersJson from '../../../data/parameters.json';
+import pollutantsJson from '../../../data/processed/local_pollutants.json';
+import type { LocalPollutantsCatalog } from '../lib/types/catalogs';
+import type { SimulationParameters } from '../lib/types/parameters';
+
+const parameters = parametersJson as unknown as SimulationParameters;
+const pollutantsData = pollutantsJson as unknown as LocalPollutantsCatalog;
+
+const baseUrl = import.meta.env.BASE_URL.endsWith('/')
+  ? import.meta.env.BASE_URL
+  : `${import.meta.env.BASE_URL}/`;
+---
+
+<Layout
+  title="Matriz de Ciclo de Vida & Inteligência ESG — Rota Energética"
+  description="Modelagem comparativa Poço-à-Roda para frotas pesadas: intensidade de carbono, conformidade com o GHG Protocol, CBIOs e mitigação de poluentes locais (PROCONVE P8)."
+>
+  <div class="space-y-6">
+    <!-- Breadcrumbs & Page Header -->
+    <div class="border-b border-base-200 pb-4">
+      <div class="breadcrumbs text-xs text-base-content/60 mb-2">
+        <ul>
+          <li><a href={baseUrl}>Início</a></li>
+          <li>Emissões & ESG</li>
+        </ul>
+      </div>
+      <h1 class="text-2xl sm:text-3xl font-extrabold text-base-content tracking-tight">
+        Matriz de Ciclo de Vida & Inteligência ESG
+      </h1>
+      <p class="mt-1 text-sm sm:text-base text-base-content/75 max-w-3xl">
+        Análise vetorial de intensidade de carbono Well-to-Wheel (WtW), rastreabilidade de emissões por Escopo (GHG Protocol), emissão de créditos CBIO na B3 e abatimento de particulados na saúde urbana.
+      </p>
+    </div>
+
+    <!-- Interactive ESG Dashboard -->
+    <EsgDashboard client:load parameters={parameters} pollutantsData={pollutantsData} />
+  </div>
+</Layout>

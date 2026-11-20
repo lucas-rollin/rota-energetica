@@ -1,0 +1,38 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { GlobalBenchmarkDashboard } from '../components/global/GlobalBenchmarkDashboard';
+import benchmarksJson from '../../../data/processed/global_benchmarks.json';
+import type { GlobalBenchmarksCatalog } from '../lib/types/catalogs';
+
+const benchmarksData = benchmarksJson as unknown as GlobalBenchmarksCatalog;
+
+const baseUrl = import.meta.env.BASE_URL.endsWith('/')
+  ? import.meta.env.BASE_URL
+  : `${import.meta.env.BASE_URL}/`;
+---
+
+<Layout
+  title="Comparativo Global vs Brasil — Rota Energética"
+  description="Avaliação multicritério de transição energética: Well-to-Wheel comparativo entre Brasil, União Europeia, Estados Unidos e China, paridade de MWh-eq e marcos regulatórios."
+>
+  <div class="space-y-6">
+    <!-- Breadcrumbs & Page Header -->
+    <div class="border-b border-base-200 pb-4">
+      <div class="breadcrumbs text-xs text-base-content/60 mb-2">
+        <ul>
+          <li><a href={baseUrl}>Início</a></li>
+          <li>Benchmark Global</li>
+        </ul>
+      </div>
+      <h1 class="text-2xl sm:text-3xl font-extrabold text-base-content tracking-tight">
+        Comparativo Estratégico: Brasil vs União Europeia vs EUA vs China
+      </h1>
+      <p class="mt-1 text-sm sm:text-base text-base-content/75 max-w-3xl">
+        O paradoxo do Well-to-Wheel (WtW), intensidade de emissões da rede elétrica de recarga, custos normalizados no virabrequim (R$/MWh-eq) e a vantagem competitiva dos biocombustíveis e biometano no agronegócio brasileiro.
+      </p>
+    </div>
+
+    <!-- Interactive Global Benchmark Dashboard -->
+    <GlobalBenchmarkDashboard client:load benchmarksData={benchmarksData} />
+  </div>
+</Layout>
