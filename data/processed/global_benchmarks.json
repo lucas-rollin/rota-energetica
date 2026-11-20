@@ -26,9 +26,9 @@
         "bev_grid": 14.2
       },
       "energy_cost_levelized_mwh_eq": {
-        "biomethane": 286.0,
-        "offpeak_electricity": 390.0,
-        "diesel_s10": 548.0
+        "biomethane": 1095.0,
+        "offpeak_electricity": 1247.0,
+        "diesel_s10": 1743.0
       },
       "regulatory_mechanism": "RenovaBio (CBIOs na B3 a ~R$ 102/unid) e Mandato Lei 14.993/2024 (Combustível do Futuro)",
       "capex_subsidy_status": "Sem subsídio direto a fundo perdido; financiamento via Finame BNDES Verde com taxa incentivada",
@@ -52,10 +52,10 @@
         "bev_grid": 38.6
       },
       "energy_cost_levelized_mwh_eq": {
-        "biomethane": 680.0,
-        "offpeak_electricity": 720.0,
-        "diesel_s10": 920.0,
-        "hpc_electricity": 1180.0
+        "biomethane": 1620.0,
+        "offpeak_electricity": 1810.0,
+        "diesel_s10": 2620.0,
+        "hpc_electricity": 2470.0
       },
       "regulatory_mechanism": "EU ETS (~€72/tCO2), Regulamento HDV CO2 Standards e Diretiva de Infraestrutura AFIR / TEN-T",
       "capex_subsidy_status": "Subsídios nacionais agressivos (bônus de aquisição de até €80.000 por caminhão elétrico)",
@@ -79,10 +79,10 @@
         "bev_grid": 62.1
       },
       "energy_cost_levelized_mwh_eq": {
-        "biomethane": 490.0,
-        "offpeak_electricity": 450.0,
-        "diesel_s10": 610.0,
-        "commercial_electricity": 645.0
+        "biomethane": 1167.0,
+        "offpeak_electricity": 720.0,
+        "diesel_s10": 1465.0,
+        "commercial_electricity": 935.0
       },
       "regulatory_mechanism": "Inflation Reduction Act (IRA Seção 45W) e mercados estaduais LCFS (Califórnia ~US$ 78/crédito)",
       "capex_subsidy_status": "Crédito tributário federal IRA de até US$ 40.000 por veículo pesado elétrico Classe 8",
@@ -106,9 +106,9 @@
         "bev_grid": 81.5
       },
       "energy_cost_levelized_mwh_eq": {
-        "biomethane": 420.0,
-        "offpeak_electricity": 310.0,
-        "diesel_s10": 580.0
+        "biomethane": 1000.0,
+        "offpeak_electricity": 647.0,
+        "diesel_s10": 1534.0
       },
       "regulatory_mechanism": "Mandatos de cotas ZEV, política de eletrificação de portos e mineradoras e subsídios diretos na fabricação",
       "capex_subsidy_status": "Subvenção na cadeia de baterias LFP e isenção de imposto de compra (NEV)",

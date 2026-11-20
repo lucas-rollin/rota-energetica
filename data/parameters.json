@@ -351,9 +351,9 @@
         "unit": "R$/kWh",
         "source_id": "P06",
         "badge": "Adaptada",
-        "notes": "Tarifa homologada ANEEL B3 Comercial (CELESC, RESOLUÇÃO HOMOLOGATÓRIA Nº 3.602, DE 21 DE AGOSTO DE 2026, vigência 2026-08-22) com incidência tributária estimada (24%)",
+        "notes": "Tarifa homologada ANEEL B3 Comercial para garagem/base própria (CELESC, REH nº 3.602/2026, vigência 2026-08-22) com ~24,5% de tributos por dentro; não inclui bandeiras tarifárias nem margem de eletropostos públicos (R$ 2,20–3,20/kWh)",
         "min": 0.3,
-        "max": 2.0,
+        "max": 3.5,
         "step": 0.02
       },
       "consumption": {

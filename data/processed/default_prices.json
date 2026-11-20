@@ -36,7 +36,7 @@
       "unit": "R$/kWh",
       "source_id": "P06",
       "badge": "Adaptada",
-      "notes": "Tarifa homologada ANEEL B3 Comercial (CELESC, RESOLUÇÃO HOMOLOGATÓRIA Nº 3.602, DE 21 DE AGOSTO DE 2026, vigência 2026-08-22) com incidência tributária estimada (24%)",
+      "notes": "Tarifa homologada ANEEL B3 Comercial para base própria (CELESC, RESOLUÇÃO HOMOLOGATÓRIA Nº 3.602, DE 21 DE AGOSTO DE 2026, vigência 2026-08-22) com incidência tributária estimada (24,5% por dentro; sem bandeiras)",
       "reference_uf": "SC",
       "is_fallback": false
     }

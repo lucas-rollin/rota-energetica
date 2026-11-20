@@ -71,15 +71,17 @@ def compute_default_prices(
     # Electricity: ANEEL B3 commercial tariff + taxes
     if aneel_data:
         price_kwh, reh, vigencia = aneel_data
-        tax_pct = int(round(config.electricity_effective_tax_rate * 100))
+        tax_pct_str = f"{config.electricity_effective_tax_rate * 100:.1f}".replace(
+            ".", ","
+        )
         defaults["eletrico"] = DefaultPriceItem(
             value=price_kwh,
             unit="R$/kWh",
             source_id=config.aneel_source_id,
             badge="Adaptada",
             notes=(
-                f"Tarifa homologada ANEEL B3 Comercial ({config.aneel_distributor}, {reh}, "
-                f"vigência {vigencia}) com incidência tributária estimada ({tax_pct}%)"
+                f"Tarifa homologada ANEEL B3 Comercial para base própria ({config.aneel_distributor}, {reh}, "
+                f"vigência {vigencia}) com incidência tributária estimada ({tax_pct_str}% por dentro; sem bandeiras)"
             ),
             weeks_window=None,
             reference_uf=config.reference_uf,
