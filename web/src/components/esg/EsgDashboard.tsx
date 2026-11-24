@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { calculateFleetEsg } from '../../lib/calc/esg';
 import type { LocalPollutantsCatalog } from '../../lib/types/catalogs';
 import type { AlternativeId, SimulationParameters } from '../../lib/types/parameters';
 import { FUEL_THEME } from '../../lib/theme/fuels';
@@ -19,96 +20,56 @@ export const EsgDashboard: React.FC<EsgDashboardProps> = ({
   const [targetFuel, setTargetFuel] = useState<'biometano' | 'eletrico' | 'gnv'>(
     'biometano'
   );
+  const [showCbioSensitivity, setShowCbioSensitivity] = useState<boolean>(false);
 
   const cbioPrice = parameters.general.cbio_price?.value ?? 102;
-  const annualDistance = monthlyMileage * 12;
 
-  // Baseline diesel calculations
-  const dieselConsumption = parameters.vehicles.diesel.consumption.value; // km/L
-  const dieselCarbonIntensity = parameters.vehicles.diesel.carbon_intensity.value; // gCO2/MJ
-  const dieselDensity = parameters.vehicles.diesel.energy_density.value; // MJ/L
-  const dieselGPerKm = (dieselDensity * dieselCarbonIntensity) / dieselConsumption; // ~1079 gCO2/km
-  const annualDieselEmissionsTonPerTruck = (dieselGPerKm * annualDistance) / 1000000;
-
-  // Selected alternative calculations
-  const altVehicle = parameters.vehicles[targetFuel];
-  const altConsumption = altVehicle.consumption.value;
-  const altDensity = altVehicle.energy_density.value;
-  const altCarbonIntensity = altVehicle.carbon_intensity.value;
-  const altChargingEff = altVehicle.charging_efficiency?.value ?? 1.0;
-  const effectiveAltConsumption = altConsumption * altChargingEff;
-  const altGPerKm = (altDensity * altCarbonIntensity) / effectiveAltConsumption;
-  const annualAltEmissionsTonPerTruck = (altGPerKm * annualDistance) / 1000000;
-
-  // Savings & Impacts
-  const tonsAvoidedPerTruck = Math.max(
-    0,
-    annualDieselEmissionsTonPerTruck - annualAltEmissionsTonPerTruck
+  const esg = useMemo(
+    () =>
+      calculateFleetEsg({
+        parameters,
+        targetFuel,
+        fleetSize,
+        monthlyMileage,
+      }),
+    [parameters, targetFuel, fleetSize, monthlyMileage]
   );
-  const totalFleetTonsAvoided = tonsAvoidedPerTruck * fleetSize;
-  const totalTreesEquivalent = Math.round(totalFleetTonsAvoided * 6.66);
-  const totalCbioRevenue = totalFleetTonsAvoided * cbioPrice;
-  const dieselLitersAvoided = (annualDistance / dieselConsumption) * fleetSize;
 
-  // Percentage reduction (positive = reduction vs diesel)
-  const reductionPercent =
-    ((annualDieselEmissionsTonPerTruck - annualAltEmissionsTonPerTruck) /
-      annualDieselEmissionsTonPerTruck) *
-    100;
+  const {
+    annualDistanceKm,
+    annualAltTon,
+    tonsAvoided,
+    reductionPercent,
+    dieselLitersAvoided,
+    scope1Ton,
+    scope2Ton,
+    scope3Ton,
+    reductionScope1Percent,
+  } = esg;
+
+  // Under RenovaBio, CBIOs are issued to biofuel producers (not fleet operators),
+  // and BEVs / fossil GNV do not generate CBIOs.
+  const hypotheticalCbioRevenue =
+    showCbioSensitivity && targetFuel === 'biometano' ? tonsAvoided * cbioPrice : 0;
 
   // Well-to-Wheel carbon intensities directly from parameters.json
   const dieselCi = parameters.vehicles.diesel.carbon_intensity.value;
   const biometanoCi = parameters.vehicles.biometano.carbon_intensity.value;
   const eletricoCi = parameters.vehicles.eletrico.carbon_intensity.value;
   const gnvCi = parameters.vehicles.gnv.carbon_intensity.value;
+  const maxCi = Math.max(dieselCi, biometanoCi, eletricoCi, gnvCi, 1);
 
   const formatDeltaVsDiesel = (ci: number) => {
     const pct = ((ci - dieselCi) / dieselCi) * 100;
     return `${pct > 0 ? '+' : ''}${formatNumber(pct, 1)}%`;
   };
 
-  // Scope 1, 2, 3 calculations
-  const scopeBreakdown = useMemo(() => {
-    const dieselScope1 =
-      ((annualDistance * ((dieselDensity * dieselCi) / dieselConsumption)) / 1000000) *
-      fleetSize;
-    if (targetFuel === 'eletrico') {
-      const elecKgPerKwh = (eletricoCi * 3.6) / 1000;
-      const scope2 =
-        (annualDistance / effectiveAltConsumption) * elecKgPerKwh * fleetSize;
-      return {
-        scope1: 0,
-        scope2: Math.round(scope2),
-        scope3: Math.round(dieselScope1 * 0.08),
-        reductionScope1: 100,
-      };
-    } else if (targetFuel === 'biometano') {
-      return {
-        scope1: Math.round(annualAltEmissionsTonPerTruck * fleetSize * 0.6),
-        scope2: 0,
-        scope3: Math.round(annualAltEmissionsTonPerTruck * fleetSize * 0.4),
-        reductionScope1: Math.round(reductionPercent),
-      };
-    } else {
-      return {
-        scope1: Math.round(annualAltEmissionsTonPerTruck * fleetSize),
-        scope2: 0,
-        scope3: Math.round(dieselScope1 * 0.12),
-        reductionScope1: Math.round(reductionPercent),
-      };
-    }
-  }, [
-    targetFuel,
-    fleetSize,
-    annualDistance,
-    effectiveAltConsumption,
-    dieselDensity,
-    dieselConsumption,
-    dieselCi,
-    eletricoCi,
-    annualAltEmissionsTonPerTruck,
-    reductionPercent,
-  ]);
+  const formatSignedReduction = (pct: number) => {
+    const rounded = Math.round(pct);
+    if (rounded > 0) return `-${rounded}%`;
+    if (rounded < 0) return `+${Math.abs(rounded)}%`;
+    return '0%';
+  };
 
   return (
     <div className="space-y-8">
@@ -139,7 +100,7 @@ export const EsgDashboard: React.FC<EsgDashboardProps> = ({
             CO₂e Evitado por Ano
           </div>
           <div className="text-base-content mt-1 font-mono text-2xl font-black">
-            {formatNumber(totalFleetTonsAvoided, 0)}{' '}
+            {formatNumber(tonsAvoided, 0)}{' '}
             <span className="text-base-content/60 text-sm font-normal">t/ano</span>
           </div>
           <div className="text-base-content/60 mt-1 text-[11px]">
@@ -149,25 +110,41 @@ export const EsgDashboard: React.FC<EsgDashboardProps> = ({
 
         <div className="bg-base-100 border-base-200 rounded-xl border p-4 shadow-xs">
           <div className="text-base-content/70 text-xs font-semibold">
-            Potencial Receita de CBIOs
+            Emissão Total da Frota (WtW)
           </div>
-          <div className="mt-1 font-mono text-2xl font-black text-emerald-600 dark:text-emerald-400">
-            {formatCurrency(totalCbioRevenue, 0)}
+          <div className="text-base-content mt-1 font-mono text-2xl font-black">
+            {formatNumber(annualAltTon, 0)}{' '}
+            <span className="text-base-content/60 text-sm font-normal">tCO₂e/ano</span>
           </div>
           <div className="text-base-content/60 mt-1 text-[11px]">
-            Cotação média B3 ({formatCurrency(cbioPrice, 0)}/CBIO)
+            {formatNumber(esg.altEmissionsGPerKm, 0)} gCO₂eq/km por veículo
           </div>
         </div>
 
         <div className="bg-base-100 border-base-200 rounded-xl border p-4 shadow-xs">
-          <div className="text-base-content/70 text-xs font-semibold">
-            Equivalência Arbórea
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-base-content/70 text-xs font-semibold">
+              Sensibilidade CBIO (Hipotética)
+            </span>
+            <input
+              type="checkbox"
+              className="toggle toggle-xs toggle-success"
+              checked={showCbioSensitivity}
+              onChange={(e) => setShowCbioSensitivity(e.target.checked)}
+              aria-label="Incluir sensibilidade hipotética de CBIOs"
+            />
           </div>
-          <div className="text-primary mt-1 font-mono text-2xl font-black">
-            {formatNumber(totalTreesEquivalent, 0)}
+          <div className="mt-1 font-mono text-2xl font-black text-emerald-600 dark:text-emerald-400">
+            {showCbioSensitivity
+              ? formatCurrency(hypotheticalCbioRevenue, 0)
+              : 'Desativado'}
           </div>
           <div className="text-base-content/60 mt-1 text-[11px]">
-            Árvores adultas preservadas/ano
+            {showCbioSensitivity
+              ? targetFuel === 'biometano'
+                ? `Cotação B3 (${formatCurrency(cbioPrice, 0)}/CBIO) — emitido ao produtor, não ao frotista`
+                : 'Não aplicável (apenas biocombustíveis no RenovaBio)'
+              : 'Opcional: CBIOs pertencem ao produtor de biocombustível'}
           </div>
         </div>
       </div>
@@ -316,26 +293,33 @@ export const EsgDashboard: React.FC<EsgDashboardProps> = ({
               </div>
               <div>
                 <span className="text-base-content/60 block text-[11px]">
-                  Créditos CBIO gerados:
+                  Emissões evitadas (WtW):
                 </span>
                 <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">
-                  {formatNumber(totalFleetTonsAvoided, 0)} CBIOs
+                  {formatNumber(tonsAvoided, 0)} tCO₂e/ano
                 </span>
               </div>
               <div>
                 <span className="text-base-content/60 block text-[11px]">
-                  Quilômetros limpos rodados:
+                  Quilômetros rodados:
                 </span>
                 <span className="text-base-content font-mono font-bold">
-                  {formatNumber((annualDistance * fleetSize) / 1000000, 2)}M km/ano
+                  {formatNumber((annualDistanceKm * fleetSize) / 1000000, 2)}M km/ano
                 </span>
               </div>
               <div>
                 <span className="text-base-content/60 block text-[11px]">
                   Impacto Escopo 1 (Combustão):
                 </span>
-                <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">
-                  -{scopeBreakdown.reductionScope1}% direto
+                <span
+                  className={`font-mono font-bold ${
+                    reductionScope1Percent >= 0
+                      ? 'text-emerald-600 dark:text-emerald-400'
+                      : 'text-amber-600 dark:text-amber-400'
+                  }`}
+                >
+                  {formatSignedReduction(reductionScope1Percent)}{' '}
+                  {reductionScope1Percent >= 0 ? 'direto' : 'WtW vs diesel'}
                 </span>
               </div>
             </div>
@@ -374,21 +358,14 @@ export const EsgDashboard: React.FC<EsgDashboardProps> = ({
               <div className="bg-base-200 flex h-4 w-full overflow-hidden rounded-full">
                 <div
                   className={`${FUEL_THEME.diesel.barClass} flex h-full items-center justify-center text-[9px] text-white`}
-                  style={{ width: '22%' }}
-                  title="Poço ao Tanque: 22%"
+                  style={{ width: `${Math.round((dieselCi / maxCi) * 100)}%` }}
                 >
-                  WtT 22%
-                </div>
-                <div
-                  className={`${FUEL_THEME.diesel.barSecondaryClass} flex h-full items-center justify-center text-[9px] text-white`}
-                  style={{ width: '78%' }}
-                  title="Tanque à Roda: 78%"
-                >
-                  TtW 78%
+                  WtW {formatNumber(dieselCi, 1)} gCO₂eq/MJ
                 </div>
               </div>
               <div className="text-base-content/60 mt-1 text-[10px]">
-                Upstream: refino e transporte fóssil + combustão pesada direta no motor.
+                Intensidade média ponderada do Diesel B (85% fóssil + 15% biodiesel) em
+                ciclo de vida completo.
               </div>
             </div>
 
@@ -413,22 +390,16 @@ export const EsgDashboard: React.FC<EsgDashboardProps> = ({
               <div className="bg-base-200 flex h-4 w-full overflow-hidden rounded-full">
                 <div
                   className={`${FUEL_THEME.biometano.barClass} flex h-full items-center justify-center text-[9px] text-white`}
-                  style={{ width: '18%' }}
-                  title="Processamento e compressão"
+                  style={{
+                    width: `${Math.max(8, Math.round((biometanoCi / maxCi) * 100))}%`,
+                  }}
                 >
-                  WtT 18%
-                </div>
-                <div
-                  className={`${FUEL_THEME.biometano.barSecondaryClass} flex h-full items-center justify-center text-[9px] text-white`}
-                  style={{ width: '82%' }}
-                  title="Ciclo biogênico neutro"
-                >
-                  Bio-TtW Neutro
+                  {formatNumber(biometanoCi, 1)}
                 </div>
               </div>
               <div className="text-base-content/60 mt-1 text-[10px]">
-                Captura metano fugitivo da biomassa residual; combustão reemite carbono do
-                ciclo biogênico recente.
+                Emissões concentradas no processamento e compressão (WtT); combustão
+                biogênica neutra no Escopo 1.
               </div>
             </div>
 
@@ -452,10 +423,11 @@ export const EsgDashboard: React.FC<EsgDashboardProps> = ({
               <div className="bg-base-200 flex h-4 w-full overflow-hidden rounded-full">
                 <div
                   className={`${FUEL_THEME.eletrico.barClass} flex h-full items-center justify-center text-[9px] text-white`}
-                  style={{ width: '100%' }}
-                  title="Emissão concentrada na geração e transmissão"
+                  style={{
+                    width: `${Math.max(10, Math.round((eletricoCi / maxCi) * 100))}%`,
+                  }}
                 >
-                  WtT 100% (Rede Elétrica SIN)
+                  {formatNumber(eletricoCi, 1)}
                 </div>
               </div>
               <div className="text-base-content/60 mt-1 flex flex-wrap items-center gap-1 text-[10px]">
@@ -487,22 +459,14 @@ export const EsgDashboard: React.FC<EsgDashboardProps> = ({
               <div className="bg-base-200 flex h-4 w-full overflow-hidden rounded-full">
                 <div
                   className={`${FUEL_THEME.gnv.barClass} flex h-full items-center justify-center text-[9px] font-semibold text-slate-950`}
-                  style={{ width: '25%' }}
-                  title="Extração e distribuição"
+                  style={{ width: `${Math.round((gnvCi / maxCi) * 100)}%` }}
                 >
-                  WtT 25%
-                </div>
-                <div
-                  className={`${FUEL_THEME.gnv.barSecondaryClass} flex h-full items-center justify-center text-[9px] text-white`}
-                  style={{ width: '75%' }}
-                  title="Combustão"
-                >
-                  TtW 75%
+                  WtW {formatNumber(gnvCi, 1)} gCO₂eq/MJ
                 </div>
               </div>
               <div className="text-base-content/60 mt-1 text-[10px]">
-                Combustível de transição fóssil; intensidade regulatória próxima ao diesel
-                por MJ, com expressiva redução de poluentes locais (NOx e MP).
+                Combustível de transição fóssil; intensidade WtW superior à do Diesel B
+                por km, com redução de poluentes locais (NOx e MP).
               </div>
             </div>
           </div>
@@ -526,13 +490,19 @@ export const EsgDashboard: React.FC<EsgDashboardProps> = ({
                     Escopo 1 — Combustão Móvel Direta
                   </span>
                   <span className="text-primary font-mono font-bold">
-                    {formatNumber(scopeBreakdown.scope1, 0)} tCO₂e/ano
+                    {formatNumber(scope1Ton, 0)} tCO₂e/ano
                   </span>
                 </div>
                 <p className="text-base-content/70 mt-1 text-[11px]">
                   Queima direta de combustível nos cilindros da frota própria. O caminhão
-                  elétrico elimina 100% desta linha; o biometano reduz em ~95% devido ao
-                  balanço biogênico.
+                  elétrico e o biometano zeram a parcela fóssil direta (redução WtW
+                  calculada de{' '}
+                  {targetFuel === 'biometano'
+                    ? `${formatNumber(reductionPercent, 1)}%`
+                    : targetFuel === 'eletrico'
+                      ? `${formatNumber(reductionPercent, 1)}%`
+                      : formatSignedReduction(reductionPercent)}
+                  ).
                 </p>
               </div>
 
@@ -542,7 +512,7 @@ export const EsgDashboard: React.FC<EsgDashboardProps> = ({
                     Escopo 2 — Eletricidade e Recarga de Bateria
                   </span>
                   <span className="font-mono font-bold text-cyan-600 dark:text-cyan-400">
-                    {formatNumber(scopeBreakdown.scope2, 0)} tCO₂e/ano
+                    {formatNumber(scope2Ton, 0)} tCO₂e/ano
                   </span>
                 </div>
                 <p className="text-base-content/70 mt-1 text-[11px]">
@@ -554,16 +524,16 @@ export const EsgDashboard: React.FC<EsgDashboardProps> = ({
               <div className="bg-base-200/50 border-base-300 rounded-lg border p-3">
                 <div className="flex items-center justify-between text-xs">
                   <span className="text-base-content font-bold">
-                    Escopo 3 — Frete Terceirizado e Cadeia Upstream
+                    Escopo 3 — Cadeia Upstream (WtT)
                   </span>
                   <span className="font-mono font-bold text-amber-600 dark:text-amber-400">
-                    {formatNumber(scopeBreakdown.scope3, 0)} tCO₂e/ano
+                    {formatNumber(scope3Ton, 0)} tCO₂e/ano
                   </span>
                 </div>
                 <p className="text-base-content/70 mt-1 text-[11px]">
-                  Operações de agregados e terceiros contratados. Empresas embarcadoras
-                  (agro, bens de consumo) exigem comprovação de redução para metas SBTi e
-                  relatórios CDP.
+                  Emissões upstream de processamento, compressão e transporte (WtT)
+                  separadas para o biometano. Para o GNV, o fator WtW em parameters.json
+                  agrega WtT + TtW no total acima.
                 </p>
               </div>
             </div>
