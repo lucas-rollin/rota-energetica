@@ -695,7 +695,7 @@ export const CorridorInfrastructureMap: React.FC<CorridorInfrastructureMapProps>
               id="map-corridor-select"
               value={selectedCorridor.id}
               onChange={(e) => onSelectCorridor(e.target.value)}
-              className="select select-xs select-bordered max-w-[260px] text-xs font-medium"
+              className="select select-xs select-bordered max-w-65 text-xs font-medium"
             >
               {corridors.map((c) => (
                 <option key={c.id} value={c.id}>
@@ -1015,7 +1015,7 @@ export const CorridorInfrastructureMap: React.FC<CorridorInfrastructureMapProps>
         <div className="border-base-200 bg-base-200/20 relative overflow-hidden rounded-xl border">
           <div
             ref={chartContainerRef}
-            className="h-[460px] w-full sm:h-[540px]"
+            className="h-115 w-full sm:h-135"
             role="img"
             aria-label={summaryText}
           />
@@ -1146,8 +1146,10 @@ export const CorridorInfrastructureMap: React.FC<CorridorInfrastructureMapProps>
         <span className="leading-relaxed">
           Fontes: IBGE Malha UF{' '}
           <SourceRef id="I14" context="Malha Territorial UF (Mapa)" />, ANP{' '}
-          <SourceRef id="I07" context="Revendedores de Combustíveis e GNV" />, Compagás{' '}
           <SourceRef id="I09" context="Corredores Sustentáveis do Paraná" />, SCGÁS{' '}
+          <SourceRef id="I16" context="Rede GNV Naturgy São Paulo Sul" />, Compagás{' '}
+          <SourceRef id="I07" context="Revendedores de Combustíveis e GNV" />, Necta{' '}
+          <SourceRef id="I15" context="Rede GNV/Biometano Necta (SP)" />, Naturgy SP Sul{' '}
           <SourceRef id="P09" context="Rede de Postos GNV/Biometano SCGÁS" /> &amp;
           ABVE/Tupi <SourceRef id="I01" context="Mapeamento Nacional de Eletropostos" />
         </span>

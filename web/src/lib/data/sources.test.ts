@@ -86,6 +86,8 @@ describe('sources integrity', () => {
       'I09',
       'I12',
       'I14',
+      'I15',
+      'I16',
     ];
     for (const id of dashboardCitedIds) {
       expect(getSource(id), `Dashboard source '${id}' not found`).toBeDefined();
