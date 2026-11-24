@@ -207,27 +207,28 @@ describe('Calculator Engine Unit Tests', () => {
       expect(() => simulate(nanParams)).toThrow(/must be a finite number/);
     });
 
-    it('calculates CBIO monetization and reflects payload penalties', () => {
-      const res = simulate(defaultParams);
+    it('keeps CBIO revenue off by default and applies opt-in CBIO only to biofuels', () => {
+      const defaultRes = simulate(defaultParams);
 
-      // Diesel generates zero CBIOs
-      expect(res.diesel.annualCbioGenerated).toBe(0);
-      expect(res.diesel.annualCbioRevenue).toBe(0);
-      expect(res.diesel.netTco).toBeCloseTo(res.diesel.tco, 4);
-      expect(res.diesel.payloadPenaltyKg).toBe(0);
+      // Off by default: zero CBIO revenue for all alternatives
+      expect(defaultRes.diesel.annualCbioGenerated).toBe(0);
+      expect(defaultRes.biometano.annualCbioGenerated).toBe(0);
+      expect(defaultRes.eletrico.annualCbioGenerated).toBe(0);
+      expect(defaultRes.biometano.netTco).toBeCloseTo(defaultRes.biometano.tco, 4);
+      expect(defaultRes.biometano.payloadPenaltyKg).toBe(-280);
+      expect(defaultRes.eletrico.payloadPenaltyKg).toBe(-2400);
 
-      // Biomethane avoids significant CO2 and generates positive CBIO revenue
-      expect(res.biometano.annualCbioGenerated).toBeGreaterThan(0);
-      expect(res.biometano.annualCbioRevenue).toBeGreaterThan(0);
-      expect(res.biometano.netTco).toBeLessThan(res.biometano.tco);
-      expect(res.biometano.netLevelizedCostPerKm).toBeLessThan(
-        res.biometano.levelizedCostPerKm
+      // Opt-in CBIO sensitivity: only biometano (biofuel) generates CBIOs; BEVs do not
+      const cbioRes = simulate(defaultParams, { includeCbio: true });
+      expect(cbioRes.diesel.annualCbioGenerated).toBe(0);
+      expect(cbioRes.eletrico.annualCbioGenerated).toBe(0);
+      expect(cbioRes.eletrico.annualCbioRevenue).toBe(0);
+      expect(cbioRes.biometano.annualCbioGenerated).toBeGreaterThan(0);
+      expect(cbioRes.biometano.annualCbioRevenue).toBeGreaterThan(0);
+      expect(cbioRes.biometano.netTco).toBeLessThan(cbioRes.biometano.tco);
+      expect(cbioRes.biometano.netLevelizedCostPerKm).toBeLessThan(
+        cbioRes.biometano.levelizedCostPerKm
       );
-      expect(res.biometano.payloadPenaltyKg).toBe(-280);
-
-      // Electric has tare battery penalty
-      expect(res.eletrico.payloadPenaltyKg).toBe(-2400);
-      expect(res.eletrico.annualCbioGenerated).toBeGreaterThan(0);
     });
   });
 });

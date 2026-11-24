@@ -320,10 +320,23 @@ export function calculateDelta(val: number, base: number): MetricComparison {
   return { diff, pct };
 }
 
+export interface SimulateOptions {
+  /**
+   * Include hypothetical RenovaBio CBIO sensitivity (off by default).
+   * Under RenovaBio, CBIOs are issued to biofuel producers rather than fleet operators,
+   * and battery-electric vehicles do not generate CBIOs.
+   */
+  includeCbio?: boolean;
+}
+
 /**
  * Simulates all energy powertrain scenarios for a given set of parameters.
  */
-export function simulate(params: SimulationParameters): SimulationResults {
+export function simulate(
+  params: SimulationParameters,
+  options: SimulateOptions = {}
+): SimulationResults {
+  const { includeCbio = false } = options;
   validateSimulationParameters(params);
 
   const g = params.general;
@@ -406,7 +419,8 @@ export function simulate(params: SimulationParameters): SimulationResults {
     const r = results[alt];
     const v = params.vehicles[alt];
     const avoidedTons = Math.max(0, dieselBase.annualEmissionsTon - r.annualEmissionsTon);
-    const annualCbioGenerated = alt === 'diesel' ? 0 : avoidedTons;
+    // Only biofuels (biometano) are eligible for hypothetical CBIO sensitivity when opted in
+    const annualCbioGenerated = includeCbio && alt === 'biometano' ? avoidedTons : 0;
     const annualCbioRevenue = annualCbioGenerated * cbioPrice;
     const pvCbioRevenue = annualCbioRevenue * annuityFactor;
     const netTco = r.tco - pvCbioRevenue;

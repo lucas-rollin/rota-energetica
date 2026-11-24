@@ -26,6 +26,7 @@ export const Simulator: React.FC<SimulatorProps> = ({ defaults }) => {
 
   const [activePresetId, setActivePresetId] = useState<string>('default');
   const [fleetSize, setFleetSize] = useState<number>(1);
+  const [includeCbio, setIncludeCbio] = useState<boolean>(false);
 
   // Count altered parameters
   const alteredCount = useMemo(() => {
@@ -72,13 +73,13 @@ export const Simulator: React.FC<SimulatorProps> = ({ defaults }) => {
   const { results, simulationWarnings, simulationError } = useMemo(() => {
     try {
       const warnings = getParameterWarnings(params);
-      const res = simulate(params);
+      const res = simulate(params, { includeCbio });
       return { results: res, simulationWarnings: warnings, simulationError: null };
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Erro no cálculo da simulação';
       return { results: null, simulationWarnings: [], simulationError: message };
     }
-  }, [params]);
+  }, [params, includeCbio]);
 
   // Handle Preset application
   const handleApplyPreset = (newParams: SimulationParameters, presetId: string) => {
@@ -138,6 +139,7 @@ export const Simulator: React.FC<SimulatorProps> = ({ defaults }) => {
     setParams(JSON.parse(JSON.stringify(defaults)));
     setActivePresetId('default');
     setFleetSize(1);
+    setIncludeCbio(false);
   };
 
   // Vehicle acquisition prices for card deltas
