@@ -49,7 +49,7 @@ const POWERTRAIN_CONFIG: Record<
     icon: React.ReactNode;
     tag: string;
     borderAccent: string;
-    highlightText: string;
+    neutralLabel: string;
     highlightClass: string;
   }
 > = {
@@ -57,28 +57,28 @@ const POWERTRAIN_CONFIG: Record<
     icon: <Fuel className="h-4 w-4 text-slate-500" aria-hidden="true" />,
     tag: 'Linha de Base',
     borderAccent: FUEL_THEME.diesel.borderAccent,
-    highlightText: 'Referência de Mercado',
+    neutralLabel: 'Referência de Mercado',
     highlightClass: FUEL_THEME.diesel.pillClass,
   },
   biometano: {
     icon: <Leaf className="h-4 w-4 text-emerald-500" aria-hidden="true" />,
     tag: 'Bioenergia Agro',
     borderAccent: FUEL_THEME.biometano.borderAccent,
-    highlightText: 'Menor TCO Acumulado',
+    neutralLabel: 'Combustível Renovável',
     highlightClass: FUEL_THEME.biometano.pillClass,
   },
   eletrico: {
     icon: <Zap className="h-4 w-4 text-cyan-500" aria-hidden="true" />,
     tag: 'Tração Elétrica',
     borderAccent: FUEL_THEME.eletrico.borderAccent,
-    highlightText: 'Zero Emissão Local (Escopo 1)',
+    neutralLabel: 'Tração 100% Elétrica',
     highlightClass: FUEL_THEME.eletrico.pillClass,
   },
   gnv: {
     icon: <Flame className="h-4 w-4 text-amber-500" aria-hidden="true" />,
     tag: 'Gás de Transição',
     borderAccent: FUEL_THEME.gnv.borderAccent,
-    highlightText: 'Redução Imediata de Particulados',
+    neutralLabel: 'Gás Natural Veicular',
     highlightClass: FUEL_THEME.gnv.pillClass,
   },
 };
@@ -89,6 +89,15 @@ export const ResultCards: React.FC<ResultCardsProps> = ({
   vehiclePurchasePrices,
   energyPrices,
 }) => {
+  const minTco = Math.min(
+    ...ALTERNATIVES_ORDER.map((id) => results[id]?.tco ?? Number.POSITIVE_INFINITY)
+  );
+  const minEmissions = Math.min(
+    ...ALTERNATIVES_ORDER.map(
+      (id) => results[id]?.annualEmissionsTon ?? Number.POSITIVE_INFINITY
+    )
+  );
+
   return (
     <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
       {ALTERNATIVES_ORDER.map((alt) => {
@@ -100,6 +109,13 @@ export const ResultCards: React.FC<ResultCardsProps> = ({
         const sobreprecoDiff = purchasePrice - dieselPurchasePrice;
         const config = POWERTRAIN_CONFIG[alt];
         const energyPrice = energyPrices?.[alt];
+        const isLowestTco = Math.abs(res.tco - minTco) < 1e-2;
+        const isLowestEmissions = Math.abs(res.annualEmissionsTon - minEmissions) < 1e-4;
+        const highlightText = isLowestTco
+          ? 'Menor TCO Acumulado'
+          : isLowestEmissions
+            ? 'Menor Emissão WtW'
+            : config.neutralLabel;
 
         return (
           <div
@@ -213,7 +229,7 @@ export const ResultCards: React.FC<ResultCardsProps> = ({
               <div
                 className={`mt-2.5 rounded px-2 py-1 text-center text-[10px] font-medium ${config.highlightClass}`}
               >
-                {config.highlightText}
+                {highlightText}
               </div>
             </div>
           </div>
