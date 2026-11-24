@@ -27,11 +27,10 @@
           "type": "string"
         },
         "corridor_ids": {
-          "description": "Lista de IDs dos corredores logísticos atendidos.",
+          "description": "Lista de IDs dos corredores logísticos atendidos (vazia para polos regionais fora de eixo mapeado).",
           "items": {
             "type": "string"
           },
-          "minItems": 1,
           "title": "Corridor Ids",
           "type": "array"
         },
@@ -152,7 +151,6 @@
         "id",
         "name",
         "technology",
-        "corridor_ids",
         "highway",
         "city",
         "state",

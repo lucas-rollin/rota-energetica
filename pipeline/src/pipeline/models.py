@@ -1184,9 +1184,8 @@ class FuelStation(BaseModel):
         title="Technology",
     )
     corridor_ids: list[str] = Field(
-        ...,
-        min_length=1,
-        description="Lista de IDs dos corredores logísticos atendidos.",
+        default_factory=list,
+        description="Lista de IDs dos corredores logísticos atendidos (vazia para polos regionais fora de eixo mapeado).",
         title="Corridor Ids",
     )
     highway: str = Field(

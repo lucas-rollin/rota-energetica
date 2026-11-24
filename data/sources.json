@@ -430,7 +430,7 @@
       "category": "D",
       "terms": "Divulgação institucional / imprensa",
       "attribution": "Fonte: Compagás.",
-      "notes": "33 postos no PR, 11 preparados para caminhões (ex.: Ponta Grossa na BR-376). Para SC: obter lista equivalente com a SCGÁS."
+      "notes": "33 postos no PR, 11 preparados para caminhões (ex.: Ponta Grossa na BR-376 e Campina Grande do Sul na BR-116 Régis Bittencourt). Para SC: obter lista equivalente com a SCGÁS."
     },
     {
       "id": "I10",
@@ -491,6 +491,30 @@
       "terms": "Dados abertos governamentais (CC BY / uso livre com atribuição ao IBGE)",
       "attribution": "Fonte: IBGE, Malha Territorial Digital (API de Malhas v3).",
       "notes": "GeoJSON simplificado das 27 UFs obtido via servicodados.ibge.gov.br para base cartográfica estática do mapa de corredores."
+    },
+    {
+      "id": "I15",
+      "name": "Rede de Postos GNV e Corredores de Biometano — Necta",
+      "publisher": "Necta (antiga GasBrasiliano) / ARSESP",
+      "description": "Infraestrutura de postos GNV e rede dedicada de biometano na área de concessão do Noroeste e Centro-Oeste Paulista",
+      "url": "https://nectagas.com.br",
+      "badge": "Adaptada",
+      "category": "D",
+      "terms": "Divulgação institucional / regulação ARSESP",
+      "attribution": "Fonte: Necta (antiga GasBrasiliano) / ARSESP.",
+      "notes": "Concessionária regulada pela ARSESP em 375 municípios do Noroeste e Centro-Oeste de SP (ex.: Ribeirão Preto, Araraquara, São Carlos, Bauru, Araçatuba, Marília, Presidente Prudente e São José do Rio Preto). Inclui o primeiro gasoduto dedicado a biometano do Brasil em Presidente Prudente (Usina Cocal)."
+    },
+    {
+      "id": "I16",
+      "name": "Rede de Postos GNV — Naturgy São Paulo Sul",
+      "publisher": "Naturgy (Gás Natural São Paulo Sul) / ARSESP",
+      "description": "Área de concessão e pontos rodoviários/urbanos de GNV operados pela Gás Natural São Paulo Sul S.A.",
+      "url": "https://www.naturgy.com.br",
+      "badge": "Adaptada",
+      "category": "D",
+      "terms": "Divulgação institucional / regulação ARSESP",
+      "attribution": "Fonte: Naturgy (Gás Natural São Paulo Sul) / ARSESP.",
+      "notes": "Atende efetivamente 18 municípios do Sul/Centro-Sul paulista ao longo das rodovias SP-280, SP-270, SP-075 e SP-127 (Sorocaba, Itu, Araçariguama, Boituva, Itapetininga, Botucatu, Tatuí etc.). A malha canalizada não alcança o Vale do Ribeira (trecho paulista da BR-116 Régis Bittencourt)."
     }
   ]
 }

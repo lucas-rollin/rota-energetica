@@ -259,6 +259,89 @@
       ]
     },
     {
+      "id": "sp-curitiba",
+      "name": "Eixo Régis Bittencourt — BR-116 (SP–PR)",
+      "origin": "São Paulo / Taboão da Serra (SP)",
+      "destination": "Curitiba (PR)",
+      "distance_km": 408.0,
+      "cargo_profile": "Autopeças, bens de consumo, carga industrializada, papel/celulose e integração Sudeste–Sul",
+      "typical_pbtc": "45t a 57t (Cavalo mecânico 4x2 e 6x2)",
+      "highways": [
+        "BR-116"
+      ],
+      "route_waypoints": [
+        [
+          -46.633,
+          -23.55
+        ],
+        [
+          -46.752,
+          -23.607
+        ],
+        [
+          -47.46,
+          -24.281
+        ],
+        [
+          -47.835,
+          -24.488
+        ],
+        [
+          -48.123,
+          -24.736
+        ],
+        [
+          -49.052,
+          -25.306
+        ],
+        [
+          -49.273,
+          -25.428
+        ]
+      ],
+      "refueling_points": {
+        "diesel": "50+ postos rodoviários ao longo da BR-116 (Serra do Cafezal e Vale do Ribeira)",
+        "biomethane_cng": "Hubs de alta vazão nas pontas (Comgás em Taboão da Serra e Compagás em Campina Grande do Sul / RMC), sem rede canalizada no Vale do Ribeira",
+        "electric_hpc": "Hubs HPC >150 kW concentrados nas pontas (RMSP e Curitiba); carregadores de passeio até 150 kW em Miracatu e Cajati"
+      },
+      "powertrain_evaluations": {
+        "biometano": {
+          "feasibility_score": 92,
+          "feasibility_label": "Viável com Abastecimento nas Pontas",
+          "stops_description": "Viagem direta de 408 km (apoio em Taboão da Serra e Campina Grande do Sul)",
+          "refuel_time_minutes": 15,
+          "payload_penalty_kg": -280.0,
+          "emission_reduction_percent": 91.2,
+          "recommendation": "Embora o Vale do Ribeira (SP) não possua rede de gás canalizado (nem Comgás nem Naturgy SP Sul alcançam o trecho), a extensão de 408 km permite travessia direta para caminhões a Bio-GNC (650–900 km), conectando os hubs de alta vazão da Comgás (Taboão da Serra) e Compagás (Campina Grande do Sul / São José dos Pinhais)."
+        },
+        "diesel": {
+          "feasibility_score": 100,
+          "feasibility_label": "Operacional Padrão",
+          "stops_description": "Sem paradas obrigatórias",
+          "refuel_time_minutes": 15,
+          "payload_penalty_kg": 0.0,
+          "emission_reduction_percent": 0.0,
+          "recommendation": "Eixo consolidado de ligação Sudeste–Sul com ampla rede de serviços na Serra do Cafezal duplicada e Vale do Ribeira."
+        },
+        "eletrico": {
+          "feasibility_score": 70,
+          "feasibility_label": "Dependente de Apoio Intermediário HPC",
+          "stops_description": "1 recarga intermediária recomendada para margem em aclives de serra",
+          "refuel_time_minutes": 60,
+          "payload_penalty_kg": -2100.0,
+          "emission_reduction_percent": 90.8,
+          "recommendation": "Pontos existentes em Miracatu (km 385) e Cajati (km 500) operam até 150 kW para veículos leves; travessia pesada com carga cheia depende de hubs HPC >150 kW dedicados nas pontas e reforço na serra."
+        }
+      },
+      "source_ids": [
+        "I12",
+        "I07",
+        "I09",
+        "I01",
+        "V10"
+      ]
+    },
+    {
       "id": "chapeco-itajai",
       "name": "Corredor Agroindustrial Catarinense — BR-282 / BR-470 / BR-101 (SC)",
       "origin": "Chapecó e Oeste Catarinense (SC)",
