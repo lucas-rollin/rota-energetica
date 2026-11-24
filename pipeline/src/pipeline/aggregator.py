@@ -158,9 +158,9 @@ def aggregate_anp_series(
             active_df = df_week if use_fallback else df_state
 
             # Hierarchical aggregation:
-            # 1. Municipality median
+            # 1. Municipality median (grouped by (uf, municipio) to avoid merging homonyms)
             # 2. State/National median of municipality medians
-            muni_medians = active_df.group_by("municipio").agg(
+            muni_medians = active_df.group_by(["uf", "municipio"]).agg(
                 pl.col("price").median().alias("muni_median")
             )
 

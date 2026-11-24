@@ -305,3 +305,44 @@ def test_full_pipeline_raw_files_available():
     """Integration check verifying raw ANP and EIA files can be aggregated."""
     anp_files = list((REPO_ROOT / "data" / "raw" / "anp").glob("ca-*.csv"))
     assert len(anp_files) >= 10
+
+
+def test_national_fallback_does_not_merge_homonymous_municipalities(tmp_path: Path):
+    """Homonymous municipalities in different states (e.g. SC/SAO JOSE vs SP/SAO JOSE) must stay separate."""
+    csv_file = tmp_path / "anp_homonyms.csv"
+    create_synthetic_anp_csv(
+        csv_file,
+        [
+            # Only 1 municipality in SC -> triggers national fallback (min_municipalities=3)
+            {
+                "uf": "SC",
+                "municipio": "SAO JOSE",
+                "produto": "DIESEL S10",
+                "data": "11/05/2026",
+                "valor": "6,00",
+            },
+            # Homonymous municipality in SP with higher price
+            {
+                "uf": "SP",
+                "municipio": "SAO JOSE",
+                "produto": "DIESEL S10",
+                "data": "11/05/2026",
+                "valor": "7,00",
+            },
+            # Third distinct municipality in PR
+            {
+                "uf": "PR",
+                "municipio": "CURITIBA",
+                "produto": "DIESEL S10",
+                "data": "11/05/2026",
+                "valor": "8,00",
+            },
+        ],
+    )
+    cfg = PipelineConfig(reference_uf="SC", min_municipalities_per_week=3)
+    res = aggregate_anp_series([csv_file], cfg)
+    pts = res["diesel_s10"]
+    assert len(pts) == 1
+    assert pts[0].is_fallback is True
+    # 3 distinct (uf, municipio) medians: 6.00, 7.00, 8.00 -> median = 7.00
+    assert pts[0].price_nominal == pytest.approx(7.00, abs=1e-3)
