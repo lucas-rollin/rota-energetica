@@ -7,6 +7,7 @@ import pytest
 
 from pipeline.aggregator import (
     aggregate_anp_series,
+    parse_aneel_csv,
     parse_brent_csv,
 )
 from pipeline.config import PipelineConfig
@@ -346,3 +347,82 @@ def test_national_fallback_does_not_merge_homonymous_municipalities(tmp_path: Pa
     assert pts[0].is_fallback is True
     # 3 distinct (uf, municipio) medians: 6.00, 7.00, 8.00 -> median = 7.00
     assert pts[0].price_nominal == pytest.approx(7.00, abs=1e-3)
+
+
+def test_parse_aneel_csv_a4_verde_and_tax_components(tmp_path: Path):
+    """Verify A4 Verde off-peak + demand tariff calculation and statutory tax gross-up."""
+    aneel_csv = tmp_path / "aneel_test.csv"
+    header = ";".join(
+        [
+            "DatGeracaoConjuntoDados",
+            "DscREH",
+            "SigAgente",
+            "NumCNPJDistribuidora",
+            "DatInicioVigencia",
+            "DatFimVigencia",
+            "DscBaseTarifaria",
+            "DscSubGrupo",
+            "DscModalidadeTarifaria",
+            "DscClasse",
+            "DscSubClasse",
+            "DscDetalhe",
+            "NomPostoTarifario",
+            "DscUnidadeTerciaria",
+            "SigAgenteAcessante",
+            "VlrTUSD",
+            "VlrTE",
+        ]
+    )
+    row_energy = ";".join(
+        [
+            "2026-08-22",
+            "REH 3.602/2026",
+            "CELESC",
+            "00000000000100",
+            "2026-08-22",
+            "2027-08-21",
+            "Tarifa de Aplicação",
+            "A4",
+            "Verde",
+            "Não se aplica",
+            "Não se aplica",
+            "Não se aplica",
+            "Fora ponta",
+            "MWh",
+            "",
+            "171,19",
+            "329,08",
+        ]
+    )
+    row_demand = ";".join(
+        [
+            "2026-08-22",
+            "REH 3.602/2026",
+            "CELESC",
+            "00000000000100",
+            "2026-08-22",
+            "2027-08-21",
+            "Tarifa de Aplicação",
+            "A4",
+            "Verde",
+            "Não se aplica",
+            "Não se aplica",
+            "Não se aplica",
+            "Não se aplica",
+            "kW",
+            "",
+            "20,27",
+            ",00",
+        ]
+    )
+    aneel_csv.write_text(
+        "\n".join([header, row_energy, row_demand]) + "\n", encoding="utf-8"
+    )
+
+    cfg = PipelineConfig()
+    assert cfg.electricity_effective_tax_rate == pytest.approx(0.225, abs=1e-6)
+    price, reh, vigencia = parse_aneel_csv(aneel_csv, cfg)
+    assert reh == "REH 3.602/2026"
+    assert vigencia == "2026-08-22"
+    # Base = (171.19 + 329.08)/1000 + (20.27 * 400)/40000 = 0.70297; / (1 - 0.225) = 0.907 -> 0.91
+    assert price == pytest.approx(0.91, abs=1e-2)

@@ -34,8 +34,24 @@ class PipelineConfig:
     # Main electricity distributor in reference state SC
     aneel_distributor: str = "CELESC"
 
-    # Total effective tax rate on electricity in SC (ICMS 17% + PIS/COFINS ~9.25% grossed-up ~24.5%)
-    electricity_effective_tax_rate: float = 0.245
+    # Medium-voltage depot tariff model (Group A4 Verde, off-peak + contracted demand)
+    # for a 400 kW heavy-duty charging hub vs B3 single-rate low-voltage fallback
+    aneel_depot_subgroup: str = "A4"
+    aneel_depot_modality: str = "Verde"
+    depot_charger_kw: float = 400.0
+    depot_monthly_kwh_reference: float = 40000.0
+
+    # Statutory tax components ("por dentro" / grossed-up):
+    # - ICMS-SC modal rate: 17.0% (Lei Estadual SC nº 10.297/1996, art. 19)
+    # - Effective non-cumulative PIS/COFINS average: 5.5% (after credits under Leis 10.637/2002 & 10.833/2003;
+    #   nominal 9.25% ceiling overstates effective rate for commercial consumers)
+    electricity_icms_rate: float = 0.17
+    electricity_pis_cofins_effective_rate: float = 0.055
+
+    @property
+    def electricity_effective_tax_rate(self) -> float:
+        """Combined 'por dentro' tax incidence on electricity (ICMS + effective PIS/COFINS)."""
+        return self.electricity_icms_rate + self.electricity_pis_cofins_effective_rate
 
 
 DEFAULT_CONFIG = PipelineConfig()

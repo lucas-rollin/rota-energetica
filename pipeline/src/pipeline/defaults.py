@@ -68,11 +68,17 @@ def compute_default_prices(
         is_fallback=False,
     )
 
-    # Electricity: ANEEL B3 commercial tariff + taxes
+    # Electricity: ANEEL A4 Verde medium-voltage depot tariff + statutory taxes
     if aneel_data:
         price_kwh, reh, vigencia = aneel_data
         tax_pct_str = f"{config.electricity_effective_tax_rate * 100:.1f}".replace(
             ".", ","
+        )
+        icms_pct_str = f"{config.electricity_icms_rate * 100:.0f}"
+        pis_pct_str = (
+            f"{config.electricity_pis_cofins_effective_rate * 100:.1f}".replace(
+                ".", ","
+            )
         )
         defaults["eletrico"] = DefaultPriceItem(
             value=price_kwh,
@@ -80,8 +86,10 @@ def compute_default_prices(
             source_id=config.aneel_source_id,
             badge="Adaptada",
             notes=(
-                f"Tarifa homologada ANEEL B3 Comercial para base própria ({config.aneel_distributor}, {reh}, "
-                f"vigência {vigencia}) com incidência tributária estimada ({tax_pct_str}% por dentro; sem bandeiras)"
+                f"Tarifa homologada ANEEL {config.aneel_depot_subgroup} {config.aneel_depot_modality} "
+                f"(Fora Ponta + demanda {config.depot_charger_kw:.0f} kW / {config.depot_monthly_kwh_reference / 1000:.0f} MWh-mês) "
+                f"para base própria ({config.aneel_distributor}, {reh}, vigência {vigencia}) "
+                f"com tributos por dentro ({tax_pct_str}%: ICMS {icms_pct_str}% + PIS/COFINS efetivo {pis_pct_str}%; sem bandeiras)"
             ),
             weeks_window=None,
             reference_uf=config.reference_uf,

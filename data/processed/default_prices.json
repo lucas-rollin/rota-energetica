@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-31T08:16:27.233246-03:00",
+  "generated_at": "2026-11-25T13:07:12.675930-03:00",
   "defaults": {
     "diesel": {
       "value": 7.28,
@@ -32,11 +32,11 @@
       "is_fallback": false
     },
     "eletrico": {
-      "value": 1.01,
+      "value": 0.91,
       "unit": "R$/kWh",
       "source_id": "P06",
       "badge": "Adaptada",
-      "notes": "Tarifa homologada ANEEL B3 Comercial para base própria (CELESC, RESOLUÇÃO HOMOLOGATÓRIA Nº 3.602, DE 21 DE AGOSTO DE 2026, vigência 2026-08-22) com incidência tributária estimada (24,5% por dentro; sem bandeiras)",
+      "notes": "Tarifa homologada ANEEL A4 Verde (Fora Ponta + demanda 400 kW / 40 MWh-mês) para base própria (CELESC, RESOLUÇÃO HOMOLOGATÓRIA Nº 3.602, DE 21 DE AGOSTO DE 2026, vigência 2026-08-22) com tributos por dentro (22,5%: ICMS 17% + PIS/COFINS efetivo 5,5%; sem bandeiras)",
       "reference_uf": "SC",
       "is_fallback": false
     }

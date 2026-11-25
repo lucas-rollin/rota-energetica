@@ -1,14 +1,14 @@
 {
   "$schema": "../schemas/parameters.schema.json",
   "schema_version": 1,
-  "generated_at": "2026-10-31",
+  "generated_at": "2026-11-25",
   "general": {
     "annual_distance_km": {
       "value": 120000.0,
       "unit": "km/ano",
-      "source_id": "V01",
-      "badge": "Adaptada",
-      "notes": "Média anual típica de operação rodoviária pesada em rotas de longa distância (ANTT/CNT)",
+      "source_id": "V05",
+      "badge": "Ilustrativa",
+      "notes": "Quilometragem anual típica de referência para operação rodoviária pesada (10.000 km/mês; premissa editável baseada em parâmetros NTC&Logística/CNT)",
       "min": 20000.0,
       "max": 250000.0,
       "step": 5000.0
@@ -77,8 +77,8 @@
       "value": 102.0,
       "unit": "R$/CBIO",
       "source_id": "P11",
-      "badge": "Primária",
-      "notes": "Preço médio negociado de CBIO na B3 nos últimos 12 meses (Painel ANP/B3)",
+      "badge": "Ilustrativa",
+      "notes": "Referência estática na B3 (não ingerida pelo pipeline automático; usada apenas na sensibilidade opcional de CBIOs)",
       "min": 40.0,
       "max": 200.0,
       "step": 1.0
@@ -110,7 +110,7 @@
       "energy_density": {
         "value": 35.8,
         "unit": "MJ/L",
-        "source_id": "E03",
+        "source_id": "E08",
         "badge": "Primária",
         "notes": "Poder calorífico inferior de referência (BEN/EPE)",
         "min": 30.0,
@@ -203,9 +203,9 @@
       "energy_density": {
         "value": 38.0,
         "unit": "MJ/m³",
-        "source_id": "E03",
+        "source_id": "E08",
         "badge": "Primária",
-        "notes": "Poder calorífico do gás natural (BEN/EPE)",
+        "notes": "Poder calorífico inferior do gás natural (BEN/EPE)",
         "min": 32.0,
         "max": 45.0,
         "step": 0.5
@@ -274,11 +274,11 @@
         "step": 0.05
       },
       "consumption": {
-        "value": 2.2,
+        "value": 2.08,
         "unit": "km/m³",
         "source_id": "V02",
         "badge": "Ilustrativa",
-        "notes": "Mesmo rendimento volumétrico do motor a gás natural",
+        "notes": "Ajustado proporcionalmente ao PCI do biometano (36 vs 38 MJ/m³) para manter demanda energética equivalente (~17,3 MJ/km) à do motor a gás natural (2,2 km/m³)",
         "min": 1.2,
         "max": 3.5,
         "step": 0.1
@@ -286,9 +286,9 @@
       "energy_density": {
         "value": 36.0,
         "unit": "MJ/m³",
-        "source_id": "E03",
+        "source_id": "E08",
         "badge": "Primária",
-        "notes": "Poder calorífico de referência do biometano purificado",
+        "notes": "Poder calorífico de referência do biometano purificado (BEN/EPE)",
         "min": 30.0,
         "max": 42.0,
         "step": 0.5
@@ -347,11 +347,11 @@
     "eletrico": {
       "label": "Elétrico (BEV)",
       "energy_price": {
-        "value": 1.01,
+        "value": 0.91,
         "unit": "R$/kWh",
         "source_id": "P06",
         "badge": "Adaptada",
-        "notes": "Tarifa homologada ANEEL B3 Comercial para garagem/base própria (CELESC, REH nº 3.602/2026, vigência 2026-08-22) com ~24,5% de tributos por dentro; não inclui bandeiras tarifárias nem margem de eletropostos públicos (R$ 2,20–3,20/kWh)",
+        "notes": "Tarifa homologada ANEEL A4 Verde (Fora Ponta + demanda 400 kW / 40 MWh-mês) para base própria (CELESC, RESOLUÇÃO HOMOLOGATÓRIA Nº 3.602, DE 21 DE AGOSTO DE 2026, vigência 2026-08-22) com tributos por dentro (22,5%: ICMS 17% + PIS/COFINS efetivo 5,5%; sem bandeiras)",
         "min": 0.3,
         "max": 3.5,
         "step": 0.02
@@ -369,9 +369,9 @@
       "energy_density": {
         "value": 3.6,
         "unit": "MJ/kWh",
-        "source_id": "E03",
+        "source_id": "E08",
         "badge": "Primária",
-        "notes": "Equivalência física exata (1 kWh = 3.6 MJ)",
+        "notes": "Equivalência física exata (1 kWh = 3,6 MJ — BEN/EPE)",
         "min": 3.6,
         "max": 3.6,
         "step": 0.0

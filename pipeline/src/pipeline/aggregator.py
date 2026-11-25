@@ -239,7 +239,11 @@ def parse_aneel_csv(
     file_path: Path,
     config: PipelineConfig,
 ) -> tuple[float, str, str]:
-    """Parse ANEEL distribution tariff CSV to extract current B3 commercial energy price with taxes.
+    """Parse ANEEL distribution tariff CSV to extract depot electricity price with taxes.
+
+    Prefers Group A4 Verde (medium-voltage off-peak energy + contracted demand amortized
+    over ``config.depot_monthly_kwh_reference`` for a ``config.depot_charger_kw`` hub),
+    falling back to Group B3 Convencional if A4 rows are unavailable.
 
     Returns:
         (price_kwh_with_tax, reh_resolution, effective_date)
@@ -247,7 +251,6 @@ def parse_aneel_csv(
     if not file_path.exists():
         raise FileNotFoundError(f"ANEEL data file not found at: {file_path}")
 
-    # Scan ANEEL dataset with utf8-lossy
     lf = pl.scan_csv(
         file_path,
         separator=";",
@@ -255,15 +258,66 @@ def parse_aneel_csv(
         ignore_errors=True,
     )
 
-    # Filter for distributor, application tariff, B3 subgroup, conventional modality in MWh
+    base_lf = lf.filter(
+        (pl.col("SigAgente").str.strip_chars() == config.aneel_distributor)
+        & (pl.col("DscBaseTarifaria").str.strip_chars() == "Tarifa de Aplicação")
+        & (pl.col("DscDetalhe").str.strip_chars() == "Não se aplica")
+    )
+
+    # Try Group A4 Verde (Fora ponta MWh + kW demand) first for 400 kW depot realism
+    if config.aneel_depot_subgroup == "A4":
+        a4_energy = (
+            base_lf.filter(
+                (pl.col("DscSubGrupo").str.strip_chars() == "A4")
+                & (
+                    pl.col("DscModalidadeTarifaria").str.strip_chars()
+                    == config.aneel_depot_modality
+                )
+                & (pl.col("NomPostoTarifario").str.strip_chars() == "Fora ponta")
+                & (pl.col("DscUnidadeTerciaria").str.strip_chars() == "MWh")
+            )
+            .select(["DscREH", "DatInicioVigencia", "VlrTUSD", "VlrTE"])
+            .sort("DatInicioVigencia", descending=True)
+            .head(1)
+            .collect()
+        )
+        a4_demand = (
+            base_lf.filter(
+                (pl.col("DscSubGrupo").str.strip_chars() == "A4")
+                & (
+                    pl.col("DscModalidadeTarifaria").str.strip_chars()
+                    == config.aneel_depot_modality
+                )
+                & (pl.col("DscUnidadeTerciaria").str.strip_chars() == "kW")
+            )
+            .select(["DatInicioVigencia", "VlrTUSD"])
+            .sort("DatInicioVigencia", descending=True)
+            .head(1)
+            .collect()
+        )
+        if not a4_energy.is_empty() and not a4_demand.is_empty():
+            e_row = a4_energy.row(0, named=True)
+            d_row = a4_demand.row(0, named=True)
+            vlr_tusd_mwh = float(str(e_row["VlrTUSD"]).replace(",", "."))
+            vlr_te_mwh = float(str(e_row["VlrTE"]).replace(",", "."))
+            vlr_demand_kw = float(str(d_row["VlrTUSD"]).replace(",", "."))
+            reh = str(e_row["DscREH"]).strip()
+            vigencia = str(e_row["DatInicioVigencia"]).strip()
+
+            energy_kwh = (vlr_tusd_mwh + vlr_te_mwh) / 1000.0
+            demand_kwh = (
+                vlr_demand_kw * config.depot_charger_kw
+            ) / config.depot_monthly_kwh_reference
+            base_kwh = energy_kwh + demand_kwh
+            effective_kwh = base_kwh / (1.0 - config.electricity_effective_tax_rate)
+            return round(effective_kwh, 2), reh, vigencia
+
+    # Fallback: B3 Commercial Conventional tariff in MWh
     df = (
-        lf.filter(
-            (pl.col("SigAgente").str.strip_chars() == config.aneel_distributor)
-            & (pl.col("DscBaseTarifaria").str.strip_chars() == "Tarifa de Aplicação")
-            & (pl.col("DscSubGrupo").str.strip_chars() == "B3")
+        base_lf.filter(
+            (pl.col("DscSubGrupo").str.strip_chars() == "B3")
             & (pl.col("DscModalidadeTarifaria").str.strip_chars() == "Convencional")
             & (pl.col("DscUnidadeTerciaria").str.strip_chars() == "MWh")
-            & (pl.col("DscDetalhe").str.strip_chars() == "Não se aplica")
         )
         .select(
             [
@@ -281,7 +335,7 @@ def parse_aneel_csv(
 
     if df.is_empty():
         raise ValueError(
-            f"No valid B3 commercial tariff found for distributor '{config.aneel_distributor}' in {file_path}"
+            f"No valid A4/B3 commercial tariff found for distributor '{config.aneel_distributor}' in {file_path}"
         )
 
     row = df.row(0, named=True)
@@ -290,11 +344,7 @@ def parse_aneel_csv(
     reh = str(row["DscREH"]).strip()
     vigencia = str(row["DatInicioVigencia"]).strip()
 
-    # Base homologated tariff per kWh: (TUSD + TE) / 1000
     base_kwh = (vlr_tusd + vlr_te) / 1000.0
-
-    # Apply effective tax gross-up rate: Base / (1 - tax_rate)
-    # in SC: ICMS 17% + PIS/COFINS ~9.25% with gross-up ~ 24.5% total incidence
     effective_kwh = base_kwh / (1.0 - config.electricity_effective_tax_rate)
     price_kwh_final = round(effective_kwh, 2)
 
