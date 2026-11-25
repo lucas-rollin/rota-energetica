@@ -131,6 +131,14 @@ Para eletricidade, o consumo utilizado deve ser expresso em kWh retirados da red
 
 ```text
 C_rede = C_bateria × η
+```
+
+Para combustíveis gasosos na mesma plataforma motriz (GNV a 38,0 MJ/m³ e biometano a 36,0 MJ/m³), o consumo volumétrico do biometano (`2,08 km/m³`) é ajustado proporcionalmente ao poder calorífico inferior para preservar a mesma demanda energética por quilômetro (`~17,3 MJ/km`) observada no GNV (`2,2 km/m³`).
+
+Para depósitos de frotas pesadas com carregadores rápidos (~400 kW), o preço padrão de eletricidade adota a tarifa homologada ANEEL **Grupo A4 Verde** (média tensão, energia fora de ponta + demanda contratada amortizada em uma referência de 40 MWh/mês para 400 kW), com incidência tributária estatutária por dentro de **22,5%** (`ICMS 17,0%` pela Lei Estadual SC nº 10.297/1996 + `PIS/COFINS efetivo médio de 5,5%` após créditos no regime não cumulativo, em vez do teto nominal de 9,25%). A tarifa B3 comercial permanece apenas como fallback monômio quando não há registros A4.
+
+```text
+C_rede = C_bateria × η
 
 custo energético/km = P / C_rede
 ```
@@ -273,7 +281,7 @@ O tempo de abastecimento ou recarga pode ser apresentado como informação conte
 
 A capacidade dos tanques de GNC expressa em volume geométrico dos cilindros não deve ser confundida com o volume de gás comercializado em m³ nas condições de referência.
 
-A análise geográfica de postos, corredores rodoviários e carregadores adequados a veículos pesados fica fora do MVP.
+Na análise complementar de corredores rodoviários (`/corridors`), a cobertura geográfica considera exclusivamente pontos de abastecimento ou recarga dentro de um **buffer lateral máximo de 15 km** perpendicular ao traçado do corredor (`DEFAULT_CORRIDOR_DETOUR_KM = 15`), evitando que estações fora da rota inflem a cobertura. Os vãos descobertos são medidos ao longo do polígono da rota para o raio operacional selecionado (`autonomia` ou `autonomia / 2`), classificando como **deserto operacional** trechos contínuos descobertos iguais ou superiores a **20 km** (`OPERATIONAL_DESERT_MIN_GAP_KM = 20`). As autonomias padrão adotam as referências documentadas dos veículos (`350 km` BEV em V08; `650 km` Bio-GNC em V07), sem notas subjetivas de viabilidade.
 
 ## 7. Interface e comparação de cenários
 
