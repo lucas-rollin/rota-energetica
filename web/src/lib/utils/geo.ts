@@ -29,8 +29,12 @@ export interface CorridorCoverageSegment {
   coords: [number, number][];
 }
 
+export const DEFAULT_CORRIDOR_DETOUR_KM = 15;
+export const OPERATIONAL_DESERT_MIN_GAP_KM = 20;
+
 export interface CorridorCoverageStats {
   activeStationsCount: number;
+  onRouteStationsCount: number;
   coveredPercent: number;
   maxUncoveredSpanKm: number;
   sampledRouteKm: number;
@@ -111,6 +115,88 @@ export function createGeodesicCircleCoords(
 }
 
 /**
+ * Compute minimum great-circle distance (km) from a point to a polyline segment AB.
+ */
+export function distancePointToSegmentKm(
+  ptLat: number,
+  ptLon: number,
+  latA: number,
+  lonA: number,
+  latB: number,
+  lonB: number
+): number {
+  const meanLatRad = (((latA + latB) / 2) * Math.PI) / 180;
+  const cosLat = Math.max(Math.cos(meanLatRad), 0.1);
+  const kmPerDegLat = (Math.PI * EARTH_RADIUS_KM) / 180;
+  const kmPerDegLon = kmPerDegLat * cosLat;
+
+  const ax = 0;
+  const ay = 0;
+  const bx = (lonB - lonA) * kmPerDegLon;
+  const by = (latB - latA) * kmPerDegLat;
+  const px = (ptLon - lonA) * kmPerDegLon;
+  const py = (ptLat - latA) * kmPerDegLat;
+
+  const ab2 = bx * bx + by * by;
+  const t =
+    ab2 > 1e-9 ? Math.max(0, Math.min(1, ((px - ax) * bx + (py - ay) * by) / ab2)) : 0;
+  const projLon = lonA + (lonB - lonA) * t;
+  const projLat = latA + (latB - latA) * t;
+
+  return haversineDistanceKm(ptLat, ptLon, projLat, projLon);
+}
+
+/**
+ * Compute minimum perpendicular distance (km) from a station to a corridor polyline.
+ */
+export function distanceStationToCorridorKm(
+  corridor: FreightCorridor,
+  station: FuelStation
+): number {
+  const waypoints = corridor.route_waypoints ?? [];
+  if (waypoints.length === 0) return Infinity;
+  if (waypoints.length === 1) {
+    return haversineDistanceKm(
+      station.latitude,
+      station.longitude,
+      waypoints[0][1],
+      waypoints[0][0]
+    );
+  }
+
+  let minDist = Infinity;
+  for (let i = 0; i < waypoints.length - 1; i++) {
+    const [lonA, latA] = waypoints[i];
+    const [lonB, latB] = waypoints[i + 1];
+    const d = distancePointToSegmentKm(
+      station.latitude,
+      station.longitude,
+      latA,
+      lonA,
+      latB,
+      lonB
+    );
+    if (d < minDist) {
+      minDist = d;
+    }
+  }
+  return minDist;
+}
+
+/**
+ * Filter stations to those physically within `maxDetourKm` of the corridor polyline.
+ */
+export function filterStationsNearCorridor(
+  corridor: FreightCorridor,
+  stations: FuelStation[],
+  maxDetourKm = DEFAULT_CORRIDOR_DETOUR_KM
+): FuelStation[] {
+  return stations.filter(
+    (st) => distanceStationToCorridorKm(corridor, st) <= maxDetourKm
+  );
+}
+
+/**
  * Sample a corridor's [lon, lat] polyline at approximately `stepKm` intervals.
  */
 export function sampleCorridorRoute(
@@ -144,19 +230,23 @@ export function sampleCorridorRoute(
 }
 
 /**
- * Compute coverage percentage and longest uncovered gap along a corridor polyline.
+ * Compute route-based coverage percentage and longest uncovered gap along a corridor polyline.
+ * Only stations within `maxDetourKm` (default 15 km) of the route are considered reachable.
  */
 export function computeCorridorCoverageStats(
   corridor: FreightCorridor,
   stations: FuelStation[],
-  effectiveRadiusKm: number
+  effectiveRadiusKm: number,
+  maxDetourKm = DEFAULT_CORRIDOR_DETOUR_KM
 ): CorridorCoverageStats {
   const waypoints = corridor.route_waypoints ?? [];
   const { points, totalKm } = sampleCorridorRoute(waypoints, 10);
+  const onRouteStations = filterStationsNearCorridor(corridor, stations, maxDetourKm);
 
   if (points.length === 0) {
     return {
       activeStationsCount: stations.length,
+      onRouteStationsCount: onRouteStations.length,
       coveredPercent: 0,
       maxUncoveredSpanKm: corridor.distance_km,
       sampledRouteKm: corridor.distance_km,
@@ -164,13 +254,14 @@ export function computeCorridorCoverageStats(
     };
   }
 
-  if (stations.length === 0) {
+  if (onRouteStations.length === 0) {
     return {
-      activeStationsCount: 0,
+      activeStationsCount: stations.length,
+      onRouteStationsCount: 0,
       coveredPercent: 0,
       maxUncoveredSpanKm: Math.round(totalKm),
       sampledRouteKm: Math.round(totalKm),
-      hasOperationalDesert: true,
+      hasOperationalDesert: Math.round(totalKm) >= OPERATIONAL_DESERT_MIN_GAP_KM,
     };
   }
 
@@ -182,7 +273,7 @@ export function computeCorridorCoverageStats(
 
   for (const [lon, lat] of points) {
     let minStationDist = Infinity;
-    for (const st of stations) {
+    for (const st of onRouteStations) {
       const d = haversineDistanceKm(lat, lon, st.latitude, st.longitude);
       if (d < minStationDist) {
         minStationDist = d;
@@ -205,23 +296,27 @@ export function computeCorridorCoverageStats(
 
   return {
     activeStationsCount: stations.length,
+    onRouteStationsCount: onRouteStations.length,
     coveredPercent,
     maxUncoveredSpanKm,
     sampledRouteKm: Math.round(totalKm),
-    hasOperationalDesert: maxUncoveredSpanKm >= 20,
+    hasOperationalDesert: maxUncoveredSpanKm >= OPERATIONAL_DESERT_MIN_GAP_KM,
   };
 }
 
 /**
- * Split a corridor's polyline into contiguous covered vs uncovered segments.
+ * Split a corridor's polyline into contiguous covered vs uncovered segments
+ * using only stations within `maxDetourKm` of the corridor.
  */
 export function buildCorridorCoverageSegments(
   corridor: FreightCorridor,
   stations: FuelStation[],
-  effectiveRadiusKm: number
+  effectiveRadiusKm: number,
+  maxDetourKm = DEFAULT_CORRIDOR_DETOUR_KM
 ): CorridorCoverageSegment[] {
   const waypoints = corridor.route_waypoints ?? [];
   const { points } = sampleCorridorRoute(waypoints, 10);
+  const onRouteStations = filterStationsNearCorridor(corridor, stations, maxDetourKm);
 
   if (points.length < 2) {
     return [];
@@ -236,7 +331,7 @@ export function buildCorridorCoverageSegments(
     const midLat = (ptA[1] + ptB[1]) / 2;
 
     let minDist = Infinity;
-    for (const st of stations) {
+    for (const st of onRouteStations) {
       const d = haversineDistanceKm(midLat, midLon, st.latitude, st.longitude);
       if (d < minDist) {
         minDist = d;

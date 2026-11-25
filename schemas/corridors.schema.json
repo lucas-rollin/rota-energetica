@@ -118,13 +118,6 @@
       "additionalProperties": false,
       "description": "Operational and environmental evaluation for a specific powertrain on a route.",
       "properties": {
-        "feasibility_score": {
-          "description": "Nota de viabilidade operacional (0 a 100).",
-          "maximum": 100,
-          "minimum": 0,
-          "title": "Feasibility Score",
-          "type": "integer"
-        },
         "feasibility_label": {
           "description": "Rótulo qualitativo da viabilidade.",
           "title": "Feasibility Label",
@@ -158,7 +151,6 @@
         }
       },
       "required": [
-        "feasibility_score",
         "feasibility_label",
         "stops_description",
         "refuel_time_minutes",

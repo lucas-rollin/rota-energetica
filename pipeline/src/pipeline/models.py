@@ -650,13 +650,6 @@ class PowertrainEvaluation(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
 
-    feasibility_score: int = Field(
-        ...,
-        ge=0,
-        le=100,
-        description="Nota de viabilidade operacional (0 a 100).",
-        title="Feasibility Score",
-    )
     feasibility_label: str = Field(
         ...,
         description="Rótulo qualitativo da viabilidade.",

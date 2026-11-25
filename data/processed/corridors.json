@@ -67,7 +67,6 @@
       },
       "powertrain_evaluations": {
         "biometano": {
-          "feasibility_score": 86,
           "feasibility_label": "Viável com Planejamento de Base",
           "stops_description": "2 a 3 paradas de abastecimento (~15 min cada)",
           "refuel_time_minutes": 35,
@@ -76,7 +75,6 @@
           "recommendation": "Forte cobertura de GNC/Biometano em SP (SP-330) e Triângulo Mineiro, porém com vazio operacional entre o Sul de MT e o Sudoeste de GO — exige autonomia >= 700 km ou ponto dedicado em Rondonópolis/Jataí."
         },
         "diesel": {
-          "feasibility_score": 100,
           "feasibility_label": "Linha de Base Operacional",
           "stops_description": "1 a 2 paradas rápidas",
           "refuel_time_minutes": 20,
@@ -85,7 +83,6 @@
           "recommendation": "Linha de base tradicional. Total cobertura de postos, porém com 100% de exposição à volatilidade do diesel fóssil e sem créditos de descarbonização (CBIO)."
         },
         "eletrico": {
-          "feasibility_score": 32,
           "feasibility_label": "Inviável no Curto Prazo",
           "stops_description": "5 a 7 horas de recarga acumulada",
           "refuel_time_minutes": 360,
@@ -142,7 +139,6 @@
       },
       "powertrain_evaluations": {
         "biometano": {
-          "feasibility_score": 94,
           "feasibility_label": "Excelente Viabilidade",
           "stops_description": "Abastecimento na base (bate-e-volta sem paradas no percurso)",
           "refuel_time_minutes": 15,
@@ -151,7 +147,6 @@
           "recommendation": "Distância curta permite ciclo duplo diário. Rede de gás e biometano da agroindústria paranaense (Compagás Corredores Sustentáveis) viabilizam custo operacional atrativo."
         },
         "diesel": {
-          "feasibility_score": 100,
           "feasibility_label": "Operacional Padrão",
           "stops_description": "Sem paradas necessárias na descida",
           "refuel_time_minutes": 15,
@@ -160,7 +155,6 @@
           "recommendation": "Operação padrão sem risco de rota, porém com custos crescentes de combustíveis fósseis e pressão ESG de tradings exportadoras no Porto de Paranaguá."
         },
         "eletrico": {
-          "feasibility_score": 88,
           "feasibility_label": "Alta Eficiência Regenerativa",
           "stops_description": "Recarga nos pátios de triagem portuária",
           "refuel_time_minutes": 45,
@@ -224,7 +218,6 @@
       },
       "powertrain_evaluations": {
         "biometano": {
-          "feasibility_score": 91,
           "feasibility_label": "Alta Viabilidade",
           "stops_description": "1 parada curta (15 min)",
           "refuel_time_minutes": 15,
@@ -233,7 +226,6 @@
           "recommendation": "Corredor Dutra possui ampla rede de gás canalizado (NTS) e biometano de aterros sanitários (Paulínia e Seropédica). Cobertura contínua mesmo com autonomia conservadora."
         },
         "diesel": {
-          "feasibility_score": 100,
           "feasibility_label": "Operacional Padrão",
           "stops_description": "Sem paradas obrigatórias",
           "refuel_time_minutes": 15,
@@ -242,7 +234,6 @@
           "recommendation": "Corredor industrial de alto fluxo com custo estável de manutenção e oficinas autorizadas."
         },
         "eletrico": {
-          "feasibility_score": 84,
           "feasibility_label": "Corredor Elétrico Mais Maduro do Brasil",
           "stops_description": "1 recarga rápida intermediária (~45-50 min em hub 150kW-350kW)",
           "refuel_time_minutes": 50,
@@ -306,7 +297,6 @@
       },
       "powertrain_evaluations": {
         "biometano": {
-          "feasibility_score": 92,
           "feasibility_label": "Viável com Abastecimento nas Pontas",
           "stops_description": "Viagem direta de 408 km (apoio em Taboão da Serra e Campina Grande do Sul)",
           "refuel_time_minutes": 15,
@@ -315,7 +305,6 @@
           "recommendation": "Embora o Vale do Ribeira (SP) não possua rede de gás canalizado (nem Comgás nem Naturgy SP Sul alcançam o trecho), a extensão de 408 km permite travessia direta para caminhões a Bio-GNC (650–900 km), conectando os hubs de alta vazão da Comgás (Taboão da Serra) e Compagás (Campina Grande do Sul / São José dos Pinhais)."
         },
         "diesel": {
-          "feasibility_score": 100,
           "feasibility_label": "Operacional Padrão",
           "stops_description": "Sem paradas obrigatórias",
           "refuel_time_minutes": 15,
@@ -324,7 +313,6 @@
           "recommendation": "Eixo consolidado de ligação Sudeste–Sul com ampla rede de serviços na Serra do Cafezal duplicada e Vale do Ribeira."
         },
         "eletrico": {
-          "feasibility_score": 70,
           "feasibility_label": "Dependente de Apoio Intermediário HPC",
           "stops_description": "1 recarga intermediária recomendada para margem em aclives de serra",
           "refuel_time_minutes": 60,
@@ -391,7 +379,6 @@
       },
       "powertrain_evaluations": {
         "biometano": {
-          "feasibility_score": 87,
           "feasibility_label": "Alta Sinergia Regional",
           "stops_description": "1 abastecimento na rota (base litorânea SCGÁS e base Oeste)",
           "refuel_time_minutes": 20,
@@ -400,7 +387,6 @@
           "recommendation": "Conecta o maior polo de dejetos agropecuários do Brasil (Oeste SC) aos portos exportadores de Itajaí e Navegantes. Exige atenção ao trecho serrano entre Campos Novos e Rio do Sul."
         },
         "diesel": {
-          "feasibility_score": 100,
           "feasibility_label": "Operacional Padrão",
           "stops_description": "1 parada regular",
           "refuel_time_minutes": 15,
@@ -409,7 +395,6 @@
           "recommendation": "Linha base do agronegócio de Santa Catarina com abastecimento garantido em todo o trecho da serra catarinense."
         },
         "eletrico": {
-          "feasibility_score": 68,
           "feasibility_label": "Viável com Hubs Dedicados",
           "stops_description": "1 a 2 recargas intermediárias no planalto serrano",
           "refuel_time_minutes": 90,
@@ -485,7 +470,6 @@
       },
       "powertrain_evaluations": {
         "biometano": {
-          "feasibility_score": 89,
           "feasibility_label": "Viável pelo Triângulo e SP",
           "stops_description": "1 a 2 paradas (Uberlândia / Ribeirão Preto)",
           "refuel_time_minutes": 25,
@@ -494,7 +478,6 @@
           "recommendation": "Sinergia alta com usinas sucroenergéticas de MG e SP ao longo da BR-050 e Anhanguera. Trecho Goiânia–Uberlândia requer planejamento de autonomia."
         },
         "diesel": {
-          "feasibility_score": 100,
           "feasibility_label": "Operacional Padrão",
           "stops_description": "1 parada regular",
           "refuel_time_minutes": 15,
@@ -503,7 +486,6 @@
           "recommendation": "Rota tradicional de escoamento de grãos e manufaturados com ampla oferta de serviços."
         },
         "eletrico": {
-          "feasibility_score": 45,
           "feasibility_label": "Restrito a Trechos Curtos em SP",
           "stops_description": "3 a 4 recargas necessárias",
           "refuel_time_minutes": 220,
@@ -558,7 +540,6 @@
       },
       "powertrain_evaluations": {
         "biometano": {
-          "feasibility_score": 88,
           "feasibility_label": "Viável com Abastecimento nas Pontas",
           "stops_description": "Trecho direto com Bio-GNC (650+ km) ou 1 parada em Pouso Alegre",
           "refuel_time_minutes": 20,
@@ -567,7 +548,6 @@
           "recommendation": "Distância compatível com autonomia de caminhões a gás (650–900 km), permitindo operação entre os hubs Gasmig (Betim) e Comgás (Guarulhos)."
         },
         "diesel": {
-          "feasibility_score": 100,
           "feasibility_label": "Operacional Padrão",
           "stops_description": "1 parada rápida",
           "refuel_time_minutes": 15,
@@ -576,7 +556,6 @@
           "recommendation": "Operação consolidada em terreno montanhoso."
         },
         "eletrico": {
-          "feasibility_score": 60,
           "feasibility_label": "Dependente de Reforço Intermediário",
           "stops_description": "1 a 2 recargas em rota serrana",
           "refuel_time_minutes": 110,
@@ -631,7 +610,6 @@
       },
       "powertrain_evaluations": {
         "biometano": {
-          "feasibility_score": 90,
           "feasibility_label": "Alta Viabilidade",
           "stops_description": "1 parada curta em Juiz de Fora ou viagem direta",
           "refuel_time_minutes": 15,
@@ -640,7 +618,6 @@
           "recommendation": "Presença estratégica de ponto GNV em Juiz de Fora preenche o trecho intermediário entre BH e Rio de Janeiro."
         },
         "diesel": {
-          "feasibility_score": 100,
           "feasibility_label": "Operacional Padrão",
           "stops_description": "Sem paradas obrigatórias",
           "refuel_time_minutes": 15,
@@ -649,7 +626,6 @@
           "recommendation": "Eixo tradicional da logística siderúrgica mineira."
         },
         "eletrico": {
-          "feasibility_score": 65,
           "feasibility_label": "Viável no Limite da Autonomia BEV",
           "stops_description": "1 recarga rápida intermediária recomendada",
           "refuel_time_minutes": 95,
@@ -718,7 +694,6 @@
       },
       "powertrain_evaluations": {
         "biometano": {
-          "feasibility_score": 95,
           "feasibility_label": "Corredor Altamente Consolidado",
           "stops_description": "1 parada estratégica (Criciúma, Itajaí ou Joinville)",
           "refuel_time_minutes": 15,
@@ -727,7 +702,6 @@
           "recommendation": "Um dos eixos mais bem servidos de gás natural e biometano do país, conectando Sulgás, SCGÁS e Compagás com sobreposição de cobertura."
         },
         "diesel": {
-          "feasibility_score": 100,
           "feasibility_label": "Operacional Padrão",
           "stops_description": "1 parada regular",
           "refuel_time_minutes": 15,
@@ -736,7 +710,6 @@
           "recommendation": "Eixo duplicado em grande extensão com plena disponibilidade."
         },
         "eletrico": {
-          "feasibility_score": 74,
           "feasibility_label": "Viável em Etapas Regionais",
           "stops_description": "2 recargas rápidas intermediárias",
           "refuel_time_minutes": 100,
@@ -810,7 +783,6 @@
       },
       "powertrain_evaluations": {
         "biometano": {
-          "feasibility_score": 82,
           "feasibility_label": "Viável com Paradas nas Capitais",
           "stops_description": "2 a 3 paradas nas RMs litorâneas",
           "refuel_time_minutes": 40,
@@ -819,7 +791,6 @@
           "recommendation": "Rede sólida de GNV entre Salvador, Aracaju, Maceió, Recife e João Pessoa; trecho Mossoró–Fortaleza requer autonomia >= 650 km."
         },
         "diesel": {
-          "feasibility_score": 100,
           "feasibility_label": "Operacional Padrão",
           "stops_description": "2 paradas rápidas",
           "refuel_time_minutes": 25,
@@ -828,7 +799,6 @@
           "recommendation": "Infraestrutura tradicional consolidada ao longo da BR-101 e BR-116."
         },
         "eletrico": {
-          "feasibility_score": 38,
           "feasibility_label": "Infraestrutura HPC Insuficiente",
           "stops_description": "5+ recargas com trechos descobertos",
           "refuel_time_minutes": 300,

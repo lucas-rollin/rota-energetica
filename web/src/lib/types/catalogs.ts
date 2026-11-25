@@ -7,7 +7,6 @@ export interface RefuelingPoints {
 }
 
 export interface PowertrainEvaluation {
-  feasibility_score: number;
   feasibility_label: string;
   stops_description: string;
   refuel_time_minutes: number;

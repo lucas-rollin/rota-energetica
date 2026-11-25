@@ -6,7 +6,12 @@ import type {
 } from '../../lib/types/catalogs';
 import { FUEL_THEME } from '../../lib/theme/fuels';
 import { formatNumber } from '../../lib/utils/format';
+import {
+  computeCorridorCoverageStats,
+  DEFAULT_CORRIDOR_DETOUR_KM,
+} from '../../lib/utils/geo';
 import { SourceRef } from '../common/SourceRef';
+import { TransparencyDisclaimer } from '../common/TransparencyDisclaimer';
 import { CorridorInfrastructureMap } from './CorridorInfrastructureMap';
 
 interface CorridorsDashboardProps {
@@ -44,11 +49,38 @@ export const CorridorsDashboard: React.FC<CorridorsDashboardProps> = ({
 
   const evalData = selectedCorridor.powertrain_evaluations[selectedPowertrain];
 
-  // Score color helper
-  const getScoreColor = (score: number) => {
-    if (score >= 85)
+  // Objective route-based coverage metrics derived from stations & reference autonomy
+  const routeCoverage = useMemo(() => {
+    if (selectedPowertrain === 'diesel') {
+      return {
+        coveredPercent: 100,
+        maxUncoveredSpanKm: 0,
+        onRouteStationsCount: null as number | null,
+        referenceAutonomyKm: null as number | null,
+      };
+    }
+    const refAutonomyKm = selectedPowertrain === 'biometano' ? 650 : 350;
+    const tech = selectedPowertrain === 'biometano' ? 'biomethane_cng' : 'electric_hpc';
+    const matchingStations = stationsData.stations.filter((s) => s.technology === tech);
+    const stats = computeCorridorCoverageStats(
+      selectedCorridor,
+      matchingStations,
+      refAutonomyKm / 2,
+      DEFAULT_CORRIDOR_DETOUR_KM
+    );
+    return {
+      coveredPercent: stats.coveredPercent,
+      maxUncoveredSpanKm: stats.maxUncoveredSpanKm,
+      onRouteStationsCount: stats.onRouteStationsCount,
+      referenceAutonomyKm: refAutonomyKm,
+    };
+  }, [selectedCorridor, selectedPowertrain, stationsData.stations]);
+
+  // Objective coverage color helper
+  const getCoverageColor = (coveredPct: number) => {
+    if (coveredPct >= 85)
       return 'text-emerald-600 dark:text-emerald-400 border-emerald-500 bg-emerald-500/10';
-    if (score >= 60)
+    if (coveredPct >= 50)
       return 'text-amber-600 dark:text-amber-400 border-amber-500 bg-amber-500/10';
     return 'text-rose-600 dark:text-rose-400 border-rose-500 bg-rose-500/10';
   };
@@ -231,29 +263,27 @@ export const CorridorsDashboard: React.FC<CorridorsDashboardProps> = ({
             </div>
           </div>
 
-          {/* Column 2: Feasibility & Logistics KPIs */}
+          {/* Column 2: Objective Route Coverage & Logistics KPIs */}
           <div className="space-y-4">
             <div
-              className={`flex items-center justify-between rounded-lg border p-4 ${getScoreColor(evalData.feasibility_score)}`}
+              className={`flex items-center justify-between gap-3 rounded-lg border p-4 ${getCoverageColor(routeCoverage.coveredPercent)}`}
             >
               <div>
                 <div className="text-[11px] font-bold tracking-wider uppercase">
-                  Índice de Viabilidade da Rota
+                  Cobertura Objetiva na Rota
                 </div>
-                <div className="mt-0.5 text-xl font-black">
-                  {evalData.feasibility_score}% — {evalData.feasibility_label}
+                <div className="mt-0.5 text-lg font-black">
+                  {formatNumber(routeCoverage.coveredPercent, 0)}% —{' '}
+                  {evalData.feasibility_label}
+                </div>
+                <div className="mt-0.5 text-[11px] opacity-85">
+                  {selectedPowertrain === 'diesel'
+                    ? 'Rede comercial consolidada ao longo da malha federal'
+                    : `Autonomia ref. ${routeCoverage.referenceAutonomyKm} km (raio ${routeCoverage.referenceAutonomyKm! / 2} km, ≤${DEFAULT_CORRIDOR_DETOUR_KM} km do eixo · ${routeCoverage.onRouteStationsCount} hubs · vão máx. ${formatNumber(routeCoverage.maxUncoveredSpanKm, 0)} km)`}
                 </div>
               </div>
-              <div
-                className="radial-progress font-mono text-xs font-bold text-current"
-                style={
-                  {
-                    '--value': evalData.feasibility_score,
-                    '--size': '3.2rem',
-                  } as React.CSSProperties
-                }
-              >
-                {evalData.feasibility_score}%
+              <div className="shrink-0 text-right font-mono text-xl font-black">
+                {formatNumber(routeCoverage.coveredPercent, 0)}%
               </div>
             </div>
 
@@ -342,6 +372,8 @@ export const CorridorsDashboard: React.FC<CorridorsDashboardProps> = ({
           setViewportTick((t) => t + 1);
         }}
       />
+
+      <TransparencyDisclaimer />
     </div>
   );
 };

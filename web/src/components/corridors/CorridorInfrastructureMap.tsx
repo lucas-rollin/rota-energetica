@@ -26,8 +26,10 @@ import {
   buildCorridorCoverageSegments,
   computeCorridorCoverageStats,
   createGeodesicCircleCoords,
+  DEFAULT_CORRIDOR_DETOUR_KM,
   getCorridorViewport,
   getEffectiveRadiusKm,
+  OPERATIONAL_DESERT_MIN_GAP_KM,
   projectWebMercator,
   unprojectWebMercator,
   type CoverageRadiusMode,
@@ -59,9 +61,21 @@ interface CorridorInfrastructureMapProps {
 }
 
 const AUTONOMY_PRESETS = [
-  { id: 'bev', label: 'Elétrico BEV', km: 400 },
-  { id: 'bio-gnc', label: 'Biometano Bio-GNC', km: 900 },
-  { id: 'bio-gnl', label: 'Biometano GNL', km: 1400 },
+  { id: 'bev', label: 'Elétrico BEV', km: 350, sourceId: 'V08', badge: 'Adaptada' },
+  {
+    id: 'bio-gnc',
+    label: 'Biometano Bio-GNC',
+    km: 650,
+    sourceId: 'V07',
+    badge: 'Adaptada',
+  },
+  {
+    id: 'bio-gnl',
+    label: 'GNL Estendido',
+    km: 1400,
+    sourceId: null,
+    badge: 'Ilustrativa',
+  },
 ] as const;
 
 const COLORS = {
@@ -116,7 +130,7 @@ export const CorridorInfrastructureMap: React.FC<CorridorInfrastructureMapProps>
   const [showElectricHpc, setShowElectricHpc] = useState<boolean>(false);
   const [onlySelectedCorridorStations, setOnlySelectedCorridorStations] =
     useState<boolean>(false);
-  const [autonomyKm, setAutonomyKm] = useState<number>(900);
+  const [autonomyKm, setAutonomyKm] = useState<number>(650);
   const [radiusMode, setRadiusMode] = useState<CoverageRadiusMode>('half');
   const [coverageVisualMode, setCoverageVisualMode] =
     useState<CoverageVisualMode>('route');
@@ -813,16 +827,26 @@ export const CorridorInfrastructureMap: React.FC<CorridorInfrastructureMapProps>
 
           <div className="flex flex-wrap gap-1.5">
             {AUTONOMY_PRESETS.map((preset) => (
-              <button
-                key={preset.id}
-                type="button"
-                onClick={() => setAutonomyKm(preset.km)}
-                className={`btn btn-xs ${
-                  autonomyKm === preset.km ? 'btn-primary' : 'btn-outline border-base-300'
-                }`}
-              >
-                {preset.label} ({formatNumber(preset.km, 0)} km)
-              </button>
+              <div key={preset.id} className="inline-flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => setAutonomyKm(preset.km)}
+                  className={`btn btn-xs ${
+                    autonomyKm === preset.km
+                      ? 'btn-primary'
+                      : 'btn-outline border-base-300'
+                  }`}
+                >
+                  {preset.label} ({formatNumber(preset.km, 0)} km
+                  {preset.badge === 'Ilustrativa' ? ' · Ilustrativa' : ''})
+                </button>
+                {preset.sourceId && (
+                  <SourceRef
+                    id={preset.sourceId}
+                    context={`Autonomia de referência: ${preset.label}`}
+                  />
+                )}
+              </div>
             ))}
           </div>
         </div>
@@ -944,10 +968,13 @@ export const CorridorInfrastructureMap: React.FC<CorridorInfrastructureMapProps>
         <div className="bg-base-200/40 border-base-200 flex items-center justify-between rounded-lg border p-3">
           <div>
             <span className="text-base-content/60 block text-[11px]">
-              Pontos no Eixo ({selectedCorridor.highways?.join(' / ') || 'Rota'})
+              Pontos na Rota (≤{DEFAULT_CORRIDOR_DETOUR_KM} km do eixo)
             </span>
             <span className="text-base-content font-mono text-base font-bold">
-              {corridorStationsCount} hubs mapeados
+              {coverageStats.onRouteStationsCount} hubs elegíveis
+            </span>
+            <span className="text-base-content/50 block text-[10px]">
+              {corridorStationsCount} associados ao corredor
             </span>
           </div>
           <span className="text-base-content/60 font-mono text-[11px]">
@@ -958,7 +985,7 @@ export const CorridorInfrastructureMap: React.FC<CorridorInfrastructureMapProps>
         <div className="bg-base-200/40 border-base-200 flex items-center justify-between rounded-lg border p-3">
           <div>
             <span className="text-base-content/60 block text-[11px]">
-              Cobertura Geográfica Estimada
+              Cobertura Geográfica na Rota
             </span>
             <span className="text-base-content font-mono text-base font-bold">
               {formatNumber(coverageStats.coveredPercent, 0)}% do traçado
@@ -993,7 +1020,7 @@ export const CorridorInfrastructureMap: React.FC<CorridorInfrastructureMapProps>
           <div>
             <span className="block text-[11px] font-bold tracking-wider uppercase">
               {coverageStats.hasOperationalDesert
-                ? 'Deserto Operacional Detectado'
+                ? `Deserto Operacional (≥${OPERATIONAL_DESERT_MIN_GAP_KM} km sem cobertura)`
                 : 'Cobertura Contínua no Eixo'}
             </span>
             <span className="font-mono text-xs font-semibold">

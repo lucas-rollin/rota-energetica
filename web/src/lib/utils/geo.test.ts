@@ -4,6 +4,7 @@ import {
   buildCorridorCoverageSegments,
   computeCorridorCoverageStats,
   createGeodesicCircleCoords,
+  distanceStationToCorridorKm,
   getCorridorViewport,
   getEffectiveRadiusKm,
   haversineDistanceKm,
@@ -88,6 +89,28 @@ describe('geo utilities', () => {
     );
     expect(highRadiusStats.hasOperationalDesert).toBe(false);
     expect(highRadiusStats.coveredPercent).toBeCloseTo(100, 1);
+  });
+
+  it('excludes off-route stations beyond the corridor detour buffer', () => {
+    // Belo Horizonte (~350 km north of Via Dutra) must not count toward SP-RJ coverage
+    const offRouteStation: FuelStation = {
+      ...MOCK_STATION_SP,
+      id: 'st-bh',
+      city: 'Belo Horizonte',
+      state: 'MG',
+      latitude: -19.9167,
+      longitude: -43.9345,
+    };
+
+    expect(distanceStationToCorridorKm(MOCK_CORRIDOR, MOCK_STATION_SP)).toBeLessThan(1);
+    expect(distanceStationToCorridorKm(MOCK_CORRIDOR, offRouteStation)).toBeGreaterThan(
+      300
+    );
+
+    const stats = computeCorridorCoverageStats(MOCK_CORRIDOR, [offRouteStation], 450);
+    expect(stats.onRouteStationsCount).toBe(0);
+    expect(stats.coveredPercent).toBe(0);
+    expect(stats.hasOperationalDesert).toBe(true);
   });
 
   it('returns zoomed viewport for corridor and Brazil default for null', () => {
