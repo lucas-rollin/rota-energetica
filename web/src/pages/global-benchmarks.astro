@@ -2,9 +2,12 @@
 import Layout from '../layouts/Layout.astro';
 import { GlobalBenchmarkDashboard } from '../components/global/GlobalBenchmarkDashboard';
 import benchmarksJson from '../../../data/processed/global_benchmarks.json';
+import parametersJson from '../../../data/parameters.json';
 import type { GlobalBenchmarksCatalog } from '../lib/types/catalogs';
+import type { SimulationParameters } from '../lib/types/parameters';
 
 const benchmarksData = benchmarksJson as unknown as GlobalBenchmarksCatalog;
+const parameters = parametersJson as unknown as SimulationParameters;
 
 const baseUrl = import.meta.env.BASE_URL.endsWith('/')
   ? import.meta.env.BASE_URL
@@ -37,6 +40,10 @@ const baseUrl = import.meta.env.BASE_URL.endsWith('/')
     </div>
 
     <!-- Interactive Global Benchmark Dashboard -->
-    <GlobalBenchmarkDashboard client:load benchmarksData={benchmarksData} />
+    <GlobalBenchmarkDashboard
+      client:load
+      benchmarksData={benchmarksData}
+      parameters={parameters}
+    />
   </div>
 </Layout>

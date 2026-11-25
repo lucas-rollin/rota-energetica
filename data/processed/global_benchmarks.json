@@ -26,8 +26,8 @@
         "bev_grid": 14.2
       },
       "energy_cost_levelized_mwh_eq": {
-        "biomethane": 1095.0,
-        "offpeak_electricity": 1247.0,
+        "biomethane": 1321.0,
+        "offpeak_electricity": 1123.0,
         "diesel_s10": 1743.0
       },
       "regulatory_mechanism": "RenovaBio (CBIOs na B3 a ~R$ 102/unid) e Mandato Lei 14.993/2024 (Combustível do Futuro)",

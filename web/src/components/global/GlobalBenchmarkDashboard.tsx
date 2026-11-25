@@ -1,15 +1,22 @@
 import React from 'react';
 import { DollarSign, Fuel, Globe, Leaf, Scale, Zap, ShieldCheck } from 'lucide-react';
 import type { GlobalBenchmarksCatalog, RegionBenchmark } from '../../lib/types/catalogs';
+import type { SimulationParameters } from '../../lib/types/parameters';
 import { formatNumber } from '../../lib/utils/format';
 import { SourceRef } from '../common/SourceRef';
+import { TransparencyDisclaimer } from '../common/TransparencyDisclaimer';
 
 interface GlobalBenchmarkDashboardProps {
   benchmarksData: GlobalBenchmarksCatalog;
+  parameters: SimulationParameters;
 }
+
+const REFERENCE_DIESEL_THERMAL_EFFICIENCY = 0.42;
+const REFERENCE_ELECTRIC_DRIVETRAIN_EFFICIENCY = 0.9;
 
 export const GlobalBenchmarkDashboard: React.FC<GlobalBenchmarkDashboardProps> = ({
   benchmarksData,
+  parameters,
 }) => {
   const regions = benchmarksData.regions;
   const regionKeys: (keyof typeof regions)[] = [
@@ -22,6 +29,72 @@ export const GlobalBenchmarkDashboard: React.FC<GlobalBenchmarkDashboardProps> =
     .map((k) => regions[k])
     .filter(Boolean) as RegionBenchmark[];
 
+  const br = regions.brasil;
+  const foreignRegions = regionList.filter((r) => r.code !== 'BR');
+  const foreignMinRenewable = Math.min(
+    ...foreignRegions.map((r) => r.renewable_grid_share_percent)
+  );
+  const foreignMaxRenewable = Math.max(
+    ...foreignRegions.map((r) => r.renewable_grid_share_percent)
+  );
+  const foreignSubsidies = foreignRegions
+    .map((r) => r.capex_subsidy_max_usd)
+    .filter((v) => v > 0);
+  const minForeignSubsidy = foreignSubsidies.length ? Math.min(...foreignSubsidies) : 0;
+  const maxForeignSubsidy = foreignSubsidies.length ? Math.max(...foreignSubsidies) : 0;
+
+  // Dynamic Brazil parameters from parameters.json
+  const diesel = parameters.vehicles.diesel;
+  const biometano = parameters.vehicles.biometano;
+  const eletrico = parameters.vehicles.eletrico;
+
+  const dieselPrice = diesel.energy_price.value;
+  const bioPrice = biometano.energy_price.value;
+  const elecPrice = eletrico.energy_price.value;
+  const bioWtWCnpe = biometano.carbon_intensity.value;
+  const payloadPenaltyAbs = Math.abs(eletrico.payload_penalty_kg?.value ?? 2400);
+
+  // Crankshaft mechanical energy cost (R$/MWh-eq) derived consistently from parameters.json MJ/km
+  const dieselMjPerKm = diesel.energy_density.value / diesel.consumption.value;
+  const bioMjPerKm = biometano.energy_density.value / biometano.consumption.value;
+  const bioImpliedEfficiency =
+    REFERENCE_DIESEL_THERMAL_EFFICIENCY * (dieselMjPerKm / bioMjPerKm);
+  const elecChargingEff = eletrico.charging_efficiency?.value ?? 0.9;
+  const elecGridToShaftEff = elecChargingEff * REFERENCE_ELECTRIC_DRIVETRAIN_EFFICIENCY;
+
+  const dieselMwhEq =
+    (dieselPrice /
+      (diesel.energy_density.value / 3.6) /
+      REFERENCE_DIESEL_THERMAL_EFFICIENCY) *
+    1000;
+  const bioMwhEq =
+    (bioPrice / (biometano.energy_density.value / 3.6) / bioImpliedEfficiency) * 1000;
+  const elecMwhEq =
+    (elecPrice / (eletrico.energy_density.value / 3.6) / elecGridToShaftEff) * 1000;
+
+  const cheapestBrIsElec = elecMwhEq <= bioMwhEq;
+  const cheapestBrMwhEq = cheapestBrIsElec ? elecMwhEq : bioMwhEq;
+
+  // Dynamic WtW bar baseline
+  const wtwBaseline = br.wtw_emissions_g_co2eq_tkm.diesel_baseline || 104;
+  const barWidthPct = (val: number) =>
+    `${Math.min(100, Math.max(4, Math.round((Math.abs(val) / wtwBaseline) * 1000) / 10))}%`;
+
+  const brBev = br.wtw_emissions_g_co2eq_tkm.bev_grid;
+  const euBev = regions.uniao_europeia.wtw_emissions_g_co2eq_tkm.bev_grid;
+  const usBev = regions.estados_unidos.wtw_emissions_g_co2eq_tkm.bev_grid;
+  const cnBev = regions.china.wtw_emissions_g_co2eq_tkm.bev_grid;
+
+  const regionShortLabel = (reg: RegionBenchmark) => {
+    if (reg.code === 'BR') return 'Brasil (SIN)';
+    if (reg.code === 'EU') return 'União Europeia';
+    if (reg.code === 'US') return 'Estados Unidos';
+    return 'China';
+  };
+
+  const formatRatio = (num: number, den: number) =>
+    den > 0 ? formatNumber(num / den, 1) : '-';
+
   return (
     <div className="space-y-8">
       {/* 1. TOP MACRO KPI SUMMARY TILES */}
@@ -32,10 +105,11 @@ export const GlobalBenchmarkDashboard: React.FC<GlobalBenchmarkDashboardProps> =
             <span>Matriz Elétrica BR</span>
           </div>
           <div className="font-mono text-2xl font-black text-emerald-600 dark:text-emerald-400">
-            86,2%
+            {formatNumber(br.renewable_grid_share_percent, 1)}%
           </div>
           <p className="text-base-content/70 mt-1 text-[11px]">
-            Renovável (SIN), contra média de apenas 22% a 45% nas economias do Norte.
+            Renovável (SIN), contra faixa de {formatNumber(foreignMinRenewable, 1)}% a{' '}
+            {formatNumber(foreignMaxRenewable, 1)}% nas economias comparadas.
           </p>
         </div>
 
@@ -45,10 +119,13 @@ export const GlobalBenchmarkDashboard: React.FC<GlobalBenchmarkDashboardProps> =
             <span>WtW Biometano BR</span>
           </div>
           <div className="text-primary font-mono text-2xl font-black">
-            -18,4 <span className="text-base-content/60 text-xs font-normal">g/t.km</span>
+            {formatNumber(bioWtWCnpe, 2)}{' '}
+            <span className="text-base-content/60 text-xs font-normal">gCO₂eq/MJ</span>
           </div>
           <p className="text-base-content/70 mt-1 text-[11px]">
-            Única rota do benchmark com balanço negativo de carbono (metano evitado).
+            Mandato CNPE 4/2026 (fronteira padrão WtW); rotas de vinhaça atingem{' '}
+            {formatNumber(br.wtw_emissions_g_co2eq_tkm.biomethane_vinasse, 1)} g/t·km com
+            crédito de metano evitado.
           </p>
         </div>
 
@@ -58,11 +135,13 @@ export const GlobalBenchmarkDashboard: React.FC<GlobalBenchmarkDashboardProps> =
             <span>Energia Útil Mecânica</span>
           </div>
           <div className="font-mono text-2xl font-black text-emerald-600 dark:text-emerald-400">
-            R$ {formatNumber(regions.brasil.energy_cost_levelized_mwh_eq.biomethane, 0)}{' '}
+            R$ {formatNumber(cheapestBrMwhEq, 0)}{' '}
             <span className="text-base-content/60 text-xs font-normal">/MWh-eq</span>
           </div>
           <p className="text-base-content/70 mt-1 text-[11px]">
-            Biometano no virabrequim supera eletricidade B3 e diesel no Brasil.
+            {cheapestBrIsElec
+              ? `Eletricidade em garagem (${formatNumber(elecGridToShaftEff * 100, 0)}% rede-eixo) supera biometano e diesel no virabrequim.`
+              : `Biometano supera eletricidade e diesel no virabrequim com eficiência de ${formatNumber(bioImpliedEfficiency * 100, 0)}%.`}
           </p>
         </div>
 
@@ -72,7 +151,7 @@ export const GlobalBenchmarkDashboard: React.FC<GlobalBenchmarkDashboardProps> =
             <span>Subsídio Direto BR</span>
           </div>
           <div className="font-mono text-2xl font-black text-amber-600 dark:text-amber-400">
-            US$ 0{' '}
+            US$ {formatNumber(br.capex_subsidy_max_usd, 0)}{' '}
             <span className="text-base-content/60 text-xs font-normal">/veículo</span>
           </div>
           <p className="text-base-content/70 mt-1 text-[11px]">
@@ -82,7 +161,7 @@ export const GlobalBenchmarkDashboard: React.FC<GlobalBenchmarkDashboardProps> =
         </div>
       </div>
 
-      {/* 2. SIDE-BY-SIDE MULTIDIMENSIONAL COMPARATIVE MATRIX (PATTERN A) */}
+      {/* 2. SIDE-BY-SIDE MULTIDIMENSIONAL COMPARATIVE MATRIX */}
       <div className="bg-base-100 border-base-200 rounded-xl border p-5 shadow-xs">
         <div className="border-base-200 mb-4 border-b pb-3">
           <div className="bg-primary/10 text-primary mb-1 inline-flex items-center gap-1.5 rounded-md px-2.5 py-0.5 text-[11px] font-bold tracking-wider uppercase">
@@ -122,13 +201,7 @@ export const GlobalBenchmarkDashboard: React.FC<GlobalBenchmarkDashboardProps> =
                         <span className="text-xs sm:text-sm">{reg.code}</span>
                       </div>
                       <span className="text-base-content/70 mt-0.5 block truncate text-[11px] font-normal">
-                        {reg.code === 'BR'
-                          ? 'Brasil (SIN)'
-                          : reg.code === 'EU'
-                            ? 'União Europeia'
-                            : reg.code === 'US'
-                              ? 'Estados Unidos'
-                              : 'China'}
+                        {regionShortLabel(reg)}
                       </span>
                     </th>
                   );
@@ -162,7 +235,7 @@ export const GlobalBenchmarkDashboard: React.FC<GlobalBenchmarkDashboardProps> =
                     US$ {formatNumber(reg.diesel_price_usd_per_liter, 2)}
                     <span className="text-base-content/50 block font-sans text-[10px] font-normal">
                       {reg.code === 'BR'
-                        ? '~R$ 7,28/L'
+                        ? `Ref. SC: R$ ${formatNumber(dieselPrice, 2)}/L`
                         : reg.code === 'EU'
                           ? 'Alta tributação'
                           : reg.code === 'US'
@@ -199,7 +272,7 @@ export const GlobalBenchmarkDashboard: React.FC<GlobalBenchmarkDashboardProps> =
                     US$ {formatNumber(reg.electricity_price_usd_per_kwh, 2)}
                     <span className="text-base-content/50 block font-sans text-[10px] font-normal">
                       {reg.code === 'BR'
-                        ? '~R$ 1,01/kWh'
+                        ? `Ref. SC: R$ ${formatNumber(elecPrice, 2)}/kWh`
                         : reg.code === 'EU'
                           ? 'Custo fóssil marginal'
                           : reg.code === 'US'
@@ -240,14 +313,8 @@ export const GlobalBenchmarkDashboard: React.FC<GlobalBenchmarkDashboardProps> =
                         US$ 0
                       </span>
                     )}
-                    <span className="text-base-content/60 mt-0.5 block text-[10px]">
-                      {reg.code === 'BR'
-                        ? 'Apenas Finame BNDES'
-                        : reg.code === 'EU'
-                          ? 'Bônus de até €80k'
-                          : reg.code === 'US'
-                            ? 'IRA §45W Clean Vehicle'
-                            : 'Incentivo bateria LFP'}
+                    <span className="text-base-content/60 mt-0.5 block text-[10px] leading-snug">
+                      {reg.capex_subsidy_status}
                     </span>
                   </td>
                 ))}
@@ -287,14 +354,10 @@ export const GlobalBenchmarkDashboard: React.FC<GlobalBenchmarkDashboardProps> =
                         0 kg (Sem abono)
                       </span>
                     )}
-                    <span className="text-base-content/60 mt-0.5 block text-[10px]">
+                    <span className="text-base-content/60 mt-0.5 block text-[10px] leading-snug">
                       {reg.code === 'BR'
-                        ? 'Perda líquida ~2.400 kg'
-                        : reg.code === 'EU'
-                          ? 'Diretiva 96/53/EC'
-                          : reg.code === 'US'
-                            ? 'FAST Act (+2.000 lbs)'
-                            : 'Troca rápida (BaaS)'}
+                        ? `Perda líquida ~${formatNumber(payloadPenaltyAbs, 0)} kg`
+                        : reg.battery_weight_regulation}
                     </span>
                   </td>
                 ))}
@@ -391,15 +454,15 @@ export const GlobalBenchmarkDashboard: React.FC<GlobalBenchmarkDashboardProps> =
         <div className="border-base-200 text-base-content/60 mt-3 flex flex-col justify-between gap-2 border-t pt-3 text-[11px] sm:flex-row sm:items-center">
           <div className="flex flex-wrap items-center gap-1.5">
             <span>
-              Dados compilados de IEA Energy Prices 2024, ANP, Eurostat e ICCT Global
-              Commercial Vehicle Policies.
+              Dados compilados de IEA, ANP, ANEEL, Eurostat e ICCT Global Commercial
+              Vehicle Policies.
             </span>
             {benchmarksData.source_ids?.map((id) => (
               <SourceRef key={id} id={id} context="Comparativo Internacional" />
             ))}
           </div>
           <span className="font-mono">
-            Valores de diesel e eletricidade convertidos pela média de câmbio PPA 2026
+            Preços internacionais em US$ conforme catálogo global_benchmarks.json
           </span>
         </div>
       </div>
@@ -414,37 +477,45 @@ export const GlobalBenchmarkDashboard: React.FC<GlobalBenchmarkDashboardProps> =
             O Paradoxo Well-to-Wheel (WtW): Emissões em g CO₂e / t.km
           </h2>
           <p className="text-base-content/70 mt-0.5 text-xs">
-            Recarregar um caminhão elétrico em países com matriz térmica a carvão/gás
-            (China ou EUA) emite substancialmente mais carbono na cadeia completa do que
-            rodar com biometano de vinhaça no Brasil.
+            Recarregar um caminhão elétrico em matrizes térmicas (China ou EUA) emite
+            substancialmente mais carbono no ciclo completo do que na rede brasileira.
+            Para o biometano, separa-se o fator regulatório padrão (CNPE 4/2026:{' '}
+            {formatNumber(bioWtWCnpe, 2)} gCO₂eq/MJ) do cenário específico com crédito de
+            metano evitado em vinhaça.
           </p>
         </div>
 
         <div className="max-w-4xl space-y-4">
-          {/* Brazil Biomethane */}
+          {/* Brazil Biomethane (Avoided methane sensitivity) */}
           <div>
             <div className="mb-1 flex justify-between text-xs">
-              <span className="flex items-center gap-1.5 font-semibold text-emerald-700 dark:text-emerald-400">
-                <span>🇧🇷</span> Brasil — Biometano (Vinhaça de Cana / Aterro)
+              <span className="flex flex-wrap items-center gap-1.5 font-semibold text-emerald-700 dark:text-emerald-400">
+                <span>🇧🇷</span> Brasil — Biometano de Vinhaça (Sensibilidade Metano
+                Evitado)
                 <span className="badge badge-xs badge-success text-[10px]">
-                  Balanço Negativo
+                  Fronteira RenovaBio Vinhaça
                 </span>
               </span>
               <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">
-                -18,4 g CO₂e/t.km
+                {formatNumber(br.wtw_emissions_g_co2eq_tkm.biomethane_vinasse, 1)} g
+                CO₂e/t.km
               </span>
             </div>
             <div className="bg-base-200 relative flex h-5 w-full overflow-hidden rounded-full">
               <div
-                className="flex h-full w-14 items-center justify-center bg-emerald-500 text-[10px] font-bold text-white"
-                title="Crédito de metano mitigado"
+                className="flex h-full items-center justify-center bg-emerald-500 px-2 text-[10px] font-bold text-white"
+                style={{
+                  width: barWidthPct(br.wtw_emissions_g_co2eq_tkm.biomethane_vinasse),
+                }}
+                title="Crédito de metano mitigado (cenário específico de biodigestão)"
               >
-                -18,4
+                {formatNumber(br.wtw_emissions_g_co2eq_tkm.biomethane_vinasse, 1)}
               </div>
             </div>
             <span className="text-base-content/60 mt-0.5 block text-[10px]">
-              Crédito ambiental pela contenção da digestão anaeróbica não controlada no
-              campo (fator de metano evitado RenovaBio).
+              Cenário específico com crédito por contenção de metano em vinhaça; no
+              simulador principal aplica-se a fronteira padrão do mandato CNPE 4/2026 (
+              {formatNumber(bioWtWCnpe, 2)} gCO₂eq/MJ).
             </span>
           </div>
 
@@ -455,20 +526,20 @@ export const GlobalBenchmarkDashboard: React.FC<GlobalBenchmarkDashboardProps> =
                 <span>🇧🇷</span> Brasil — Caminhão Elétrico Pesado (Rede SIN)
               </span>
               <span className="font-mono font-bold text-cyan-600 dark:text-cyan-400">
-                14,2 g CO₂e/t.km
+                {formatNumber(brBev, 1)} g CO₂e/t.km
               </span>
             </div>
             <div className="bg-base-200 h-5 w-full overflow-hidden rounded-full">
               <div
                 className="flex h-full items-center bg-cyan-500 px-2 text-[10px] font-bold text-white"
-                style={{ width: '13.6%' }}
+                style={{ width: barWidthPct(brBev) }}
               >
-                14,2
+                {formatNumber(brBev, 1)}
               </div>
             </div>
             <span className="text-base-content/60 mt-0.5 block text-[10px]">
-              Baixíssimo fator de emissão do Sistema Interligado Nacional (hidrelétrica,
-              eólica e solar dominantes).
+              Baixo fator de emissão do Sistema Interligado Nacional (
+              {formatNumber(br.grid_carbon_intensity_g_kwh, 0)} g CO₂e/kWh).
             </span>
           </div>
 
@@ -479,20 +550,21 @@ export const GlobalBenchmarkDashboard: React.FC<GlobalBenchmarkDashboardProps> =
                 <span>🇪🇺</span> União Europeia — BEV Médio (Rede Mix EU-27)
               </span>
               <span className="text-base-content font-mono font-bold">
-                38,6 g CO₂e/t.km
+                {formatNumber(euBev, 1)} g CO₂e/t.km
               </span>
             </div>
             <div className="bg-base-200 h-5 w-full overflow-hidden rounded-full">
               <div
                 className="flex h-full items-center bg-blue-500 px-2 text-[10px] font-bold text-white"
-                style={{ width: '37.1%' }}
+                style={{ width: barWidthPct(euBev) }}
               >
-                38,6
+                {formatNumber(euBev, 1)}
               </div>
             </div>
             <span className="text-base-content/60 mt-0.5 block text-[10px]">
-              Mix de energia europeu com presença de gás fóssil e nuclear; emissão 2,7x
-              superior ao BEV recarregado no Brasil.
+              Mix europeu (
+              {formatNumber(regions.uniao_europeia.grid_carbon_intensity_g_kwh, 0)} g
+              CO₂e/kWh); emissão {formatRatio(euBev, brBev)}x superior ao BEV no Brasil.
             </span>
           </div>
 
@@ -503,20 +575,21 @@ export const GlobalBenchmarkDashboard: React.FC<GlobalBenchmarkDashboardProps> =
                 <span>🇺🇸</span> Estados Unidos — BEV Classe 8 (Média US Grid)
               </span>
               <span className="text-base-content font-mono font-bold">
-                62,1 g CO₂e/t.km
+                {formatNumber(usBev, 1)} g CO₂e/t.km
               </span>
             </div>
             <div className="bg-base-200 h-5 w-full overflow-hidden rounded-full">
               <div
                 className="flex h-full items-center bg-indigo-500 px-2 text-[10px] font-bold text-white"
-                style={{ width: '59.7%' }}
+                style={{ width: barWidthPct(usBev) }}
               >
-                62,1
+                {formatNumber(usBev, 1)}
               </div>
             </div>
             <span className="text-base-content/60 mt-0.5 block text-[10px]">
-              Matriz norte-americana com gás fóssil e carvão térmico no Midwest; emissão
-              4,4x superior à rede brasileira.
+              Matriz norte-americana (
+              {formatNumber(regions.estados_unidos.grid_carbon_intensity_g_kwh, 0)} g
+              CO₂e/kWh); emissão {formatRatio(usBev, brBev)}x superior à rede brasileira.
             </span>
           </div>
 
@@ -527,20 +600,21 @@ export const GlobalBenchmarkDashboard: React.FC<GlobalBenchmarkDashboardProps> =
                 <span>🇨🇳</span> China — BEV Pesado (Matriz Térmica a Carvão)
               </span>
               <span className="text-base-content font-mono font-bold">
-                81,5 g CO₂e/t.km
+                {formatNumber(cnBev, 1)} g CO₂e/t.km
               </span>
             </div>
             <div className="bg-base-200 h-5 w-full overflow-hidden rounded-full">
               <div
                 className="flex h-full items-center bg-rose-500 px-2 text-[10px] font-bold text-white"
-                style={{ width: '78.4%' }}
+                style={{ width: barWidthPct(cnBev) }}
               >
-                81,5
+                {formatNumber(cnBev, 1)}
               </div>
             </div>
             <span className="text-base-content/60 mt-0.5 block text-[10px]">
-              Forte dependência de usinas térmicas a carvão nas províncias industriais do
-              norte e interior.
+              Matriz predominantemente térmica (
+              {formatNumber(regions.china.grid_carbon_intensity_g_kwh, 0)} g CO₂e/kWh),{' '}
+              {formatRatio(cnBev, brBev)}x superior à rede brasileira.
             </span>
           </div>
 
@@ -551,15 +625,15 @@ export const GlobalBenchmarkDashboard: React.FC<GlobalBenchmarkDashboardProps> =
                 <span>🌐</span> Referência Global — Diesel Fóssil (Euro VI / Conama P8)
               </span>
               <span className="text-base-content/70 font-mono font-bold">
-                104,0 g CO₂e/t.km (100% Base)
+                {formatNumber(wtwBaseline, 1)} g CO₂e/t.km (100% Base)
               </span>
             </div>
             <div className="bg-base-200 h-5 w-full overflow-hidden rounded-full">
               <div
                 className="flex h-full items-center bg-slate-500 px-2 text-[10px] font-bold text-white"
-                style={{ width: '100%' }}
+                style={{ width: barWidthPct(wtwBaseline) }}
               >
-                104,0
+                {formatNumber(wtwBaseline, 1)}
               </div>
             </div>
           </div>
@@ -570,59 +644,70 @@ export const GlobalBenchmarkDashboard: React.FC<GlobalBenchmarkDashboardProps> =
       <div className="bg-base-100 border-base-200 rounded-xl border p-5 shadow-xs">
         <div className="border-base-200 mb-4 border-b pb-3">
           <div className="badge badge-xs badge-neutral mb-1">
-            Paridade Calórica &amp; Eficiência Térmica
+            Paridade Calórica &amp; Eficiência Consistente com o Simulador
           </div>
           <h2 className="text-base-content text-base font-bold tracking-tight">
             Custo Nivelado de Energia Útil no Virabrequim (R$/MWh-eq)
           </h2>
           <p className="text-base-content/70 mt-0.5 text-xs">
-            Normalização na ponta mecânica motriz, considerando a eficiência termodinâmica
-            de motores térmicos (~42%) versus conjunto carregador/motor elétrico (~81%
-            rede-eixo).
+            Calculado diretamente a partir de parameters.json: Diesel a{' '}
+            {formatNumber(REFERENCE_DIESEL_THERMAL_EFFICIENCY * 100, 0)}% de eficiência
+            térmica ({formatNumber(dieselMjPerKm, 1)} MJ/km), ciclo Otto a gás com
+            eficiência implícita de {formatNumber(bioImpliedEfficiency * 100, 1)}% (
+            {formatNumber(bioMjPerKm, 1)} MJ/km) e elétrico a{' '}
+            {formatNumber(elecGridToShaftEff * 100, 0)}% rede-eixo (recarga{' '}
+            {formatNumber(elecChargingEff * 100, 0)}% × trem de força{' '}
+            {formatNumber(REFERENCE_ELECTRIC_DRIVETRAIN_EFFICIENCY * 100, 0)}%).
           </p>
         </div>
 
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="flex flex-col justify-between rounded-xl border border-cyan-500/30 bg-cyan-500/5 p-3.5">
+            <div>
+              <div className="mb-1 flex items-center justify-between">
+                <span className="text-xs font-bold text-cyan-700 dark:text-cyan-400">
+                  🇧🇷 Eletricidade A4 (Base Própria)
+                </span>
+                <span
+                  className={`badge badge-xs ${cheapestBrIsElec ? 'badge-success' : 'badge-info'}`}
+                >
+                  {cheapestBrIsElec ? 'Menor Custo BR' : 'Pátio Próprio'}
+                </span>
+              </div>
+              <span className="text-base-content/70 block text-[11px]">
+                Tarifa CELESC A4 Verde + tributos (R$ {formatNumber(elecPrice, 2)}/kWh)
+              </span>
+            </div>
+            <div className="mt-3">
+              <span className="font-mono text-xl font-black text-cyan-600 dark:text-cyan-400">
+                R$ {formatNumber(elecMwhEq, 0)}
+              </span>
+              <span className="text-base-content/60 ml-1 text-[10px]">/MWh-eq</span>
+            </div>
+          </div>
+
           <div className="flex flex-col justify-between rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-3.5">
             <div>
               <div className="mb-1 flex items-center justify-between">
                 <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400">
                   🇧🇷 Biometano Brasil
                 </span>
-                <span className="badge badge-xs badge-success">Menor Custo BR</span>
+                <span
+                  className={`badge badge-xs ${!cheapestBrIsElec ? 'badge-success' : 'badge-ghost'}`}
+                >
+                  {!cheapestBrIsElec
+                    ? 'Menor Custo BR'
+                    : `Ef. Otto ${formatNumber(bioImpliedEfficiency * 100, 0)}%`}
+                </span>
               </div>
               <span className="text-base-content/70 block text-[11px]">
-                Gás purificado canalizado / GNC (R$ 4,60/m³)
+                Referência ilustrativa (R$ {formatNumber(bioPrice, 2)}/m³ ·{' '}
+                {formatNumber(biometano.energy_density.value, 0)} MJ/m³)
               </span>
             </div>
             <div className="mt-3">
               <span className="font-mono text-xl font-black text-emerald-600 dark:text-emerald-400">
-                R${' '}
-                {formatNumber(regions.brasil.energy_cost_levelized_mwh_eq.biomethane, 0)}
-              </span>
-              <span className="text-base-content/60 ml-1 text-[10px]">/MWh-eq</span>
-            </div>
-          </div>
-
-          <div className="flex flex-col justify-between rounded-xl border border-cyan-500/30 bg-cyan-500/5 p-3.5">
-            <div>
-              <div className="mb-1 flex items-center justify-between">
-                <span className="text-xs font-bold text-cyan-700 dark:text-cyan-400">
-                  🇧🇷 Eletricidade B3 (Base Própria)
-                </span>
-                <span className="badge badge-xs badge-info">Pátio Próprio</span>
-              </div>
-              <span className="text-base-content/70 block text-[11px]">
-                Tarifa CELESC com tributos (~R$ 1,01/kWh)
-              </span>
-            </div>
-            <div className="mt-3">
-              <span className="font-mono text-xl font-black text-cyan-600 dark:text-cyan-400">
-                R${' '}
-                {formatNumber(
-                  regions.brasil.energy_cost_levelized_mwh_eq.offpeak_electricity,
-                  0
-                )}
+                R$ {formatNumber(bioMwhEq, 0)}
               </span>
               <span className="text-base-content/60 ml-1 text-[10px]">/MWh-eq</span>
             </div>
@@ -632,22 +717,18 @@ export const GlobalBenchmarkDashboard: React.FC<GlobalBenchmarkDashboardProps> =
             <div>
               <div className="mb-1 flex items-center justify-between">
                 <span className="text-base-content text-xs font-bold">
-                  🇺🇸 EUA Eletricidade Comercial
+                  🇧🇷 Diesel B15 Brasil
                 </span>
-                <span className="badge badge-xs badge-ghost">Média US</span>
+                <span className="badge badge-xs badge-ghost">Referência</span>
               </div>
               <span className="text-base-content/70 block text-[11px]">
-                Tarifa comercial média (~US$ 0.13/kWh)
+                Mediana ANP SC (R$ {formatNumber(dieselPrice, 2)}/L ·{' '}
+                {formatNumber(diesel.energy_density.value, 1)} MJ/L)
               </span>
             </div>
             <div className="mt-3">
               <span className="text-base-content font-mono text-xl font-black">
-                R${' '}
-                {formatNumber(
-                  regions.estados_unidos.energy_cost_levelized_mwh_eq
-                    .commercial_electricity ?? 0,
-                  0
-                )}
+                R$ {formatNumber(dieselMwhEq, 0)}
               </span>
               <span className="text-base-content/60 ml-1 text-[10px]">/MWh-eq</span>
             </div>
@@ -662,7 +743,9 @@ export const GlobalBenchmarkDashboard: React.FC<GlobalBenchmarkDashboardProps> =
                 <span className="badge badge-xs badge-ghost">Alta Potência</span>
               </div>
               <span className="text-base-content/70 block text-[11px]">
-                Carregador rodoviário ultrarrápido 750kW
+                Carregador rodoviário ultrarrápido (US${' '}
+                {formatNumber(regions.uniao_europeia.electricity_price_usd_per_kwh, 2)}
+                /kWh ref.)
               </span>
             </div>
             <div className="mt-3">
@@ -680,38 +763,37 @@ export const GlobalBenchmarkDashboard: React.FC<GlobalBenchmarkDashboardProps> =
         </div>
       </div>
 
-      {/* 5. STRATEGIC SYNTHESIS: POR QUE A ROTA BRASILEIRA É SINGULAR? */}
+      {/* 5. STRATEGIC SYNTHESIS */}
       <div className="bg-base-100 border-base-200 rounded-xl border p-5 shadow-xs">
         <h2 className="text-base-content mb-3 text-base font-bold tracking-tight">
-          Síntese Estratégica: Por que a Transição no Brasil segue uma Rota Única?
+          Síntese Estratégica: Condições Estruturais da Transição no Brasil
         </h2>
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           <div className="border-base-200 bg-base-200/30 space-y-1.5 rounded-xl border p-4">
             <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-700 dark:text-emerald-400">
               <Leaf className="h-4 w-4 shrink-0" aria-hidden="true" />
-              <span>1. Agroenergia Dispensa Subsídios Massivos</span>
+              <span>1. Transição Sem Subsídios Diretos de CAPEX</span>
             </div>
             <p className="text-base-content/75 text-xs leading-relaxed">
-              Enquanto Europa e EUA precisam desembolsar de US$ 40 mil a US$ 85 mil por
-              caminhão para viabilizar a transição elétrica a frotistas, o Brasil tem no
-              agronegócio uma fábrica de combustíveis renováveis de baixo custo (biometano
-              de vinhaça e esterco) que compete economicamente com o diesel de forma
-              orgânica.
+              Enquanto mercados como EUA e União Europeia oferecem incentivos diretos de
+              US$ {formatNumber(minForeignSubsidy, 0)} a US${' '}
+              {formatNumber(maxForeignSubsidy, 0)} por caminhão pesado, o Brasil depende
+              da competitividade operacional dos insumos (energia elétrica A4 e biometano)
+              para diluir o sobrepreço inicial.
             </p>
           </div>
 
           <div className="border-base-200 bg-base-200/30 space-y-1.5 rounded-xl border p-4">
             <div className="flex items-center gap-1.5 text-xs font-bold text-indigo-700 dark:text-indigo-400">
               <Scale className="h-4 w-4 shrink-0" aria-hidden="true" />
-              <span>2. O Gargalo de Carga Útil na Balança (PBTC 74t)</span>
+              <span>2. O Gargalo de Carga Útil na Balança (PBTC)</span>
             </div>
             <p className="text-base-content/75 text-xs leading-relaxed">
-              O transporte pesado rodoviário brasileiro roda em distâncias continentais
-              (1.500+ km) no limite legal de carga (rodotrens de 9 eixos). Sem tolerância
-              de peso para baterias na legislação do CONTRAN, o caminhão elétrico perde
-              até 2.400 kg de carga paga por viagem, tornando o biometano a alternativa de
-              descarbonização imediata mais viável.
+              Em rotas de longo curso no limite legal de peso, sem tolerância de PBTC para
+              baterias na legislação vigente, o caminhão elétrico apresenta penalidade
+              estimada de ~{formatNumber(payloadPenaltyAbs, 0)} kg de carga útil,
+              favorecendo soluções a gás/biometano em operações sensíveis a massa.
             </p>
           </div>
 
@@ -721,15 +803,17 @@ export const GlobalBenchmarkDashboard: React.FC<GlobalBenchmarkDashboardProps> =
               <span>3. A Verdade do Ciclo de Vida (Well-to-Wheel)</span>
             </div>
             <p className="text-base-content/75 text-xs leading-relaxed">
-              Políticas focadas apenas em escapamento (Tank-to-Wheel) criam distorções ao
-              ignorar que eletricidade gerada a carvão (China) ou gás natural (EUA)
-              transfere o carbono do cano de descarga para a chaminé da usina térmica. A
-              matriz hidrelétrica e solar brasileira confere ao país um diferencial verde
-              incomparável.
+              Políticas focadas apenas em escapamento ignoram que eletricidade gerada em
+              matrizes fósseis transfere emissões para a geração. Com{' '}
+              {formatNumber(br.renewable_grid_share_percent, 1)}% de renováveis no SIN,
+              tanto a eletrificação quanto o biometano entregam forte abatimento WtW no
+              Brasil.
             </p>
           </div>
         </div>
       </div>
+
+      <TransparencyDisclaimer />
     </div>
   );
 };
