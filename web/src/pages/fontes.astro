@@ -34,6 +34,7 @@ const generalLabels: Record<string, string> = {
   diesel_fossil_carbon_intensity: 'Intensidade de carbono: diesel fóssil',
   biodiesel_carbon_intensity: 'Intensidade de carbono: biodiesel',
   arla_price: 'Preço do agente redutor (ARLA 32)',
+  cbio_price: 'Preço de referência do CBIO (RenovaBio)',
 };
 
 for (const [key, item] of Object.entries(paramsData.general)) {
@@ -63,6 +64,7 @@ const vehicleFieldLabels: Record<string, string> = {
   residual_value_ratio: 'Fração de valor residual',
   charging_efficiency: 'Eficiência de recarga (rede-bateria)',
   arla_consumption_ratio: 'Consumo de ARLA 32 (% diesel)',
+  payload_penalty_kg: 'Impacto na carga útil (Lei da Balança)',
 };
 
 for (const [altId, vehicle] of Object.entries(paramsData.vehicles)) {
@@ -262,6 +264,16 @@ for (const [altId, vehicle] of Object.entries(paramsData.vehicles)) {
           <p class="text-base-content/75 leading-relaxed">
             Calculadas no ciclo de vida Well-to-Wheel pelos fatores regulatórios médios
             (RenovaBio, MCTI e EPE).
+          </p>
+        </div>
+
+        <div class="p-3 rounded-xl bg-base-200/40 border border-base-200 sm:col-span-2 lg:col-span-3">
+          <span class="font-bold text-base-content block mb-0.5">
+            7. Incerteza e Precisão Exibida
+          </span>
+          <p class="text-base-content/75 leading-relaxed">
+            A incerteza real dos dados de mercado, consumo operacional e valor residual
+            pode ser maior do que a precisão numérica exibida nas tabelas e gráficos.
           </p>
         </div>
       </div>

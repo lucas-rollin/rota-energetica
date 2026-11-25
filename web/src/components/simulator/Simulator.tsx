@@ -11,6 +11,7 @@ import { FleetImpactBanner } from './FleetImpactBanner';
 import { FleetTunerSidebar } from './FleetTunerSidebar';
 import { ResultCards } from './ResultCards';
 import { ScenarioPresets } from './ScenarioPresets';
+import { TransparencyDisclaimer } from '../common/TransparencyDisclaimer';
 import { PaybackTimelineChart } from './charts/PaybackTimelineChart';
 import { TcoComparisonChart } from './charts/TcoComparisonChart';
 
@@ -274,6 +275,11 @@ export const Simulator: React.FC<SimulatorProps> = ({ defaults }) => {
           )}
         </div>
       </div>
+
+      {/* 4. Methodology §10 Transparency Disclaimers near results */}
+      <section aria-label="Transparência e Limitações Metodológicas">
+        <TransparencyDisclaimer />
+      </section>
     </div>
   );
 };

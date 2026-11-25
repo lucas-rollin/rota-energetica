@@ -5,6 +5,7 @@ import type { AlternativeId, SimulationParameters } from '../../lib/types/parame
 import { FUEL_THEME } from '../../lib/theme/fuels';
 import { formatCurrency, formatNumber } from '../../lib/utils/format';
 import { SourceRef } from '../common/SourceRef';
+import { TransparencyDisclaimer } from '../common/TransparencyDisclaimer';
 
 interface EsgDashboardProps {
   parameters: SimulationParameters;
@@ -656,6 +657,8 @@ export const EsgDashboard: React.FC<EsgDashboardProps> = ({
           </span>
         </div>
       </div>
+
+      <TransparencyDisclaimer />
     </div>
   );
 };

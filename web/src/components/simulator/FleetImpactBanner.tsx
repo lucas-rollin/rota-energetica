@@ -110,6 +110,10 @@ export const FleetImpactBanner: React.FC<FleetImpactBannerProps> = ({
             Frente à linha de base do Diesel B15, considerando a redução acumulada de
             despesas com combustível e manutenção trazidas a valor presente.
           </p>
+          <p className="text-base-content/60 mt-1 text-[11px] font-medium">
+            Nota: exclui CapEx de infraestrutura de recarga/abastecimento em garagem,
+            reforços de rede elétrica e custos de financiamento.
+          </p>
         </div>
 
         {/* Aggregate KPI Badges */}
