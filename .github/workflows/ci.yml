@@ -102,17 +102,11 @@ jobs:
           cd web
           pnpm build
 
-  deploy-pages:
-    name: Deploy to GitHub Pages
+  build-pages:
+    name: Build GitHub Pages Artifact
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     needs: [pipeline-checks, web-checks]
     runs-on: ubuntu-latest
-    permissions:
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -147,6 +141,18 @@ jobs:
         with:
           path: web/dist
 
+  deploy-pages:
+    name: Deploy to GitHub Pages
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    needs: [build-pages]
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
