@@ -15,6 +15,7 @@ echo "=== Python Pipeline Checks ==="
 echo "=== Web Frontend Checks ==="
 (
   cd "$ROOT_DIR/web"
+  export ASTRO_TELEMETRY_DISABLED=1
   pnpm lint
   pnpm format:check
   pnpm test
