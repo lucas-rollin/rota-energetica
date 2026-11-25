@@ -30,6 +30,7 @@ describe('sources integrity', () => {
       expect(['Primária', 'Adaptada', 'Ilustrativa']).toContain(s.badge);
       expect(s.category).toBeDefined();
       expect(s.terms).toBeDefined();
+      expect(s.terms.toLowerCase()).not.toContain('a definir');
       if (s.attribution) {
         expect(s.attribution.length).toBeGreaterThan(0);
       }

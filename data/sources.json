@@ -32,12 +32,12 @@
       "name": "Portaria SUROC nº 3/2026 e Resolução nº 6.084/2026",
       "publisher": "ANTT",
       "description": "Diesel S10 de referência da tabela regulatória de frete",
-      "url": "https://frotanews.com.br/scania-g-460-gnv-biometano-diesel-custo-combustivel-emissoes/",
+      "url": "https://www.gov.br/antt/pt-br/assuntos/cargas/piso-minimo-de-frete",
       "badge": "Adaptada",
       "category": "A",
       "terms": "Ato oficial (Lei nº 9.610/1998, art. 8º, IV)",
-      "attribution": "Fonte: ANTT, Portaria SUROC nº 3/2026.",
-      "notes": "Marco para o gráfico de volatilidade (R$ 6,11/L na semana de 08 a 14/03/2026; Res. 6.084/2026 usa R$ 6,97/L). Citar texto da norma e data."
+      "attribution": "Fonte: ANTT, Portaria SUROC nº 3/2026 e Resolução nº 6.084/2026.",
+      "notes": "Marco regulatório de piso de frete (R$ 6,11/L na Portaria SUROC nº 3/2026; Res. 6.084/2026 usa R$ 6,97/L). Citar texto oficial da norma e data."
     },
     {
       "id": "P04",
@@ -53,15 +53,15 @@
     },
     {
       "id": "P05",
-      "name": "Estudo de mercado de biometano",
-      "publisher": "Copersucar via AutoData",
-      "description": "Preço de referência do biometano para frotas",
+      "name": "Referência ilustrativa de preço do biometano para frotas",
+      "publisher": "Copersucar via AutoData (referência ilustrativa)",
+      "description": "Preço de referência editável do biometano na ausência de série oficial em bomba",
       "url": "https://www.autodata.com.br/revistas/flipbook/429-2026-02/83/",
       "badge": "Ilustrativa",
       "category": "D",
-      "terms": "Citação jornalística / estudo setorial",
+      "terms": "Citação jornalística / estudo setorial (premissa editável)",
       "attribution": "Fonte: Copersucar, citado na AutoData (fev/2026).",
-      "notes": "Citar número com fonte, veículo e data; não copiar texto. O trecho lido estava truncado (R$ 4,60) e a unidade não ficou clara. Sem série pública oficial."
+      "notes": "Premissa ilustrativa editável (R$ 4,60/m³). O trecho original citado estava truncado e sem série pública oficial na ANP; usar o controle do simulador para testar contratos reais."
     },
     {
       "id": "P06",
@@ -127,13 +127,13 @@
       "id": "P11",
       "name": "Cotação e Painel de Negociação de CBIOs (RenovaBio)",
       "publisher": "B3 / ANP",
-      "description": "Preço de fechamento e histórico de negociação de Créditos de Descarbonização (CBIO) na B3",
+      "description": "Preço de referência estático de Créditos de Descarbonização (CBIO) na B3 para análise de sensibilidade",
       "url": "https://www.b3.com.br/pt_br/produtos-e-servicos/negociacao/renda-variavel/creditos-de-descarbonizacao-cbio.htm",
-      "badge": "Primária",
+      "badge": "Ilustrativa",
       "category": "B",
       "terms": "Dados públicos de mercado e boletins diários B3 / ANP",
-      "attribution": "Fonte: B3 / ANP.",
-      "notes": "Preço de referência do CBIO na B3. 1 CBIO equivale a 1 tCO2eq evitada comprovada via RenovaBio."
+      "attribution": "Fonte: B3 / ANP (referência estática).",
+      "notes": "Valor estático de sensibilidade (não ingerido automaticamente pelo pipeline). No RenovaBio, CBIOs são emitidos a produtores de biocombustíveis (1 CBIO = 1 tCO2eq evitada), não diretamente a transportadores."
     },
     {
       "id": "E01",
@@ -174,13 +174,15 @@
     },
     {
       "id": "E04",
-      "name": "Intensidade de carbono do diesel fóssil",
-      "publisher": "RenovaBio / ANP / GHG Protocol",
-      "description": "Intensidade de carbono de ciclo de vida do diesel (gCO₂eq/MJ)",
+      "name": "Intensidade de carbono do diesel fóssil (Poço à Roda)",
+      "publisher": "ANP (RenovaCalc / RenovaBio)",
+      "description": "Intensidade de carbono de ciclo de vida do diesel fóssil (gCO₂eq/MJ)",
+      "url": "https://www.gov.br/anp/pt-br/assuntos/renovabio/renovacalc",
       "badge": "Adaptada",
-      "category": "C",
-      "terms": "A definir conforme a base adotada",
-      "notes": "Fixar uma única base de ciclo de vida ('poço à roda') para todas as alternativas. Combustão isolada não é diretamente comparável com biometano."
+      "category": "A",
+      "terms": "Ato regulatório oficial / Dados abertos governamentais (ANP RenovaBio)",
+      "attribution": "Fonte: ANP, Metodologia RenovaCalc / RenovaBio.",
+      "notes": "Fixar uma única base de ciclo de vida ('poço à roda' / WtW) para todas as alternativas. Valor editável calibrado para compatibilidade entre fatores regulatórios."
     },
     {
       "id": "E05",
@@ -217,6 +219,18 @@
       "terms": "Ato regulatório oficial federal",
       "attribution": "Fonte: CONAMA / IBAMA.",
       "notes": "Vigência plena desde 2023. Fixa limites de 0,40 g/kWh de NOx e 0,010 g/kWh de MP para veículos comerciais pesados."
+    },
+    {
+      "id": "E08",
+      "name": "Balanço Energético Nacional (BEN) — Poderes Caloríficos Inferiores",
+      "publisher": "EPE / MME",
+      "description": "Fatores de conversão energética e poder calorífico inferior (PCI) de combustíveis e eletricidade",
+      "url": "https://www.epe.gov.br/pt/publicacoes-dados-abertos/publicacoes/balanco-energetico-nacional-ben",
+      "badge": "Primária",
+      "category": "B",
+      "terms": "Dados abertos governamentais (EPE)",
+      "attribution": "Fonte: EPE, Balanço Energético Nacional (BEN).",
+      "notes": "Anexo de fatores de conversão de energia (PCI do óleo diesel 35,8 MJ/L, gás natural 38,0 MJ/m³, biometano 36,0 MJ/m³ e equivalência exata 1 kWh = 3,6 MJ)."
     },
     {
       "id": "V01",
