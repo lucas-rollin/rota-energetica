@@ -7,6 +7,7 @@ import type {
   SimulationParameters,
   VehicleParameters,
 } from '../../lib/types/parameters';
+import { DecimalInput } from '../common/DecimalInput';
 import { SourceRef } from '../common/SourceRef';
 
 interface FleetTunerSidebarProps {
@@ -191,7 +192,7 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
           />
           <div className="text-base-content/50 mt-0.5 flex justify-between text-[10px]">
             <span>Regional (40k)</span>
-            <span>Média (100k)</span>
+            <span>Padrão (120k)</span>
             <span>Longo Curso (180k)</span>
           </div>
         </div>
@@ -226,21 +227,23 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
             <span className="text-base-content/70 mb-1 block text-[10px] font-semibold">
               Taxa Desconto
             </span>
-            <div className="bg-base-100 border-base-300 flex items-center justify-between rounded border px-2 py-1">
-              <input
-                type="number"
-                step="0.01"
-                min="0"
-                max="0.30"
-                value={discountRate}
-                onChange={(e) => {
-                  const val = parseFloat(e.target.value);
-                  if (!isNaN(val)) onGeneralChange('discount_rate', val);
+            <div className="bg-base-100 border-base-300 flex items-center justify-end gap-1 rounded border px-2 py-1">
+              <DecimalInput
+                step={0.5}
+                decimals={1}
+                min={(params.general.discount_rate.min ?? 0) * 100}
+                max={(params.general.discount_rate.max ?? 0.3) * 100}
+                value={discountRate * 100}
+                onChange={(pct) => {
+                  const minFrac = params.general.discount_rate.min ?? 0;
+                  const maxFrac = params.general.discount_rate.max ?? 0.3;
+                  const clamped = Math.min(maxFrac, Math.max(minFrac, pct / 100));
+                  onGeneralChange('discount_rate', clamped);
                 }}
-                className="text-base-content w-12 bg-transparent text-right font-mono font-bold focus:outline-none"
-                aria-label="Taxa de desconto anual real"
+                className="text-base-content min-w-0 flex-1 bg-transparent text-right font-mono font-bold focus:outline-none"
+                aria-label="Taxa de desconto anual real (% a.a.)"
               />
-              <span className="text-base-content/60 text-[10px]">% a.a.</span>
+              <span className="text-base-content/60 shrink-0 text-[10px]">% a.a.</span>
             </div>
           </div>
         </div>
@@ -285,14 +288,13 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
                       <span className="text-base-content/50 font-mono text-[10px]">
                         R$
                       </span>
-                      <input
-                        type="number"
+                      <DecimalInput
                         step={fuel.step}
-                        min="0.01"
+                        decimals={2}
+                        min={0.01}
                         value={currentVal}
-                        onChange={(e) => {
-                          const val = parseFloat(e.target.value);
-                          if (!isNaN(val) && val > 0) {
+                        onChange={(val) => {
+                          if (val > 0) {
                             onVehicleChange(fuel.alt, 'energy_price', val);
                           }
                         }}
@@ -388,13 +390,13 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
                 <span className="text-base-content/70 text-[11px]">
                   Consumo ({params.vehicles[selectedAltTab].consumption.unit}):
                 </span>
-                <input
-                  type="number"
-                  step="0.1"
+                <DecimalInput
+                  step={0.1}
+                  decimals={1}
+                  min={0.1}
                   value={params.vehicles[selectedAltTab].consumption.value}
-                  onChange={(e) => {
-                    const val = parseFloat(e.target.value);
-                    if (!isNaN(val)) onVehicleChange(selectedAltTab, 'consumption', val);
+                  onChange={(val) => {
+                    if (val > 0) onVehicleChange(selectedAltTab, 'consumption', val);
                   }}
                   className="bg-base-100 text-base-content border-base-300 w-20 rounded border px-2 py-0.5 text-right font-mono text-xs font-bold focus:outline-none"
                 />
@@ -403,15 +405,14 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
               {/* Maintenance */}
               <div className="flex items-center justify-between">
                 <span className="text-base-content/70 text-[11px]">Manut. (R$/km):</span>
-                <input
-                  type="number"
-                  step="0.05"
+                <DecimalInput
+                  step={0.05}
+                  decimals={2}
+                  min={0}
                   value={params.vehicles[selectedAltTab].maintenance_cost_per_km.value}
-                  onChange={(e) => {
-                    const val = parseFloat(e.target.value);
-                    if (!isNaN(val))
-                      onVehicleChange(selectedAltTab, 'maintenance_cost_per_km', val);
-                  }}
+                  onChange={(val) =>
+                    onVehicleChange(selectedAltTab, 'maintenance_cost_per_km', val)
+                  }
                   className="bg-base-100 text-base-content border-base-300 w-20 rounded border px-2 py-0.5 text-right font-mono text-xs font-bold focus:outline-none"
                 />
               </div>

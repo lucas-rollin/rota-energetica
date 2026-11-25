@@ -20,7 +20,7 @@ export const PRESETS: ScenarioPreset[] = [
   {
     id: 'default',
     label: 'Padrão SC (Referência)',
-    badge: '100.000 km/ano',
+    badge: '120.000 km/ano',
     description:
       'Operação média rodoviária em Santa Catarina com preços e parâmetros originais.',
     apply: (def) => JSON.parse(JSON.stringify(def)),
