@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { SlidersHorizontal } from 'lucide-react';
+import type { ResidualScenarioId } from '../../lib/calc/simulator';
 import { FUEL_THEME } from '../../lib/theme/fuels';
 import type {
   AlternativeId,
   GeneralParameters,
+  ParameterItem,
   SimulationParameters,
   VehicleParameters,
 } from '../../lib/types/parameters';
@@ -20,9 +22,37 @@ interface FleetTunerSidebarProps {
     key: K,
     value: number
   ) => void;
+  residualScenario: ResidualScenarioId;
+  onResidualScenarioChange: (scenario: ResidualScenarioId) => void;
+  includeCbio: boolean;
+  onIncludeCbioChange: (enabled: boolean) => void;
   onResetAll: () => void;
   alteredCount: number;
 }
+
+const ParamProvenance: React.FC<{ item: ParameterItem; label: string }> = ({
+  item,
+  label,
+}) => {
+  const badgeClass =
+    item.badge === 'Primária'
+      ? 'badge-success text-white'
+      : item.badge === 'Adaptada'
+        ? 'badge-info text-white'
+        : 'badge-ghost border-base-300 text-base-content/75';
+
+  return (
+    <span className="inline-flex items-center gap-1">
+      <span
+        className={`badge badge-xs px-1.5 text-[9px] font-medium ${badgeClass}`}
+        title={`Selo metodológico: ${item.badge}`}
+      >
+        {item.badge}
+      </span>
+      <SourceRef id={item.source_id} context={label} />
+    </span>
+  );
+};
 
 export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
   params,
@@ -30,6 +60,10 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
   onFleetSizeChange,
   onGeneralChange,
   onVehicleChange,
+  residualScenario,
+  onResidualScenarioChange,
+  includeCbio,
+  onIncludeCbioChange,
   onResetAll,
   alteredCount,
 }) => {
@@ -39,13 +73,17 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
   const horizonYears = Math.round(params.general.horizon_years.value);
   const annualDistance = params.general.annual_distance_km.value;
   const discountRate = params.general.discount_rate.value;
+  const biodieselBlend = params.general.biodiesel_blend.value;
+  const arlaPrice = params.general.arla_price.value;
+  const cbioPrice = params.general.cbio_price?.value ?? 102;
+
+  const selectedVehicle = params.vehicles[selectedAltTab];
 
   const fuels: {
     alt: AlternativeId;
     label: string;
     unit: string;
     dotColor: string;
-    sourceId: string;
     step: number;
   }[] = [
     {
@@ -53,7 +91,6 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
       label: 'Diesel B15',
       unit: 'R$/L',
       dotColor: FUEL_THEME.diesel.dotClass,
-      sourceId: params.vehicles.diesel.energy_price.source_id,
       step: 0.05,
     },
     {
@@ -61,7 +98,6 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
       label: 'Biometano',
       unit: 'R$/m³',
       dotColor: FUEL_THEME.biometano.dotClass,
-      sourceId: params.vehicles.biometano.energy_price.source_id,
       step: 0.05,
     },
     {
@@ -69,7 +105,6 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
       label: 'Energia Elétrica',
       unit: 'R$/kWh',
       dotColor: FUEL_THEME.eletrico.dotClass,
-      sourceId: params.vehicles.eletrico.energy_price.source_id,
       step: 0.02,
     },
     {
@@ -77,7 +112,6 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
       label: 'GNV',
       unit: 'R$/m³',
       dotColor: FUEL_THEME.gnv.dotClass,
-      sourceId: params.vehicles.gnv.energy_price.source_id,
       step: 0.05,
     },
   ];
@@ -102,7 +136,12 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
         <button
           type="button"
           onClick={onResetAll}
-          disabled={alteredCount === 0 && fleetSize === 1}
+          disabled={
+            alteredCount === 0 &&
+            fleetSize === 1 &&
+            residualScenario === 'base' &&
+            !includeCbio
+          }
           aria-label="Restaurar parâmetros para os padrões originais"
           className="btn btn-ghost btn-xs text-base-content/70 hover:text-base-content text-[11px]"
         >
@@ -154,13 +193,19 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
 
         {/* 2. Annual Distance Controller */}
         <div className="bg-base-200/40 border-base-200 rounded-xl border p-3">
-          <div className="mb-1.5 flex items-center justify-between">
-            <label
-              htmlFor="tuner-mileage"
-              className="text-base-content text-xs font-semibold"
-            >
-              Distância Anual
-            </label>
+          <div className="mb-1.5 flex flex-wrap items-center justify-between gap-1">
+            <div className="flex items-center gap-1.5">
+              <label
+                htmlFor="tuner-mileage"
+                className="text-base-content text-xs font-semibold"
+              >
+                Distância Anual
+              </label>
+              <ParamProvenance
+                item={params.general.annual_distance_km}
+                label="Distância Anual"
+              />
+            </div>
             <div className="bg-base-100 border-base-300 flex items-center gap-1 rounded border px-2 py-0.5">
               <input
                 id="tuner-mileage"
@@ -201,9 +246,15 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
         <div className="grid grid-cols-2 gap-2">
           {/* Horizon Pills */}
           <div className="bg-base-200/40 border-base-200 rounded-xl border p-2.5">
-            <span className="text-base-content/70 mb-1.5 block text-[10px] font-semibold">
-              Horizonte
-            </span>
+            <div className="mb-1.5 flex items-center justify-between gap-1">
+              <span className="text-base-content/70 text-[10px] font-semibold">
+                Horizonte
+              </span>
+              <ParamProvenance
+                item={params.general.horizon_years}
+                label="Horizonte Econômico"
+              />
+            </div>
             <div className="flex gap-1">
               {[5, 7, 10].map((h) => (
                 <button
@@ -224,9 +275,15 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
 
           {/* Discount Rate */}
           <div className="bg-base-200/40 border-base-200 flex flex-col justify-between rounded-xl border p-2.5">
-            <span className="text-base-content/70 mb-1 block text-[10px] font-semibold">
-              Taxa Desconto
-            </span>
+            <div className="mb-1 flex items-center justify-between gap-1">
+              <span className="text-base-content/70 text-[10px] font-semibold">
+                Desconto
+              </span>
+              <ParamProvenance
+                item={params.general.discount_rate}
+                label="Taxa de Desconto"
+              />
+            </div>
             <div className="bg-base-100 border-base-300 flex items-center justify-end gap-1 rounded border px-2 py-1">
               <DecimalInput
                 step={0.5}
@@ -245,6 +302,46 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
               />
               <span className="text-base-content/60 shrink-0 text-[10px]">% a.a.</span>
             </div>
+          </div>
+        </div>
+
+        {/* 3b. Residual Value Scenario (§4.4) */}
+        <div className="bg-base-200/40 border-base-200 rounded-xl border p-2.5">
+          <div className="mb-1.5 flex items-center justify-between gap-1">
+            <span className="text-base-content/75 text-[10px] font-semibold">
+              Cenário Residual (§4.4)
+            </span>
+            <ParamProvenance
+              item={params.vehicles.diesel.residual_value_ratio}
+              label="Cenário de Valor Residual"
+            />
+          </div>
+          <div
+            className="grid grid-cols-3 gap-1"
+            role="group"
+            aria-label="Cenário de valor residual"
+          >
+            {(
+              [
+                { id: 'low', label: 'Baixo (-15p.p.)' },
+                { id: 'base', label: 'Base' },
+                { id: 'high', label: 'Alto (+15p.p.)' },
+              ] as const
+            ).map((opt) => (
+              <button
+                key={opt.id}
+                type="button"
+                onClick={() => onResidualScenarioChange(opt.id)}
+                aria-pressed={residualScenario === opt.id}
+                className={`rounded py-1 text-[10px] font-bold transition-colors ${
+                  residualScenario === opt.id
+                    ? 'bg-primary text-primary-content shadow-xs'
+                    : 'bg-base-100 text-base-content/70 hover:bg-base-200'
+                }`}
+              >
+                {opt.label}
+              </button>
+            ))}
           </div>
         </div>
 
@@ -275,16 +372,16 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
                       : 'bg-base-200/40 hover:bg-base-200/70'
                   }`}
                 >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
+                  <div className="flex items-center justify-between gap-1">
+                    <div className="flex flex-wrap items-center gap-1.5">
                       <span className={`h-2 w-2 rounded-full ${fuel.dotColor}`}></span>
                       <span className="text-base-content text-xs font-medium">
                         {fuel.label}
                       </span>
-                      <SourceRef id={fuel.sourceId} context={fuel.label} />
+                      <ParamProvenance item={priceObj} label={fuel.label} />
                     </div>
 
-                    <div className="bg-base-100 border-base-300 flex items-center gap-1 rounded border px-1.5 py-0.5">
+                    <div className="bg-base-100 border-base-300 flex shrink-0 items-center gap-1 rounded border px-1.5 py-0.5">
                       <span className="text-base-content/50 font-mono text-[10px]">
                         R$
                       </span>
@@ -321,7 +418,7 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
           </div>
         </div>
 
-        {/* 5. Collapsible Truck Technical Details (CAPEX & Consumo) */}
+        {/* 5. Collapsible Truck Technical Details & Regulatory Inputs */}
         <div className="border-base-200 border-t pt-2.5">
           <button
             type="button"
@@ -329,7 +426,7 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
             className="text-base-content/70 hover:text-primary flex w-full items-center justify-between py-1 text-xs font-semibold transition-colors"
             aria-expanded={showVehicleDetails}
           >
-            <span>Preço do Caminhão (CAPEX) & Consumo</span>
+            <span>CAPEX, Residual, Eficiência &amp; Insumos</span>
             <span className="font-mono text-[10px]">
               {showVehicleDetails ? '▲ Fechar' : '▼ Ajustar'}
             </span>
@@ -370,51 +467,204 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
               </div>
 
               {/* Purchase price */}
-              <div className="flex items-center justify-between">
-                <span className="text-base-content/70 text-[11px]">Aquisição (R$):</span>
+              <div className="flex items-center justify-between gap-1">
+                <div className="flex flex-wrap items-center gap-1">
+                  <span className="text-base-content/70 text-[11px]">
+                    Aquisição (R$):
+                  </span>
+                  <ParamProvenance
+                    item={selectedVehicle.vehicle_purchase_price}
+                    label={`Aquisição (${selectedVehicle.label})`}
+                  />
+                </div>
                 <input
                   type="number"
                   step="20000"
-                  value={params.vehicles[selectedAltTab].vehicle_purchase_price.value}
+                  value={selectedVehicle.vehicle_purchase_price.value}
                   onChange={(e) => {
                     const val = parseFloat(e.target.value);
                     if (!isNaN(val))
                       onVehicleChange(selectedAltTab, 'vehicle_purchase_price', val);
                   }}
-                  className="bg-base-100 text-base-content border-base-300 w-24 rounded border px-2 py-0.5 text-right font-mono text-xs font-bold focus:outline-none"
+                  className="bg-base-100 text-base-content border-base-300 w-24 shrink-0 rounded border px-2 py-0.5 text-right font-mono text-xs font-bold focus:outline-none"
                 />
               </div>
 
               {/* Consumption */}
-              <div className="flex items-center justify-between">
-                <span className="text-base-content/70 text-[11px]">
-                  Consumo ({params.vehicles[selectedAltTab].consumption.unit}):
-                </span>
+              <div className="flex items-center justify-between gap-1">
+                <div className="flex flex-wrap items-center gap-1">
+                  <span className="text-base-content/70 text-[11px]">
+                    Consumo ({selectedVehicle.consumption.unit}):
+                  </span>
+                  <ParamProvenance
+                    item={selectedVehicle.consumption}
+                    label={`Consumo (${selectedVehicle.label})`}
+                  />
+                </div>
                 <DecimalInput
                   step={0.1}
                   decimals={1}
                   min={0.1}
-                  value={params.vehicles[selectedAltTab].consumption.value}
+                  value={selectedVehicle.consumption.value}
                   onChange={(val) => {
                     if (val > 0) onVehicleChange(selectedAltTab, 'consumption', val);
                   }}
-                  className="bg-base-100 text-base-content border-base-300 w-20 rounded border px-2 py-0.5 text-right font-mono text-xs font-bold focus:outline-none"
+                  className="bg-base-100 text-base-content border-base-300 w-20 shrink-0 rounded border px-2 py-0.5 text-right font-mono text-xs font-bold focus:outline-none"
                 />
               </div>
 
               {/* Maintenance */}
-              <div className="flex items-center justify-between">
-                <span className="text-base-content/70 text-[11px]">Manut. (R$/km):</span>
+              <div className="flex items-center justify-between gap-1">
+                <div className="flex flex-wrap items-center gap-1">
+                  <span className="text-base-content/70 text-[11px]">
+                    Manut. (R$/km):
+                  </span>
+                  <ParamProvenance
+                    item={selectedVehicle.maintenance_cost_per_km}
+                    label={`Manutenção (${selectedVehicle.label})`}
+                  />
+                </div>
                 <DecimalInput
                   step={0.05}
                   decimals={2}
                   min={0}
-                  value={params.vehicles[selectedAltTab].maintenance_cost_per_km.value}
+                  value={selectedVehicle.maintenance_cost_per_km.value}
                   onChange={(val) =>
                     onVehicleChange(selectedAltTab, 'maintenance_cost_per_km', val)
                   }
-                  className="bg-base-100 text-base-content border-base-300 w-20 rounded border px-2 py-0.5 text-right font-mono text-xs font-bold focus:outline-none"
+                  className="bg-base-100 text-base-content border-base-300 w-20 shrink-0 rounded border px-2 py-0.5 text-right font-mono text-xs font-bold focus:outline-none"
                 />
+              </div>
+
+              {/* Residual value */}
+              <div className="flex items-center justify-between gap-1">
+                <div className="flex flex-wrap items-center gap-1">
+                  <span className="text-base-content/70 text-[11px]">
+                    Residual (% V₀):
+                  </span>
+                  <ParamProvenance
+                    item={selectedVehicle.residual_value_ratio}
+                    label={`Valor Residual (${selectedVehicle.label})`}
+                  />
+                </div>
+                <DecimalInput
+                  step={5}
+                  decimals={0}
+                  min={(selectedVehicle.residual_value_ratio.min ?? 0) * 100}
+                  max={(selectedVehicle.residual_value_ratio.max ?? 0.9) * 100}
+                  value={selectedVehicle.residual_value_ratio.value * 100}
+                  onChange={(pct) =>
+                    onVehicleChange(selectedAltTab, 'residual_value_ratio', pct / 100)
+                  }
+                  className="bg-base-100 text-base-content border-base-300 w-20 shrink-0 rounded border px-2 py-0.5 text-right font-mono text-xs font-bold focus:outline-none"
+                />
+              </div>
+
+              {/* Charging efficiency (BEV only) */}
+              {selectedVehicle.charging_efficiency && (
+                <div className="flex items-center justify-between gap-1">
+                  <div className="flex flex-wrap items-center gap-1">
+                    <span className="text-base-content/70 text-[11px]">
+                      Efic. recarga (%):
+                    </span>
+                    <ParamProvenance
+                      item={selectedVehicle.charging_efficiency}
+                      label="Eficiência de Recarga"
+                    />
+                  </div>
+                  <DecimalInput
+                    step={1}
+                    decimals={0}
+                    min={(selectedVehicle.charging_efficiency.min ?? 0.5) * 100}
+                    max={(selectedVehicle.charging_efficiency.max ?? 1) * 100}
+                    value={selectedVehicle.charging_efficiency.value * 100}
+                    onChange={(pct) =>
+                      onVehicleChange(selectedAltTab, 'charging_efficiency', pct / 100)
+                    }
+                    className="bg-base-100 text-base-content border-base-300 w-20 shrink-0 rounded border px-2 py-0.5 text-right font-mono text-xs font-bold focus:outline-none"
+                  />
+                </div>
+              )}
+
+              {/* ARLA & Biodiesel & CBIO globals */}
+              <div className="border-base-200 space-y-2 border-t pt-2">
+                <div className="flex items-center justify-between gap-1">
+                  <div className="flex flex-wrap items-center gap-1">
+                    <span className="text-base-content/70 text-[11px]">
+                      ARLA 32 (R$/L):
+                    </span>
+                    <ParamProvenance
+                      item={params.general.arla_price}
+                      label="Preço ARLA 32"
+                    />
+                  </div>
+                  <DecimalInput
+                    step={0.1}
+                    decimals={2}
+                    min={params.general.arla_price.min ?? 1}
+                    max={params.general.arla_price.max ?? 10}
+                    value={arlaPrice}
+                    onChange={(val) => onGeneralChange('arla_price', val)}
+                    className="bg-base-100 text-base-content border-base-300 w-20 shrink-0 rounded border px-2 py-0.5 text-right font-mono text-xs font-bold focus:outline-none"
+                  />
+                </div>
+
+                <div className="flex items-center justify-between gap-1">
+                  <div className="flex flex-wrap items-center gap-1">
+                    <span className="text-base-content/70 text-[11px]">
+                      Biodiesel (% v/v):
+                    </span>
+                    <ParamProvenance
+                      item={params.general.biodiesel_blend}
+                      label="Teor de Biodiesel"
+                    />
+                  </div>
+                  <DecimalInput
+                    step={1}
+                    decimals={0}
+                    min={(params.general.biodiesel_blend.min ?? 0) * 100}
+                    max={(params.general.biodiesel_blend.max ?? 0.4) * 100}
+                    value={biodieselBlend * 100}
+                    onChange={(pct) => onGeneralChange('biodiesel_blend', pct / 100)}
+                    className="bg-base-100 text-base-content border-base-300 w-20 shrink-0 rounded border px-2 py-0.5 text-right font-mono text-xs font-bold focus:outline-none"
+                  />
+                </div>
+
+                <div className="space-y-1.5 pt-1">
+                  <label className="flex cursor-pointer items-center justify-between gap-2">
+                    <span className="text-base-content/75 text-[11px] font-medium">
+                      Sensibilidade CBIO (produtor)
+                    </span>
+                    <input
+                      type="checkbox"
+                      className="toggle toggle-xs toggle-success"
+                      checked={includeCbio}
+                      onChange={(e) => onIncludeCbioChange(e.target.checked)}
+                    />
+                  </label>
+                  {includeCbio && params.general.cbio_price && (
+                    <div className="flex items-center justify-between gap-1">
+                      <div className="flex flex-wrap items-center gap-1">
+                        <span className="text-base-content/70 text-[11px]">
+                          CBIO (R$/un):
+                        </span>
+                        <ParamProvenance
+                          item={params.general.cbio_price}
+                          label="Preço CBIO"
+                        />
+                      </div>
+                      <DecimalInput
+                        step={1}
+                        decimals={0}
+                        min={params.general.cbio_price.min ?? 20}
+                        max={params.general.cbio_price.max ?? 300}
+                        value={cbioPrice}
+                        onChange={(val) => onGeneralChange('cbio_price', val)}
+                        className="bg-base-100 text-base-content border-base-300 w-20 shrink-0 rounded border px-2 py-0.5 text-right font-mono text-xs font-bold focus:outline-none"
+                      />
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           )}

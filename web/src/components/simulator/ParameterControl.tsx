@@ -110,26 +110,32 @@ export const ParameterControl: React.FC<ParameterControlProps> = ({
       )}
 
       <div className="flex items-center gap-3">
-        <div className="flex-1">
-          <input
-            id={sliderId}
-            type="range"
-            min={min}
-            max={max}
-            step={step}
-            value={item.value}
-            onChange={handleSliderChange}
-            aria-label={`Controle deslizante de ${label}`}
-            aria-valuemin={min}
-            aria-valuemax={max}
-            aria-valuenow={item.value}
-            className="range range-primary range-sm focus:outline-primary w-full cursor-pointer"
-          />
-          <div className="text-base-content/50 mt-0.5 flex justify-between px-0.5 font-mono text-[11px]">
-            <span>{min}</span>
-            <span>{max}</span>
+        {min < max ? (
+          <div className="flex-1">
+            <input
+              id={sliderId}
+              type="range"
+              min={min}
+              max={max}
+              step={step > 0 ? step : 'any'}
+              value={item.value}
+              onChange={handleSliderChange}
+              aria-label={`Controle deslizante de ${label}`}
+              aria-valuemin={min}
+              aria-valuemax={max}
+              aria-valuenow={item.value}
+              className="range range-primary range-sm focus:outline-primary w-full cursor-pointer"
+            />
+            <div className="text-base-content/50 mt-0.5 flex justify-between px-0.5 font-mono text-[11px]">
+              <span>{min}</span>
+              <span>{max}</span>
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="text-base-content/60 flex-1 text-xs">
+            Constante física / referência fixa ({min} {item.unit})
+          </div>
+        )}
 
         <div className="w-24 shrink-0 sm:w-28">
           <input
@@ -137,8 +143,9 @@ export const ParameterControl: React.FC<ParameterControlProps> = ({
             type="number"
             min={min}
             max={max}
-            step={step}
+            step={step > 0 ? step : 'any'}
             value={item.value}
+            readOnly={min >= max}
             onChange={handleNumberChange}
             aria-label={`Valor numérico de ${label}`}
             className={`input input-bordered input-sm focus:input-primary w-full text-right font-mono text-xs ${

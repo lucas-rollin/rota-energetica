@@ -1,25 +1,38 @@
 import React, { useMemo, useState } from 'react';
-import { TriangleAlert } from 'lucide-react';
-import { getParameterWarnings, simulate } from '../../lib/calc';
+import { ChevronDown, SlidersHorizontal, TriangleAlert } from 'lucide-react';
+import {
+  applyResidualScenario,
+  getParameterWarnings,
+  simulate,
+  simulateResidualSensitivity,
+  type ResidualScenarioId,
+} from '../../lib/calc';
 import type {
   AlternativeId,
   GeneralParameters,
   SimulationParameters,
   VehicleParameters,
 } from '../../lib/types/parameters';
+import type { PricesHistory } from '../../lib/types/prices';
+import { TransparencyDisclaimer } from '../common/TransparencyDisclaimer';
 import { FleetImpactBanner } from './FleetImpactBanner';
 import { FleetTunerSidebar } from './FleetTunerSidebar';
+import { GeneralParametersPanel } from './GeneralParametersPanel';
 import { ResultCards } from './ResultCards';
 import { ScenarioPresets } from './ScenarioPresets';
-import { TransparencyDisclaimer } from '../common/TransparencyDisclaimer';
+import { VehicleParametersPanel } from './VehicleParametersPanel';
 import { PaybackTimelineChart } from './charts/PaybackTimelineChart';
+import { PriceHistoryChart } from './charts/PriceHistoryChart';
 import { TcoComparisonChart } from './charts/TcoComparisonChart';
 
 interface SimulatorProps {
   defaults: SimulationParameters;
+  pricesHistory?: PricesHistory;
 }
 
-export const Simulator: React.FC<SimulatorProps> = ({ defaults }) => {
+type AdvancedTabId = 'general' | AlternativeId;
+
+export const Simulator: React.FC<SimulatorProps> = ({ defaults, pricesHistory }) => {
   // Deep clone defaults to avoid in-place mutations
   const [params, setParams] = useState<SimulationParameters>(() =>
     JSON.parse(JSON.stringify(defaults))
@@ -28,6 +41,8 @@ export const Simulator: React.FC<SimulatorProps> = ({ defaults }) => {
   const [activePresetId, setActivePresetId] = useState<string>('default');
   const [fleetSize, setFleetSize] = useState<number>(1);
   const [includeCbio, setIncludeCbio] = useState<boolean>(false);
+  const [residualScenario, setResidualScenario] = useState<ResidualScenarioId>('base');
+  const [advancedTab, setAdvancedTab] = useState<AdvancedTabId>('general');
 
   // Count altered parameters
   const alteredCount = useMemo(() => {
@@ -70,17 +85,51 @@ export const Simulator: React.FC<SimulatorProps> = ({ defaults }) => {
     return count;
   }, [params, defaults]);
 
-  // Derived simulation results with useMemo and fallback safety
-  const { results, simulationWarnings, simulationError } = useMemo(() => {
+  const effectiveParams = useMemo(
+    () => applyResidualScenario(params, residualScenario),
+    [params, residualScenario]
+  );
+
+  // Derived simulation results & Methodology §4.4 residual sensitivity band
+  const { results, residualBand, simulationWarnings, simulationError } = useMemo(() => {
     try {
-      const warnings = getParameterWarnings(params);
-      const res = simulate(params, { includeCbio });
-      return { results: res, simulationWarnings: warnings, simulationError: null };
+      const warnings = getParameterWarnings(effectiveParams);
+      const res = simulate(effectiveParams, { includeCbio });
+      const sensitivity = simulateResidualSensitivity(params, { includeCbio });
+      const band = {
+        diesel: {
+          lowTco: sensitivity.low.diesel.tco,
+          highTco: sensitivity.high.diesel.tco,
+        },
+        gnv: {
+          lowTco: sensitivity.low.gnv.tco,
+          highTco: sensitivity.high.gnv.tco,
+        },
+        biometano: {
+          lowTco: sensitivity.low.biometano.tco,
+          highTco: sensitivity.high.biometano.tco,
+        },
+        eletrico: {
+          lowTco: sensitivity.low.eletrico.tco,
+          highTco: sensitivity.high.eletrico.tco,
+        },
+      };
+      return {
+        results: res,
+        residualBand: band,
+        simulationWarnings: warnings,
+        simulationError: null,
+      };
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Erro no cálculo da simulação';
-      return { results: null, simulationWarnings: [], simulationError: message };
+      return {
+        results: null,
+        residualBand: undefined,
+        simulationWarnings: [],
+        simulationError: message,
+      };
     }
-  }, [params, includeCbio]);
+  }, [params, effectiveParams, includeCbio]);
 
   // Handle Preset application
   const handleApplyPreset = (newParams: SimulationParameters, presetId: string) => {
@@ -104,6 +153,12 @@ export const Simulator: React.FC<SimulatorProps> = ({ defaults }) => {
         },
       },
     }));
+  };
+
+  const handleGeneralReset = <K extends keyof GeneralParameters>(key: K) => {
+    const defaultItem = defaults.general[key];
+    if (!defaultItem) return;
+    handleGeneralChange(key, defaultItem.value);
   };
 
   // Vehicle parameters handler
@@ -135,40 +190,51 @@ export const Simulator: React.FC<SimulatorProps> = ({ defaults }) => {
     });
   };
 
+  const handleVehicleReset = <K extends keyof VehicleParameters>(
+    alt: AlternativeId,
+    key: K
+  ) => {
+    const defaultField = defaults.vehicles[alt]?.[key];
+    if (defaultField && typeof defaultField === 'object' && 'value' in defaultField) {
+      handleVehicleChange(alt, key, defaultField.value);
+    }
+  };
+
   // Global Reset handler
   const handleResetAll = () => {
     setParams(JSON.parse(JSON.stringify(defaults)));
     setActivePresetId('default');
     setFleetSize(1);
     setIncludeCbio(false);
+    setResidualScenario('base');
   };
 
   // Vehicle acquisition prices for card deltas
   const vehiclePurchasePrices: Record<AlternativeId, number> = {
-    diesel: params.vehicles.diesel.vehicle_purchase_price.value,
-    gnv: params.vehicles.gnv.vehicle_purchase_price.value,
-    biometano: params.vehicles.biometano.vehicle_purchase_price.value,
-    eletrico: params.vehicles.eletrico.vehicle_purchase_price.value,
+    diesel: effectiveParams.vehicles.diesel.vehicle_purchase_price.value,
+    gnv: effectiveParams.vehicles.gnv.vehicle_purchase_price.value,
+    biometano: effectiveParams.vehicles.biometano.vehicle_purchase_price.value,
+    eletrico: effectiveParams.vehicles.eletrico.vehicle_purchase_price.value,
   };
   const dieselPurchasePrice = vehiclePurchasePrices.diesel;
 
   // Energy prices for cards
   const energyPrices: Record<AlternativeId, { value: number; unit: string }> = {
     diesel: {
-      value: params.vehicles.diesel.energy_price.value,
-      unit: params.vehicles.diesel.energy_price.unit,
+      value: effectiveParams.vehicles.diesel.energy_price.value,
+      unit: effectiveParams.vehicles.diesel.energy_price.unit,
     },
     biometano: {
-      value: params.vehicles.biometano.energy_price.value,
-      unit: params.vehicles.biometano.energy_price.unit,
+      value: effectiveParams.vehicles.biometano.energy_price.value,
+      unit: effectiveParams.vehicles.biometano.energy_price.unit,
     },
     eletrico: {
-      value: params.vehicles.eletrico.energy_price.value,
-      unit: params.vehicles.eletrico.energy_price.unit,
+      value: effectiveParams.vehicles.eletrico.energy_price.value,
+      unit: effectiveParams.vehicles.eletrico.energy_price.unit,
     },
     gnv: {
-      value: params.vehicles.gnv.energy_price.value,
-      unit: params.vehicles.gnv.energy_price.unit,
+      value: effectiveParams.vehicles.gnv.energy_price.value,
+      unit: effectiveParams.vehicles.gnv.energy_price.unit,
     },
   };
 
@@ -183,7 +249,7 @@ export const Simulator: React.FC<SimulatorProps> = ({ defaults }) => {
         />
       </section>
 
-      {/* Mild Warning for Out-of-Bound Sensitivity Scenarios (Does not disrupt charts) */}
+      {/* Mild Warning for Out-of-Bound Sensitivity Scenarios */}
       {simulationWarnings && simulationWarnings.length > 0 && (
         <div
           role="status"
@@ -219,7 +285,7 @@ export const Simulator: React.FC<SimulatorProps> = ({ defaults }) => {
         </div>
       )}
 
-      {/* 2. TOP KPI CARDS (Full Width, Above Parameters like in Stitch) */}
+      {/* 2. TOP KPI CARDS */}
       {results && (
         <section aria-label="Métricas Comparativas por Trem de Força">
           <ResultCards
@@ -227,6 +293,7 @@ export const Simulator: React.FC<SimulatorProps> = ({ defaults }) => {
             dieselPurchasePrice={dieselPurchasePrice}
             vehiclePurchasePrices={vehiclePurchasePrices}
             energyPrices={energyPrices}
+            residualBand={residualBand}
           />
         </section>
       )}
@@ -241,42 +308,122 @@ export const Simulator: React.FC<SimulatorProps> = ({ defaults }) => {
             onFleetSizeChange={setFleetSize}
             onGeneralChange={handleGeneralChange}
             onVehicleChange={handleVehicleChange}
+            residualScenario={residualScenario}
+            onResidualScenarioChange={setResidualScenario}
+            includeCbio={includeCbio}
+            onIncludeCbioChange={setIncludeCbio}
             onResetAll={handleResetAll}
             alteredCount={alteredCount}
           />
         </div>
 
-        {/* RIGHT COLUMN: Fleet Impact Banner + Interactive Charts + Global Context */}
+        {/* RIGHT COLUMN: Fleet Impact Banner + Interactive Charts */}
         <div className="space-y-6 xl:col-span-8">
           {results && (
             <>
-              {/* Fleet Impact Callout Banner */}
               <FleetImpactBanner
                 results={results}
-                params={params}
+                params={effectiveParams}
                 fleetSize={fleetSize}
               />
 
-              {/* Interactive Charts: TCO Stacked Breakdown & Payback Timeline */}
               <div className="space-y-6">
                 <TcoComparisonChart
                   results={results}
-                  horizonYears={Math.round(params.general.horizon_years.value)}
+                  horizonYears={Math.round(effectiveParams.general.horizon_years.value)}
                   fleetSize={fleetSize}
                 />
 
                 <PaybackTimelineChart
                   results={results}
-                  params={params}
+                  params={effectiveParams}
                   fleetSize={fleetSize}
                 />
+
+                {pricesHistory && <PriceHistoryChart pricesHistory={pricesHistory} />}
               </div>
             </>
           )}
         </div>
       </div>
 
-      {/* 4. Methodology §10 Transparency Disclaimers near results */}
+      {/* 4. Full Editable Parameter Panels with Badges & Sources */}
+      <section aria-label="Editor Avançado de Premissas e Proveniência">
+        <details className="card bg-base-100 border-base-200 group overflow-hidden rounded-2xl border shadow-xs">
+          <summary className="hover:bg-base-200/40 flex cursor-pointer list-none items-center justify-between gap-3 p-4 transition-colors select-none sm:p-5">
+            <div className="flex items-center gap-2.5">
+              <span className="bg-primary/10 text-primary flex h-8 w-8 shrink-0 items-center justify-center rounded-xl">
+                <SlidersHorizontal className="h-4 w-4" aria-hidden="true" />
+              </span>
+              <div>
+                <h2 className="text-base-content text-sm font-bold sm:text-base">
+                  Parâmetros Completos, Selos de Qualidade e Fontes
+                </h2>
+                <p className="text-base-content/70 text-xs">
+                  Edite todas as premissas do modelo (incluindo valor residual, eficiência
+                  de recarga, ARLA, biodiesel, densidade energética e fatores WtW) com
+                  rastreabilidade por parâmetro.
+                </p>
+              </div>
+            </div>
+            <ChevronDown
+              className="text-base-content/60 h-4 w-4 shrink-0 transition-transform duration-200 group-open:rotate-180"
+              aria-hidden="true"
+            />
+          </summary>
+
+          <div className="border-base-200 space-y-5 border-t p-4 sm:p-5">
+            <div
+              className="flex flex-wrap gap-1.5"
+              role="tablist"
+              aria-label="Categorias de parâmetros do simulador"
+            >
+              {(
+                [
+                  { id: 'general', label: 'Globais & Operação' },
+                  { id: 'diesel', label: 'Diesel B15' },
+                  { id: 'biometano', label: 'Biometano' },
+                  { id: 'eletrico', label: 'Elétrico (BEV)' },
+                  { id: 'gnv', label: 'GNV' },
+                ] as const
+              ).map((tab) => (
+                <button
+                  key={tab.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={advancedTab === tab.id}
+                  onClick={() => setAdvancedTab(tab.id)}
+                  className={`btn btn-xs sm:btn-sm ${
+                    advancedTab === tab.id ? 'btn-primary' : 'btn-outline border-base-300'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+
+            {advancedTab === 'general' ? (
+              <GeneralParametersPanel
+                parameters={params.general}
+                defaultParameters={defaults.general}
+                onChange={handleGeneralChange}
+                onReset={handleGeneralReset}
+              />
+            ) : (
+              <VehicleParametersPanel
+                alternativeId={advancedTab}
+                parameters={params.vehicles[advancedTab]}
+                defaultParameters={defaults.vehicles[advancedTab]}
+                dieselPurchasePrice={params.vehicles.diesel.vehicle_purchase_price.value}
+                onChange={(key, val) => handleVehicleChange(advancedTab, key, val)}
+                onReset={(key) => handleVehicleReset(advancedTab, key)}
+              />
+            )}
+          </div>
+        </details>
+      </section>
+
+      {/* 5. Methodology §10 Transparency Disclaimers near results */}
       <section aria-label="Transparência e Limitações Metodológicas">
         <TransparencyDisclaimer />
       </section>

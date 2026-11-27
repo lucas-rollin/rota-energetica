@@ -154,6 +154,17 @@ export const VehicleParametersPanel: React.FC<VehicleParametersPanelProps> = ({
               onReset={() => onReset('arla_consumption_ratio')}
             />
           )}
+
+        {parameters.payload_penalty_kg && defaultParameters.payload_penalty_kg && (
+          <ParameterControl
+            id={`${alternativeId}-payload-penalty`}
+            label="Impacto na carga útil (Lei da Balança)"
+            item={parameters.payload_penalty_kg}
+            defaultItem={defaultParameters.payload_penalty_kg}
+            onChange={(val) => onChange('payload_penalty_kg', val)}
+            onReset={() => onReset('payload_penalty_kg')}
+          />
+        )}
       </div>
     </div>
   );

@@ -2,9 +2,12 @@
 import Layout from '../layouts/Layout.astro';
 import Simulator from '../components/simulator/Simulator';
 import parametersJson from '../../../data/parameters.json';
+import pricesHistoryJson from '../../../data/processed/prices_history.json';
 import type { SimulationParameters } from '../lib/types';
+import type { PricesHistory } from '../lib/types/prices';
 
 const defaults = parametersJson as unknown as SimulationParameters;
+const pricesHistory = pricesHistoryJson as unknown as PricesHistory;
 ---
 
 <Layout
@@ -22,5 +25,5 @@ const defaults = parametersJson as unknown as SimulationParameters;
     </p>
   </div>
 
-  <Simulator client:load defaults={defaults} />
+  <Simulator client:load defaults={defaults} pricesHistory={pricesHistory} />
 </Layout>
