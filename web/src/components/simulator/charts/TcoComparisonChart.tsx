@@ -12,6 +12,7 @@ import { SVGRenderer } from 'echarts/renderers';
 import type { AlternativeId } from '../../../lib/types/parameters';
 import type { SimulationResults } from '../../../lib/types/scenario';
 import { formatCurrency, formatNumber } from '../../../lib/utils/format';
+import { SourceRef } from '../../common/SourceRef';
 import { ChartContainer } from './ChartContainer';
 
 // Register necessary ECharts components once
@@ -392,12 +393,29 @@ export const TcoComparisonChart: React.FC<TcoComparisonChartProps> = ({
     </div>
   );
 
+  const sourceAttribution = (
+    <>
+      <span className="font-semibold">Fontes:</span>
+      <span>ANP (Diesel/GNV)</span>
+      <SourceRef id="P01" context="Preços ANP no TCO" />
+      <span>· ANEEL CELESC (Eletricidade)</span>
+      <SourceRef id="P06" context="Tarifa elétrica no TCO" />
+      <span>· NTC/CNT &amp; FIPE (OPEX/Residual)</span>
+      <SourceRef id="V05" context="Manutenção NTC/CNT" />
+      <SourceRef id="V06" context="Valor residual FIPE" />
+      <span>· Montadoras (Scania/Sany)</span>
+      <SourceRef id="V07" context="Especificações Scania G/R 460" />
+      <SourceRef id="V08" context="Especificações Sany SE 588" />
+    </>
+  );
+
   return (
     <ChartContainer
       id="tco-comparison"
       title="Decomposição do Custo Total de Propriedade (TCO)"
       subtitle={`Comparativo da composição de capital líquido e custos operacionais descontados em ${horizonYears} anos.`}
       summaryText={`${summaryText} Destaque: ${cheapestAlt}.`}
+      sourceAttribution={sourceAttribution}
       tableData={tableData}
       controls={controls}
     >

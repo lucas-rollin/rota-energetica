@@ -11,6 +11,7 @@ interface ChartContainerProps {
   title: string;
   subtitle?: string;
   summaryText: string;
+  sourceAttribution?: React.ReactNode;
   tableData: ChartTableData;
   controls?: React.ReactNode;
   children: React.ReactNode;
@@ -21,6 +22,7 @@ export const ChartContainer: React.FC<ChartContainerProps> = ({
   title,
   subtitle,
   summaryText,
+  sourceAttribution,
   tableData,
   controls,
   children,
@@ -136,6 +138,12 @@ export const ChartContainer: React.FC<ChartContainerProps> = ({
             </table>
           </div>
         </div>
+
+        {sourceAttribution && (
+          <div className="border-base-200/80 text-base-content/70 mt-3 flex flex-wrap items-center gap-1.5 border-t pt-2.5 text-[11px]">
+            {sourceAttribution}
+          </div>
+        )}
       </div>
     </div>
   );

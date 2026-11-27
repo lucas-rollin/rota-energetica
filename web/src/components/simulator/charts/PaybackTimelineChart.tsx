@@ -14,6 +14,7 @@ import type { SimulationResults } from '../../../lib/types/scenario';
 import { calculateAnnuityDiscountFactor } from '../../../lib/calc/tco';
 import { FUEL_THEME } from '../../../lib/theme/fuels';
 import { formatCurrency, formatNumber } from '../../../lib/utils/format';
+import { SourceRef } from '../../common/SourceRef';
 import { ChartContainer, type ChartTableData } from './ChartContainer';
 
 echarts.use([
@@ -303,12 +304,28 @@ export const PaybackTimelineChart: React.FC<PaybackTimelineChartProps> = ({
     };
   }, []);
 
+  const sourceAttribution = (
+    <>
+      <span className="font-semibold">Fontes:</span>
+      <span>ANP (Diesel/GNV)</span>
+      <SourceRef id="P01" context="Preços ANP no Payback" />
+      <span>· ANEEL CELESC (Eletricidade)</span>
+      <SourceRef id="P06" context="Tarifa elétrica no Payback" />
+      <span>· Biometano (Ilustrativa)</span>
+      <SourceRef id="P05" context="Referência de biometano" />
+      <span>· FIPE &amp; NTC/CNT</span>
+      <SourceRef id="V06" context="CAPEX e residual FIPE" />
+      <SourceRef id="V05" context="OPEX NTC/CNT" />
+    </>
+  );
+
   return (
     <ChartContainer
       id="payback-timeline"
       title="Evolução Temporal dos Custos e Ponto de Equilíbrio (Payback)"
       subtitle="Custos acumulados (investimento inicial + custos operacionais descontados) do Ano 0 ao fim do horizonte."
       summaryText={paybackText}
+      sourceAttribution={sourceAttribution}
       tableData={tableData}
     >
       <div
