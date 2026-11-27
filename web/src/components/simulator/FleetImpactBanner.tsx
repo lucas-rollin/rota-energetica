@@ -83,7 +83,7 @@ export const FleetImpactBanner: React.FC<FleetImpactBannerProps> = ({
   }
 
   return (
-    <div className="via-base-100 to-base-100 relative overflow-hidden rounded-2xl border border-emerald-500/30 bg-linear-to-br from-emerald-950/20 p-4 shadow-sm sm:p-6 dark:from-emerald-950/40">
+    <div className="via-base-100 to-base-100 relative overflow-hidden rounded-2xl border border-emerald-500/30 bg-linear-to-br from-emerald-400/20 dark:from-emerald-950/40 p-4 shadow-sm sm:p-6">
       <div className="relative z-10 flex flex-col justify-between gap-4 lg:flex-row lg:items-center">
         <div>
           <div className="flex items-center gap-2">
