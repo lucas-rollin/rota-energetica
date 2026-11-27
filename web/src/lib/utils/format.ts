@@ -63,3 +63,18 @@ export function formatDeltaText(diff: number, pct: number, unit: string = ''): s
   const unitPart = unit ? ` ${unit}` : '';
   return `${sign}${formattedPct} (${sign}${formattedDiff}${unitPart})`;
 }
+
+const HTML_ESCAPE_MAP: Record<string, string> = {
+  '&': '&amp;',
+  '<': '&lt;',
+  '>': '&gt;',
+  '"': '&quot;',
+  "'": '&#39;',
+};
+
+/**
+ * Escapes special HTML characters for safe interpolation inside tooltip HTML strings.
+ */
+export function escapeHtml(value: unknown): string {
+  return String(value ?? '').replace(/[&<>"']/g, (ch) => HTML_ESCAPE_MAP[ch] ?? ch);
+}

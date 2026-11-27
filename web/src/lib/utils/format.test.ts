@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { formatCurrency, formatDeltaText, formatNumber, formatPercent } from './format';
+import {
+  escapeHtml,
+  formatCurrency,
+  formatDeltaText,
+  formatNumber,
+  formatPercent,
+} from './format';
 
 describe('format utilities', () => {
   it('formats numbers using pt-BR convention', () => {
@@ -25,5 +31,12 @@ describe('format utilities', () => {
     expect(formatDeltaText(0, 0)).toBe('Referência');
     expect(formatDeltaText(-1.25, -15.5, 'R$/km')).toBe('-15,5% (-1,25 R$/km)');
     expect(formatDeltaText(2.5, 20.0, 'R$/km')).toBe('+20,0% (+2,50 R$/km)');
+  });
+
+  it('escapes special HTML characters in tooltip strings', () => {
+    expect(escapeHtml('<script>alert("xss" & \'1\')</script>')).toBe(
+      '&lt;script&gt;alert(&quot;xss&quot; &amp; &#39;1&#39;)&lt;/script&gt;'
+    );
+    expect(escapeHtml(null)).toBe('');
   });
 });
