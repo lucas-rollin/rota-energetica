@@ -57,6 +57,23 @@ const navItems = [
     <meta name="generator" content={Astro.generator} />
     <meta name="description" content={description} />
     <title>{title}</title>
+    <script is:inline>
+      (() => {
+        try {
+          const stored = localStorage.getItem('theme');
+          const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          const theme =
+            stored === 'dark' || stored === 'light'
+              ? stored
+              : prefersDark
+                ? 'dark'
+                : 'light';
+          document.documentElement.setAttribute('data-theme', theme);
+        } catch {
+          // Ignore storage/matchMedia errors in restricted contexts
+        }
+      })();
+    </script>
   </head>
   <body class="min-h-screen flex flex-col bg-base-200/40 text-base-content antialiased">
     <!-- Extension Project Header Notice -->
@@ -102,31 +119,83 @@ const navItems = [
             </a>
           </div>
 
-          <nav
-            aria-label="Navegação principal"
-            class="flex items-center gap-1 sm:gap-1.5 overflow-x-auto py-1 max-w-full"
-          >
-            {navItems.map((item) => {
-              const active = item.match(currentPath);
-              return (
-                <a
-                  href={item.href}
-                  class={`btn btn-sm text-xs font-semibold whitespace-nowrap transition-colors ${
-                    active
-                      ? 'btn-neutral text-primary font-bold shadow-xs'
-                      : 'btn-ghost text-base-content/85 hover:text-base-content'
-                  }`}
-                >
-                  {item.label}
-                </a>
-              );
-            })}
+          <div class="flex items-center gap-1 sm:gap-1.5 min-w-0">
+            <nav
+              aria-label="Navegação principal"
+              class="flex items-center gap-1 sm:gap-1.5 overflow-x-auto py-1 max-w-full"
+            >
+              {navItems.map((item) => {
+                const active = item.match(currentPath);
+                return (
+                  <a
+                    href={item.href}
+                    class={`btn btn-sm text-xs font-semibold whitespace-nowrap transition-colors ${
+                      active
+                        ? 'btn-neutral text-primary font-bold shadow-xs'
+                        : 'btn-ghost text-base-content/85 hover:text-base-content'
+                    }`}
+                  >
+                    {item.label}
+                  </a>
+                );
+              })}
+            </nav>
+
+            <label
+              class="swap swap-rotate btn btn-ghost btn-sm btn-square text-base-content shrink-0 ml-1"
+              title="Alternar tema claro/escuro"
+            >
+              <input
+                id="theme-controller"
+                type="checkbox"
+                class="theme-controller"
+                value="dark"
+                aria-label="Alternar modo escuro"
+              />
+              <!-- Sun icon (light mode) -->
+              <svg
+                class="swap-off h-4 w-4"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <circle cx="12" cy="12" r="4"></circle>
+                <path d="M12 2v2"></path>
+                <path d="M12 20v2"></path>
+                <path d="m4.93 4.93 1.41 1.41"></path>
+                <path d="m17.66 17.66 1.41 1.41"></path>
+                <path d="M2 12h2"></path>
+                <path d="M20 12h2"></path>
+                <path d="m6.34 17.66-1.41 1.41"></path>
+                <path d="m19.07 4.93-1.41 1.41"></path>
+              </svg>
+              <!-- Moon icon (dark mode) -->
+              <svg
+                class="swap-on h-4 w-4"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+              </svg>
+            </label>
+
             <a
               href="https://github.com/lucas-rollin/rota-energetica"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Repositório no GitHub (abre em nova aba)"
-              class="btn btn-ghost btn-sm btn-square text-base-content shrink-0 ml-1"
+              class="btn btn-ghost btn-sm btn-square text-base-content shrink-0"
             >
               <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24" aria-hidden="true">
                 <path
@@ -136,7 +205,7 @@ const navItems = [
                 />
               </svg>
             </a>
-          </nav>
+          </div>
         </div>
       </div>
     </header>
@@ -190,5 +259,42 @@ const navItems = [
     </footer>
 
     <GlobalSourceModal client:load />
+
+    <script is:inline>
+      (() => {
+        const toggle = document.getElementById('theme-controller');
+        if (!(toggle instanceof HTMLInputElement)) return;
+
+        const syncToggle = () => {
+          toggle.checked = document.documentElement.getAttribute('data-theme') === 'dark';
+        };
+
+        syncToggle();
+
+        toggle.addEventListener('change', () => {
+          const next = toggle.checked ? 'dark' : 'light';
+          document.documentElement.setAttribute('data-theme', next);
+          try {
+            localStorage.setItem('theme', next);
+          } catch {
+            // Ignore storage errors
+          }
+        });
+
+        const mq = window.matchMedia('(prefers-color-scheme: dark)');
+        mq.addEventListener('change', (e) => {
+          try {
+            if (localStorage.getItem('theme')) return;
+          } catch {
+            // Ignore storage errors
+          }
+          document.documentElement.setAttribute(
+            'data-theme',
+            e.matches ? 'dark' : 'light'
+          );
+          syncToggle();
+        });
+      })();
+    </script>
   </body>
 </html>

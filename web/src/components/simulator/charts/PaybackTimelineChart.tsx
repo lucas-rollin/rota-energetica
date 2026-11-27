@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import * as echarts from 'echarts/core';
 import { LineChart } from 'echarts/charts';
 import {
@@ -13,6 +13,7 @@ import type { AlternativeId, SimulationParameters } from '../../../lib/types/par
 import type { SimulationResults } from '../../../lib/types/scenario';
 import { calculateAnnuityDiscountFactor } from '../../../lib/calc/tco';
 import { FUEL_THEME } from '../../../lib/theme/fuels';
+import { useDarkMode } from '../../../lib/theme/useDarkMode';
 import { formatCurrency, formatNumber } from '../../../lib/utils/format';
 import { SourceRef } from '../../common/SourceRef';
 import { ChartContainer, type ChartTableData } from './ChartContainer';
@@ -47,16 +48,7 @@ export const PaybackTimelineChart: React.FC<PaybackTimelineChartProps> = ({
 }) => {
   const chartRef = useRef<HTMLDivElement>(null);
   const chartInstance = useRef<echarts.ECharts | null>(null);
-  const [isDark, setIsDark] = useState(false);
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const mq = window.matchMedia('(prefers-color-scheme: dark)');
-    const update = () => setIsDark(mq.matches);
-    update();
-    mq.addEventListener('change', update);
-    return () => mq.removeEventListener('change', update);
-  }, []);
+  const isDark = useDarkMode();
 
   const horizonYears = Math.max(1, Math.round(params.general.horizon_years.value));
   const discountRate = params.general.discount_rate.value;

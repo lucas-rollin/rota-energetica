@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import type { FreightCorridor, FuelStation } from '../../lib/types/catalogs';
 import { FUEL_THEME } from '../../lib/theme/fuels';
+import { useDarkMode } from '../../lib/theme/useDarkMode';
 import { formatNumber } from '../../lib/utils/format';
 import { SourceRef } from '../common/SourceRef';
 import {
@@ -136,17 +137,7 @@ export const CorridorInfrastructureMap: React.FC<CorridorInfrastructureMapProps>
     useState<CoverageVisualMode>('route');
   const [hoveredStationId, setHoveredStationId] = useState<string | null>(null);
   const [tableUfFilter, setTableUfFilter] = useState<string>('TODOS');
-  const [isDark, setIsDark] = useState<boolean>(false);
-
-  // Track system dark mode for crisp map palette
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const mq = window.matchMedia('(prefers-color-scheme: dark)');
-    const update = () => setIsDark(mq.matches);
-    update();
-    mq.addEventListener('change', update);
-    return () => mq.removeEventListener('change', update);
-  }, []);
+  const isDark = useDarkMode();
 
   const effectiveRadiusKm = useMemo(
     () => getEffectiveRadiusKm(autonomyKm, radiusMode),

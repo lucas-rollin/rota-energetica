@@ -11,6 +11,7 @@ import {
 import { SVGRenderer } from 'echarts/renderers';
 import type { AlternativeId } from '../../../lib/types/parameters';
 import type { SimulationResults } from '../../../lib/types/scenario';
+import { useDarkMode } from '../../../lib/theme/useDarkMode';
 import { formatCurrency, formatNumber } from '../../../lib/utils/format';
 import { SourceRef } from '../../common/SourceRef';
 import { ChartContainer } from './ChartContainer';
@@ -57,16 +58,7 @@ export const TcoComparisonChart: React.FC<TcoComparisonChartProps> = ({
   const chartRef = useRef<HTMLDivElement>(null);
   const chartInstance = useRef<echarts.ECharts | null>(null);
   const [metricMode, setMetricMode] = useState<MetricMode>('total');
-  const [isDark, setIsDark] = useState(false);
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const mq = window.matchMedia('(prefers-color-scheme: dark)');
-    const update = () => setIsDark(mq.matches);
-    update();
-    mq.addEventListener('change', update);
-    return () => mq.removeEventListener('change', update);
-  }, []);
+  const isDark = useDarkMode();
 
   const isTotal = metricMode === 'total';
   const multiplier = isTotal ? fleetSize : 1;

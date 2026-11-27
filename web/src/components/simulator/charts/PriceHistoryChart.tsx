@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useEffect, useState, useSyncExternalStore } from 'react';
+import React, { useMemo, useRef, useEffect, useState } from 'react';
 import * as echarts from 'echarts/core';
 import { LineChart, type LineSeriesOption } from 'echarts/charts';
 import {
@@ -12,6 +12,7 @@ import {
 import { SVGRenderer } from 'echarts/renderers';
 import type { PricesHistory, PricePoint } from '../../../lib/types/prices';
 import { FUEL_THEME } from '../../../lib/theme/fuels';
+import { useDarkMode } from '../../../lib/theme/useDarkMode';
 import { formatNumber } from '../../../lib/utils/format';
 import { SourceRef } from '../../common/SourceRef';
 import { ChartContainer, type ChartTableData } from './ChartContainer';
@@ -34,22 +35,6 @@ interface PriceHistoryChartProps {
 type RangeMode = 'recent' | 'anp' | 'all';
 type UnitMode = 'nominal' | 'energy';
 
-function subscribeTheme(callback: () => void) {
-  if (typeof window === 'undefined') return () => {};
-  const mq = window.matchMedia('(prefers-color-scheme: dark)');
-  mq.addEventListener('change', callback);
-  return () => mq.removeEventListener('change', callback);
-}
-
-function getIsDarkClient() {
-  if (typeof window === 'undefined') return false;
-  return window.matchMedia('(prefers-color-scheme: dark)').matches;
-}
-
-function getIsDarkServer() {
-  return false;
-}
-
 export const PriceHistoryChart: React.FC<PriceHistoryChartProps> = ({
   pricesHistory,
 }) => {
@@ -57,7 +42,7 @@ export const PriceHistoryChart: React.FC<PriceHistoryChartProps> = ({
   const chartInstance = useRef<echarts.ECharts | null>(null);
   const [rangeMode, setRangeMode] = useState<RangeMode>('recent');
   const [unitMode, setUnitMode] = useState<UnitMode>('nominal');
-  const isDark = useSyncExternalStore(subscribeTheme, getIsDarkClient, getIsDarkServer);
+  const isDark = useDarkMode();
 
   const dieselSeries = pricesHistory.fuels.diesel_s10;
   const gnvSeries = pricesHistory.fuels.gnv;
