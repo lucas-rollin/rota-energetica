@@ -8,6 +8,7 @@ export const OPEN_SOURCE_MODAL_EVENT = 'rota:open-source';
 export interface OpenSourceModalDetail {
   sourceId: string;
   contextLabel?: string;
+  triggerElement?: HTMLElement | null;
 }
 
 /**
@@ -18,9 +19,14 @@ export function openSourceModal(sourceId: string, contextLabel?: string): boolea
   if (!source) return false;
 
   if (typeof window !== 'undefined') {
+    const triggerElement =
+      typeof document !== 'undefined' && document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null;
+
     window.dispatchEvent(
       new CustomEvent<OpenSourceModalDetail>(OPEN_SOURCE_MODAL_EVENT, {
-        detail: { sourceId, contextLabel },
+        detail: { sourceId, contextLabel, triggerElement },
       })
     );
   }
@@ -30,182 +36,222 @@ export function openSourceModal(sourceId: string, contextLabel?: string): boolea
 interface SourceModalProps {
   source: SourceItem | null;
   contextLabel?: string;
+  triggerElement?: HTMLElement | null;
   onClose: () => void;
 }
 
 /**
  * Accessible native dialog displaying provenance, methodology, license, and links for a data source.
+ * Keeps `<dialog>` mounted and closes via `dialog.close()` so focus restores to the triggering SourceRef.
  */
 export const SourceModal: React.FC<SourceModalProps> = ({
   source,
   contextLabel,
+  triggerElement,
   onClose,
 }) => {
   const dialogRef = useRef<HTMLDialogElement | null>(null);
+  const previousFocusRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     const dialog = dialogRef.current;
     if (!dialog) return;
 
     if (source) {
+      if (triggerElement) {
+        previousFocusRef.current = triggerElement;
+      } else if (
+        !previousFocusRef.current &&
+        typeof document !== 'undefined' &&
+        document.activeElement instanceof HTMLElement
+      ) {
+        previousFocusRef.current = document.activeElement;
+      }
+
       if (!dialog.open) {
         dialog.showModal();
       }
     } else if (dialog.open) {
       dialog.close();
     }
-  }, [source]);
+  }, [source, triggerElement]);
 
-  // Handle native cancel (Esc key)
-  const handleCancel = (e: React.SyntheticEvent) => {
-    e.preventDefault();
-    onClose();
+  const restoreFocus = () => {
+    const target = previousFocusRef.current;
+    previousFocusRef.current = null;
+    if (target && target.isConnected && document.activeElement !== target) {
+      target.focus();
+    }
   };
 
-  if (!source) return null;
+  const handleRequestClose = () => {
+    const dialog = dialogRef.current;
+    if (dialog?.open) {
+      dialog.close();
+    } else {
+      restoreFocus();
+      if (source) onClose();
+    }
+  };
+
+  const handleDialogClose = () => {
+    restoreFocus();
+    if (source) {
+      onClose();
+    }
+  };
 
   const badgeColorClass =
-    source.badge === 'Primária'
+    source?.badge === 'Primária'
       ? 'badge-success'
-      : source.badge === 'Adaptada'
+      : source?.badge === 'Adaptada'
         ? 'badge-info'
         : 'badge-warning';
 
   return (
     <dialog
       ref={dialogRef}
-      onCancel={handleCancel}
+      onClose={handleDialogClose}
       className="modal modal-bottom sm:modal-middle"
-      aria-labelledby="source-dialog-title"
+      aria-labelledby={source ? 'source-dialog-title' : undefined}
     >
-      <div className="modal-box bg-base-100 text-base-content border-base-300 max-w-2xl rounded-2xl border p-6 shadow-2xl">
-        <div className="border-base-200 flex items-start justify-between gap-4 border-b pb-3">
-          <div>
-            <div className="mb-1 flex items-center gap-2">
-              <span className="bg-base-200 text-base-content/80 rounded px-2 py-0.5 font-mono text-xs font-bold">
-                {source.id}
-              </span>
-              <span className={`badge badge-sm font-medium ${badgeColorClass}`}>
-                {source.badge}
-              </span>
-              <span className="text-base-content/60 text-xs font-medium">
-                Categoria {source.category}
-              </span>
+      {source && (
+        <>
+          <div className="modal-box bg-base-100 text-base-content border-base-300 max-w-2xl rounded-2xl border p-6 shadow-2xl">
+            <div className="border-base-200 flex items-start justify-between gap-4 border-b pb-3">
+              <div>
+                <div className="mb-1 flex items-center gap-2">
+                  <span className="bg-base-200 text-base-content/85 rounded px-2 py-0.5 font-mono text-xs font-bold">
+                    {source.id}
+                  </span>
+                  <span className={`badge badge-sm font-medium ${badgeColorClass}`}>
+                    {source.badge}
+                  </span>
+                  <span className="text-base-content/75 text-xs font-medium">
+                    Categoria {source.category}
+                  </span>
+                </div>
+                <h3 id="source-dialog-title" className="text-base-content text-xl font-bold">
+                  {source.name}
+                </h3>
+                {contextLabel && (
+                  <p className="text-primary mt-0.5 text-xs font-medium">
+                    Referência: {contextLabel}
+                  </p>
+                )}
+              </div>
+              <button
+                type="button"
+                onClick={handleRequestClose}
+                className="btn btn-sm btn-circle btn-ghost"
+                aria-label="Fechar modal de fonte"
+              >
+                <X className="h-4 w-4" aria-hidden="true" />
+              </button>
             </div>
-            <h3 id="source-dialog-title" className="text-base-content text-xl font-bold">
-              {source.name}
-            </h3>
-            {contextLabel && (
-              <p className="text-primary mt-0.5 text-xs font-medium">
-                Referência: {contextLabel}
-              </p>
-            )}
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="btn btn-sm btn-circle btn-ghost"
-            aria-label="Fechar modal de fonte"
-          >
-            <X className="h-4 w-4" aria-hidden="true" />
-          </button>
-        </div>
 
-        <div className="space-y-4 py-4 text-sm">
-          <div>
-            <span className="text-base-content/60 mb-1 block text-xs font-semibold tracking-wider uppercase">
-              Publicador / Órgão
-            </span>
-            <p className="text-base-content font-medium">{source.publisher}</p>
-          </div>
+            <div className="space-y-4 py-4 text-sm">
+              <div>
+                <span className="text-base-content/75 mb-1 block text-xs font-semibold tracking-wider uppercase">
+                  Publicador / Órgão
+                </span>
+                <p className="text-base-content font-medium">{source.publisher}</p>
+              </div>
 
-          <div>
-            <span className="text-base-content/60 mb-1 block text-xs font-semibold tracking-wider uppercase">
-              Descrição
-            </span>
-            <p className="text-base-content/90 leading-relaxed">{source.description}</p>
-          </div>
+              <div>
+                <span className="text-base-content/75 mb-1 block text-xs font-semibold tracking-wider uppercase">
+                  Descrição
+                </span>
+                <p className="text-base-content/90 leading-relaxed">{source.description}</p>
+              </div>
 
-          {source.notes && (
-            <div className="bg-base-200/50 border-base-200 rounded-lg border p-3">
-              <span className="text-base-content/60 mb-1 block text-xs font-semibold tracking-wider uppercase">
-                Notas metodológicas
-              </span>
-              <p className="text-base-content/80 text-xs leading-relaxed">
-                {source.notes}
-              </p>
-            </div>
-          )}
+              {source.notes && (
+                <div className="bg-base-200/50 border-base-200 rounded-lg border p-3">
+                  <span className="text-base-content/75 mb-1 block text-xs font-semibold tracking-wider uppercase">
+                    Notas metodológicas
+                  </span>
+                  <p className="text-base-content/85 text-xs leading-relaxed">
+                    {source.notes}
+                  </p>
+                </div>
+              )}
 
-          {source.attribution && (
-            <div>
-              <span className="text-base-content/60 mb-1 block text-xs font-semibold tracking-wider uppercase">
-                Texto de Atribuição (LICENSE-DATA)
-              </span>
-              <blockquote className="border-primary bg-primary/5 text-base-content/90 rounded-r border-l-4 py-1 pl-3 font-mono text-xs italic">
-                {source.attribution}
-              </blockquote>
-            </div>
-          )}
+              {source.attribution && (
+                <div>
+                  <span className="text-base-content/75 mb-1 block text-xs font-semibold tracking-wider uppercase">
+                    Texto de Atribuição (LICENSE-DATA)
+                  </span>
+                  <blockquote className="border-primary bg-primary/5 text-base-content/90 rounded-r border-l-4 py-1 pl-3 font-mono text-xs italic">
+                    {source.attribution}
+                  </blockquote>
+                </div>
+              )}
 
-          <div className="grid grid-cols-1 gap-3 pt-2 sm:grid-cols-2">
-            <div>
-              <span className="text-base-content/60 mb-1 block text-xs font-semibold tracking-wider uppercase">
-                Termos de uso
-              </span>
-              <p className="text-base-content/80 text-xs">
-                {source.terms}
-                {source.terms_url && (
-                  <>
-                    {' · '}
+              <div className="grid grid-cols-1 gap-3 pt-2 sm:grid-cols-2">
+                <div>
+                  <span className="text-base-content/75 mb-1 block text-xs font-semibold tracking-wider uppercase">
+                    Termos de uso
+                  </span>
+                  <p className="text-base-content/85 text-xs">
+                    {source.terms}
+                    {source.terms_url && (
+                      <>
+                        {' · '}
+                        <a
+                          href={source.terms_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="link link-primary inline-flex items-center gap-1"
+                        >
+                          <span>Ver termos</span>
+                          <ExternalLink
+                            className="h-3.5 w-3.5 shrink-0"
+                            aria-hidden="true"
+                          />
+                        </a>
+                      </>
+                    )}
+                  </p>
+                </div>
+
+                <div>
+                  <span className="text-base-content/75 mb-1 block text-xs font-semibold tracking-wider uppercase">
+                    Link da Fonte Oficial
+                  </span>
+                  {source.url ? (
                     <a
-                      href={source.terms_url}
+                      href={source.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="link link-primary inline-flex items-center gap-1"
+                      className="link link-primary inline-flex items-center gap-1 text-xs font-medium break-all"
                     >
-                      <span>Ver termos</span>
+                      <span>Acessar página oficial</span>
                       <ExternalLink className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
                     </a>
-                  </>
-                )}
-              </p>
+                  ) : (
+                    <span className="text-base-content/75 text-xs italic">
+                      Link direto não disponível
+                    </span>
+                  )}
+                </div>
+              </div>
             </div>
 
-            <div>
-              <span className="text-base-content/60 mb-1 block text-xs font-semibold tracking-wider uppercase">
-                Link da Fonte Oficial
-              </span>
-              {source.url ? (
-                <a
-                  href={source.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="link link-primary inline-flex items-center gap-1 text-xs font-medium break-all"
-                >
-                  <span>Acessar página oficial</span>
-                  <ExternalLink className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
-                </a>
-              ) : (
-                <span className="text-base-content/50 text-xs italic">
-                  Link direto não disponível
-                </span>
-              )}
+            <div className="modal-action border-base-200 border-t pt-3">
+              <button
+                type="button"
+                className="btn btn-primary btn-sm px-6"
+                onClick={handleRequestClose}
+              >
+                Fechar
+              </button>
             </div>
           </div>
-        </div>
-
-        <div className="modal-action border-base-200 border-t pt-3">
-          <button type="button" className="btn btn-primary btn-sm px-6" onClick={onClose}>
-            Fechar
-          </button>
-        </div>
-      </div>
-      <form method="dialog" className="modal-backdrop">
-        <button type="button" onClick={onClose}>
-          fechar
-        </button>
-      </form>
+          <form method="dialog" className="modal-backdrop">
+            <button type="submit">fechar</button>
+          </form>
+        </>
+      )}
     </dialog>
   );
 };
@@ -217,6 +263,7 @@ export const GlobalSourceModal: React.FC = () => {
   const [modalState, setModalState] = useState<{
     source: SourceItem;
     contextLabel?: string;
+    triggerElement?: HTMLElement | null;
   } | null>(null);
 
   useEffect(() => {
@@ -230,6 +277,7 @@ export const GlobalSourceModal: React.FC = () => {
         setModalState({
           source,
           contextLabel: detail.contextLabel,
+          triggerElement: detail.triggerElement,
         });
       }
     };
@@ -244,6 +292,7 @@ export const GlobalSourceModal: React.FC = () => {
     <SourceModal
       source={modalState?.source ?? null}
       contextLabel={modalState?.contextLabel}
+      triggerElement={modalState?.triggerElement}
       onClose={() => setModalState(null)}
     />
   );
