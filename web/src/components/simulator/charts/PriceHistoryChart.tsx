@@ -29,7 +29,7 @@ echarts.use([
 ]);
 
 interface PriceHistoryChartProps {
-  pricesHistory: PricesHistory;
+  pricesHistory?: PricesHistory;
 }
 
 type RangeMode = 'recent' | 'anp' | 'all';
@@ -42,11 +42,28 @@ export const PriceHistoryChart: React.FC<PriceHistoryChartProps> = ({
   const chartInstance = useRef<echarts.ECharts | null>(null);
   const [rangeMode, setRangeMode] = useState<RangeMode>('recent');
   const [unitMode, setUnitMode] = useState<UnitMode>('nominal');
+  const [loadedHistory, setLoadedHistory] = useState<PricesHistory | null>(null);
   const isDark = useDarkMode();
 
-  const dieselSeries = pricesHistory.fuels.diesel_s10;
-  const gnvSeries = pricesHistory.fuels.gnv;
-  const brentSeries = pricesHistory.fuels.brent;
+  useEffect(() => {
+    if (pricesHistory) return;
+    let active = true;
+    import('../../../../../data/processed/prices_history.json').then((mod) => {
+      if (active) {
+        const data = ('default' in mod ? mod.default : mod) as unknown as PricesHistory;
+        setLoadedHistory(data);
+      }
+    });
+    return () => {
+      active = false;
+    };
+  }, [pricesHistory]);
+
+  const activeHistory = pricesHistory ?? loadedHistory;
+  const referenceUf = activeHistory?.reference_uf ?? 'SC';
+  const dieselSeries = activeHistory?.fuels.diesel_s10;
+  const gnvSeries = activeHistory?.fuels.gnv;
+  const brentSeries = activeHistory?.fuels.brent;
 
   // Baseline 12-week window from diesel_s10
   const baselineWindow = useMemo(() => {
@@ -129,7 +146,7 @@ export const PriceHistoryChart: React.FC<PriceHistoryChartProps> = ({
       const g = gnvMap.get(w);
       const b = brentMap.get(w);
       const isFb = Boolean(d?.is_fallback || g?.is_fallback);
-      const cov = isFb ? 'Fallback BR' : pricesHistory.reference_uf;
+      const cov = isFb ? 'Fallback BR' : referenceUf;
 
       if (unitMode === 'nominal') {
         return [
@@ -158,11 +175,11 @@ export const PriceHistoryChart: React.FC<PriceHistoryChartProps> = ({
     dieselSeries,
     gnvSeries,
     brentSeries,
-    pricesHistory.reference_uf,
+    referenceUf,
   ]);
 
   useEffect(() => {
-    if (!chartRef.current) return;
+    if (!chartRef.current || !activeHistory) return;
 
     let chart = echarts.getInstanceByDom(chartRef.current);
     if (!chart) {
@@ -387,6 +404,7 @@ export const PriceHistoryChart: React.FC<PriceHistoryChartProps> = ({
     dieselSeries,
     gnvSeries,
     brentSeries,
+    activeHistory,
     isDark,
   ]);
 
@@ -399,12 +417,14 @@ export const PriceHistoryChart: React.FC<PriceHistoryChartProps> = ({
     };
   }, []);
 
-  const summaryText = `Série semanal histórica (${weeks[0] ?? '-'} a ${weeks[weeks.length - 1] ?? '-'}) para ${pricesHistory.reference_uf}: Diesel S10, GNV (ANP) e Brent (EIA). Janela padrão de 12 semanas destacada (${baselineWindow?.startWeek ?? ''} a ${baselineWindow?.endWeek ?? ''}); ${fallbackCount} semanas no período usaram fallback nacional (BR).`;
+  const summaryText = activeHistory
+    ? `Série semanal histórica (${weeks[0] ?? '-'} a ${weeks[weeks.length - 1] ?? '-'}) para ${referenceUf}: Diesel S10, GNV (ANP) e Brent (EIA). Janela padrão de 12 semanas destacada (${baselineWindow?.startWeek ?? ''} a ${baselineWindow?.endWeek ?? ''}); ${fallbackCount} semanas no período usaram fallback nacional (BR).`
+    : `Carregando série semanal histórica (ANP e EIA) para ${referenceUf}...`;
 
   const sourceAttribution = (
     <>
       <span className="font-semibold">Fontes:</span>
-      <span>ANP — Diesel S10 e GNV ({pricesHistory.reference_uf})</span>
+      <span>ANP — Diesel S10 e GNV ({referenceUf})</span>
       <SourceRef id={dieselSeries?.source_id ?? 'P01'} context="Série Histórica ANP" />
       {dieselSeries?.retrieved_at && (
         <span className="font-mono text-[11px] opacity-90">
@@ -480,12 +500,19 @@ export const PriceHistoryChart: React.FC<PriceHistoryChartProps> = ({
       tableData={tableData}
       controls={controls}
     >
-      <div
-        ref={chartRef}
-        className="h-72 w-full sm:h-80 md:h-96"
-        role="img"
-        aria-label="Gráfico de linhas mostrando séries históricas semanais de Diesel S10, GNV e Petróleo Brent"
-      />
+      <div className="relative">
+        <div
+          ref={chartRef}
+          className="h-72 w-full sm:h-80 md:h-96"
+          role="img"
+          aria-label="Gráfico de linhas mostrando séries históricas semanais de Diesel S10, GNV e Petróleo Brent"
+        />
+        {!activeHistory && (
+          <div className="text-base-content/75 pointer-events-none absolute inset-0 flex items-center justify-center text-xs font-medium">
+            Carregando série histórica de preços...
+          </div>
+        )}
+      </div>
     </ChartContainer>
   );
 };

@@ -1,29 +1,378 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { ArrowDown, ArrowRight, Calculator, Leaf, ShieldCheck } from 'lucide-react';
 import Simulator from '../components/simulator/Simulator';
+import { PriceHistoryChart } from '../components/simulator/charts/PriceHistoryChart';
+import { EsgDashboard } from '../components/esg/EsgDashboard';
+import { CorridorsDashboard } from '../components/corridors/CorridorsDashboard';
+import { CorridorInfrastructureMap } from '../components/corridors/CorridorInfrastructureMap';
+import { GlobalBenchmarkDashboard } from '../components/global/GlobalBenchmarkDashboard';
 import parametersJson from '../../../data/parameters.json';
-import pricesHistoryJson from '../../../data/processed/prices_history.json';
+import pollutantsJson from '../../../data/processed/local_pollutants.json';
+import corridorsJson from '../../../data/processed/corridors.json';
+import stationsJson from '../../../data/processed/corridor_fuel_stations.json';
+import benchmarksJson from '../../../data/processed/global_benchmarks.json';
 import type { SimulationParameters } from '../lib/types';
-import type { PricesHistory } from '../lib/types/prices';
+import type {
+  CorridorFuelStationsCatalog,
+  CorridorsCatalog,
+  GlobalBenchmarksCatalog,
+  LocalPollutantsCatalog,
+} from '../lib/types/catalogs';
 
 const defaults = parametersJson as unknown as SimulationParameters;
-const pricesHistory = pricesHistoryJson as unknown as PricesHistory;
+const pollutantsData = pollutantsJson as unknown as LocalPollutantsCatalog;
+const corridorsData = corridorsJson as unknown as CorridorsCatalog;
+const stationsData = stationsJson as unknown as CorridorFuelStationsCatalog;
+const benchmarksData = benchmarksJson as unknown as GlobalBenchmarksCatalog;
+
+const baseUrl = import.meta.env.BASE_URL.endsWith('/')
+  ? import.meta.env.BASE_URL
+  : `${import.meta.env.BASE_URL}/`;
 ---
 
 <Layout
+  fullWidth={true}
   title="Rota Energética — Simulador Educacional de Transição em Frotas Pesadas"
-  description="Ferramenta interativa de cálculo de TCO e emissões para cavalos mecânicos rodoviários: Diesel B15, GNV, Biometano e Elétrico."
+  description="Ferramenta interativa de cálculo de TCO, histórico de preços, emissões Poço-à-Roda e infraestrutura de corredores para cavalos mecânicos rodoviários: Diesel B15, GNV, Biometano e Elétrico."
 >
-  <div class="mb-6">
-    <h1 class="text-2xl sm:text-3xl font-extrabold text-base-content tracking-tight">
-      Simulador de Custos e Emissões de Frotas Pesadas
-    </h1>
-    <p class="mt-1 text-sm sm:text-base text-base-content/75 max-w-3xl">
-      Compare o Custo Total de Propriedade (TCO), custos operacionais nivelados e emissões
-      de gases de efeito estufa (Poço à Roda) entre Diesel comercial, GNV, Biometano e
-      Tração Elétrica em Santa Catarina.
-    </p>
+  <!-- Band 1: Chartless Editorial Hero + Methodology Brief -->
+  <div class="bg-base-100">
+    <div class="mx-auto max-w-7xl space-y-10 px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
+      <!-- 1. Hero -->
+      <section id="topo" aria-labelledby="hero-title" class="scroll-mt-20">
+        <div class="max-w-4xl space-y-5">
+          <span class="badge badge-primary badge-outline text-xs font-semibold">
+            Projeto de Extensão Universitária
+          </span>
+
+          <div class="space-y-3">
+            <h1
+              id="hero-title"
+              class="text-base-content text-4xl font-black tracking-tight sm:text-5xl"
+            >
+              Rota Energética
+            </h1>
+            <p class="text-base-content/85 text-base leading-relaxed font-medium sm:text-xl">
+              Compare <strong>Diesel B15</strong>, <strong>GNV</strong>,{' '}
+              <strong>Biometano</strong> e <strong>Elétrico</strong> em caminhões pesados
+              de longa distância: quanto cada um custa por km, ao longo de vários anos, e
+              quanto emite.
+            </p>
+            <p class="text-base-content/75 max-w-3xl text-sm leading-relaxed">
+              O simulador como o resultado muda conforme a quilometragem anual, o preço da energia, o
+              valor de revenda e o acesso a postos e carregadores ao longo da rota. Em rota
+              fixa, com base de recarga própria e energia barata.
+            </p>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-3 pt-1">
+            <a href="#simulador" class="btn btn-primary btn-sm sm:btn-md gap-2 font-bold">
+              <span>Ir para o simulador</span>
+              <ArrowDown className="h-4 w-4 shrink-0" aria-hidden="true" />
+            </a>
+            <a href="#metodologia" class="btn btn-ghost btn-sm sm:btn-md">
+              Como ler os resultados
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. Methodology Brief -->
+      <section
+        id="metodologia"
+        aria-labelledby="metodologia-heading"
+        class="border-base-200 scroll-mt-20 space-y-4 border-t pt-8"
+      >
+        <div class="flex flex-col justify-between gap-2 sm:flex-row sm:items-end">
+          <div>
+            <span class="text-primary text-xs font-bold tracking-wider uppercase">
+              01 · Como ler os resultados
+            </span>
+            <h2
+              id="metodologia-heading"
+              class="text-base-content text-xl font-extrabold tracking-tight sm:text-2xl"
+            >
+              O que o simulador calcula
+            </h2>
+          </div>
+          <a
+            href={`${baseUrl}fontes`}
+            class="link link-primary inline-flex items-center gap-1 text-xs font-semibold"
+          >
+            <span>Ver todas as fontes e parâmetros</span>
+            <ArrowRight className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+          </a>
+        </div>
+
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
+          <!-- TCO -->
+          <article class="bg-base-200/45 border-base-200 rounded-2xl border p-5">
+            <div class="mb-2 flex items-center gap-2.5">
+              <span
+                class="bg-primary/10 text-primary flex h-8 w-8 shrink-0 items-center justify-center rounded-xl"
+              >
+                <Calculator className="h-4 w-4" aria-hidden="true" />
+              </span>
+              <h3 class="text-base-content text-sm font-bold">
+                Custo total de propriedade (TCO)
+              </h3>
+            </div>
+            <p class="text-base-content/75 text-xs leading-relaxed">
+              Tudo que o caminhão custa no horizonte escolhido: compra, combustível ou energia, 
+              manutenção e ARLA 32, menos o que se espera recuperar na revenda.
+            </p>
+            <p
+              class="bg-base-100 border-base-300 text-base-content/90 my-3 rounded-lg border px-3 py-2 text-xs leading-relaxed font-semibold"
+            >
+              Compra + custos de operação − revenda
+            </p>
+            <p class="text-base-content/75 text-xs leading-relaxed">
+              Gastos futuros entram descontados a valor de hoje, porque R$ 1 pago daqui a
+              anos pesa menos que R$ 1 agora. Dividido pelos km rodados, vira o{' '}
+              <strong>custo por km</strong>, que permite comparar alternativas de preços
+              diferentes.
+            </p>
+          </article>
+
+          <!-- Emissions -->
+          <article class="bg-base-200/45 border-base-200 rounded-2xl border p-5">
+            <div class="mb-2 flex items-center gap-2.5">
+              <span
+                class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
+              >
+                <Leaf className="h-4 w-4" aria-hidden="true" />
+              </span>
+              <h3 class="text-base-content text-sm font-bold">Emissões do poço à roda</h3>
+            </div>
+            <p class="text-base-content/75 text-xs leading-relaxed">
+              Contamos o carbono emitido para <strong>produzir e entregar</strong> a
+              energia e também o emitido ao <strong>usá-la</strong> no caminhão. Por isso o
+              elétrico não entra como "zero": o resultado depende de como a rede gera
+              eletricidade.
+            </p>
+            <p class="text-base-content/75 mt-3 text-xs leading-relaxed">
+              A unidade é gramas de CO₂ equivalente por megajoule de energia (gCO₂eq/MJ),
+              multiplicada pela energia gasta por km. Os fatores de GNV e biometano são
+              valores regulatórios (CNPE 4/2026), não medições de uma usina específica.
+            </p>
+          </article>
+
+          <!-- Traceability -->
+          <article class="bg-base-200/45 border-base-200 rounded-2xl border p-5">
+            <div class="mb-2 flex items-center gap-2.5">
+              <span
+                class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 text-amber-700 dark:text-amber-400"
+              >
+                <ShieldCheck className="h-4 w-4" aria-hidden="true" />
+              </span>
+              <h3 class="text-base-content text-sm font-bold">De onde vêm os números</h3>
+            </div>
+            <p class="text-base-content/75 text-xs leading-relaxed">
+              Cada parâmetro mostra sua fonte (<code class="font-mono">P01</code>,{' '}
+              <code class="font-mono">E01</code>…), clicável, e um selo:
+            </p>
+            <ul class="text-base-content/75 mt-2 space-y-1.5 text-xs leading-relaxed">
+              <li>
+                <strong>Primária:</strong> valor direto de órgão oficial.
+              </li>
+              <li>
+                <strong>Adaptada:</strong> derivado de fonte oficial com cálculo, como a
+                mediana das últimas 12 semanas.
+              </li>
+              <li>
+                <strong>Ilustrativa:</strong> hipótese sem série pública. Edite à vontade.
+              </li>
+            </ul>
+          </article>
+        </div>
+
+      </section>
+    </div>
   </div>
 
-  <Simulator client:load defaults={defaults} pricesHistory={pricesHistory} />
+  <!-- Band 2: Interactive TCO Simulator -->
+  <section
+    id="simulador"
+    aria-labelledby="simulador-heading"
+    class="bg-base-200/60 border-base-300/70 scroll-mt-16 border-t py-10 sm:py-12"
+  >
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="mb-4">
+        <span class="text-primary text-xs font-bold tracking-wider uppercase">
+          02 · Simulador Interativo
+        </span>
+        <h2
+          id="simulador-heading"
+          class="text-base-content text-2xl font-extrabold tracking-tight sm:text-3xl"
+        >
+          Custos, Payback e Premissas de Frota
+        </h2>
+        <p class="text-base-content/75 mt-1 max-w-3xl text-sm">
+          Ajuste quilometragem, preços de combustível/tarifa elétrica, CAPEX e cenários
+          residuais. Alterações feitas aqui atualizam também os painéis de Emissões &amp;
+          ESG e Benchmark Global abaixo.
+        </p>
+      </div>
+
+      <Simulator client:load defaults={defaults} showDisclaimer={true} />
+    </div>
+  </section>
+
+  <!-- Band 3: Weekly Historical Fuel Prices -->
+  <section
+    id="historico"
+    aria-labelledby="historico-heading"
+    class="bg-base-100 border-base-300/70 scroll-mt-16 border-t py-10 sm:py-12"
+  >
+    <div class="mx-auto max-w-7xl space-y-5 px-4 sm:px-6 lg:px-8">
+      <div>
+        <span class="text-primary text-xs font-bold tracking-wider uppercase">
+          03 · Contexto de Preços
+        </span>
+        <h2
+          id="historico-heading"
+          class="text-base-content text-2xl font-extrabold tracking-tight sm:text-3xl"
+        >
+          Série Histórica de Combustíveis (ANP &amp; EIA)
+        </h2>
+        <p class="text-base-content/75 mt-1 max-w-3xl text-sm">
+          Evolução semanal de Diesel S10, GNV em Santa Catarina e Petróleo Brent, com
+          destaque para a janela-base de 12 semanas usada nos valores padrão do simulador.
+        </p>
+      </div>
+
+      <PriceHistoryChart client:visible />
+    </div>
+  </section>
+
+  <!-- Band 4: Lifecycle Emissions & Local Pollutants -->
+  <section
+    id="emissoes"
+    aria-labelledby="emissoes-heading"
+    class="bg-base-200/60 border-base-300/70 scroll-mt-16 border-t py-10 sm:py-12"
+  >
+    <div class="mx-auto max-w-7xl space-y-6 px-4 sm:px-6 lg:px-8">
+      <div>
+        <span class="text-primary text-xs font-bold tracking-wider uppercase">
+          04 · Impacto Ambiental &amp; Saúde Urbana
+        </span>
+        <h2
+          id="emissoes-heading"
+          class="text-base-content text-2xl font-extrabold tracking-tight sm:text-3xl"
+        >
+          Matriz de Ciclo de Vida &amp; Inteligência ESG
+        </h2>
+        <p class="text-base-content/75 mt-1 max-w-3xl text-sm">
+          Intensidade de carbono Well-to-Wheel (WtW), inventário por Escopo (GHG
+          Protocol), sensibilidade hipotética de CBIOs e poluentes locais (PROCONVE P8 /
+          Euro VI).
+        </p>
+      </div>
+
+      <EsgDashboard
+        client:visible
+        parameters={defaults}
+        pollutantsData={pollutantsData}
+        showDisclaimer={false}
+      />
+    </div>
+  </section>
+
+  <!-- Band 5: Strategic Corridors & Infrastructure Map -->
+  <section
+    id="corredores"
+    aria-labelledby="corredores-heading"
+    class="bg-base-100 border-base-300/70 scroll-mt-16 border-t py-10 sm:py-12"
+  >
+    <div class="mx-auto max-w-7xl space-y-6 px-4 sm:px-6 lg:px-8">
+      <div>
+        <span class="text-primary text-xs font-bold tracking-wider uppercase">
+          05 · Logística &amp; Infraestrutura
+        </span>
+        <h2
+          id="corredores-heading"
+          class="text-base-content text-2xl font-extrabold tracking-tight sm:text-3xl"
+        >
+          Corredores Estratégicos &amp; Prontidão de Abastecimento
+        </h2>
+        <p class="text-base-content/75 mt-1 max-w-3xl text-sm">
+          Cobertura objetiva ao longo dos principais eixos rodoviários de carga no Brasil,
+          postos de GNV/biometano, eletropostos HPC (&gt;150 kW) e impacto na Lei da
+          Balança.
+        </p>
+      </div>
+
+      <CorridorsDashboard
+        client:visible
+        corridorsData={corridorsData}
+        stationsData={stationsData}
+      />
+
+      <CorridorInfrastructureMap
+        client:visible
+        corridors={corridorsData.corridors}
+        stations={stationsData.stations}
+      />
+    </div>
+  </section>
+
+  <!-- Band 6: Global Benchmark + Closing Sources Callout -->
+  <section
+    id="benchmark-global"
+    aria-labelledby="global-heading"
+    class="bg-base-200/60 border-base-300/70 scroll-mt-16 border-t py-10 sm:py-12"
+  >
+    <div class="mx-auto max-w-7xl space-y-8 px-4 sm:px-6 lg:px-8">
+      <div>
+        <span class="text-primary text-xs font-bold tracking-wider uppercase">
+          06 · Contexto Internacional
+        </span>
+        <h2
+          id="global-heading"
+          class="text-base-content text-2xl font-extrabold tracking-tight sm:text-3xl"
+        >
+          Comparativo Estratégico: Brasil vs. UE vs. EUA vs. China
+        </h2>
+        <p class="text-base-content/75 mt-1 max-w-3xl text-sm">
+          O paradoxo do Well-to-Wheel conforme a matriz elétrica, paridade energética no
+          virabrequim (R$/MWh-eq), subsídios de CAPEX e regras de peso de bateria.
+        </p>
+      </div>
+
+      <GlobalBenchmarkDashboard
+        client:visible
+        benchmarksData={benchmarksData}
+        parameters={defaults}
+        showDisclaimer={false}
+      />
+
+      <!-- Sources & Governance Closing Banner -->
+      <div
+        aria-labelledby="fontes-cta-heading"
+        class="bg-base-100 border-base-200 flex flex-col items-start justify-between gap-4 rounded-2xl border p-6 shadow-xs sm:flex-row sm:items-center"
+      >
+        <div class="space-y-1">
+          <h3 id="fontes-cta-heading" class="text-base-content text-base font-bold">
+            Auditoria Completa de Fontes, Parâmetros e Licenças
+          </h3>
+          <p class="text-base-content/75 text-xs leading-relaxed">
+            Consulte todos os valores padrão, selos metodológicos, datas de acesso e
+            termos de uso de dados de terceiros conforme{' '}
+            <code class="font-mono">LICENSE-DATA.md</code>.
+          </p>
+        </div>
+        <div class="flex shrink-0 flex-wrap items-center gap-2">
+          <a href="#topo" class="btn btn-ghost btn-sm">
+            {' '}
+            Voltar ao topo ↑{' '}
+          </a>
+          <a href={`${baseUrl}fontes`} class="btn btn-primary btn-sm gap-1.5">
+            <span>Abrir Fontes &amp; Licenças</span>
+            <ArrowRight className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
 </Layout>

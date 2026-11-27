@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { calculateFleetEsg } from '../../lib/calc/esg';
+import { useSharedSimulationParams } from '../../lib/calc/paramsStore';
 import type { LocalPollutantsCatalog } from '../../lib/types/catalogs';
 import type { AlternativeId, SimulationParameters } from '../../lib/types/parameters';
 import { FUEL_THEME } from '../../lib/theme/fuels';
@@ -10,12 +11,15 @@ import { TransparencyDisclaimer } from '../common/TransparencyDisclaimer';
 interface EsgDashboardProps {
   parameters: SimulationParameters;
   pollutantsData: LocalPollutantsCatalog;
+  showDisclaimer?: boolean;
 }
 
 export const EsgDashboard: React.FC<EsgDashboardProps> = ({
   parameters,
   pollutantsData,
+  showDisclaimer = true,
 }) => {
+  const liveParameters = useSharedSimulationParams(parameters);
   const [fleetSize, setFleetSize] = useState<number>(45);
   const [monthlyMileage, setMonthlyMileage] = useState<number>(10000);
   const [targetFuel, setTargetFuel] = useState<'biometano' | 'eletrico' | 'gnv'>(
@@ -23,17 +27,17 @@ export const EsgDashboard: React.FC<EsgDashboardProps> = ({
   );
   const [showCbioSensitivity, setShowCbioSensitivity] = useState<boolean>(false);
 
-  const cbioPrice = parameters.general.cbio_price?.value ?? 102;
+  const cbioPrice = liveParameters.general.cbio_price?.value ?? 102;
 
   const esg = useMemo(
     () =>
       calculateFleetEsg({
-        parameters,
+        parameters: liveParameters,
         targetFuel,
         fleetSize,
         monthlyMileage,
       }),
-    [parameters, targetFuel, fleetSize, monthlyMileage]
+    [liveParameters, targetFuel, fleetSize, monthlyMileage]
   );
 
   const {
@@ -54,10 +58,10 @@ export const EsgDashboard: React.FC<EsgDashboardProps> = ({
     showCbioSensitivity && targetFuel === 'biometano' ? tonsAvoided * cbioPrice : 0;
 
   // Well-to-Wheel carbon intensities directly from parameters.json
-  const dieselCi = parameters.vehicles.diesel.carbon_intensity.value;
-  const biometanoCi = parameters.vehicles.biometano.carbon_intensity.value;
-  const eletricoCi = parameters.vehicles.eletrico.carbon_intensity.value;
-  const gnvCi = parameters.vehicles.gnv.carbon_intensity.value;
+  const dieselCi = liveParameters.vehicles.diesel.carbon_intensity.value;
+  const biometanoCi = liveParameters.vehicles.biometano.carbon_intensity.value;
+  const eletricoCi = liveParameters.vehicles.eletrico.carbon_intensity.value;
+  const gnvCi = liveParameters.vehicles.gnv.carbon_intensity.value;
   const maxCi = Math.max(dieselCi, biometanoCi, eletricoCi, gnvCi, 1);
 
   const formatDeltaVsDiesel = (ci: number) => {
@@ -658,7 +662,7 @@ export const EsgDashboard: React.FC<EsgDashboardProps> = ({
         </div>
       </div>
 
-      <TransparencyDisclaimer />
+      {showDisclaimer && <TransparencyDisclaimer />}
     </div>
   );
 };

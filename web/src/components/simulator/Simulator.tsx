@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { ChevronDown, SlidersHorizontal, TriangleAlert } from 'lucide-react';
 import {
   applyResidualScenario,
@@ -7,6 +7,7 @@ import {
   simulateResidualSensitivity,
   type ResidualScenarioId,
 } from '../../lib/calc';
+import { setSharedSimulationParams } from '../../lib/calc/paramsStore';
 import type {
   AlternativeId,
   GeneralParameters,
@@ -29,15 +30,24 @@ import { TcoComparisonChart } from './charts/TcoComparisonChart';
 interface SimulatorProps {
   defaults: SimulationParameters;
   pricesHistory?: PricesHistory;
+  showDisclaimer?: boolean;
 }
 
 type AdvancedTabId = 'general' | AlternativeId;
 
-export const Simulator: React.FC<SimulatorProps> = ({ defaults, pricesHistory }) => {
+export const Simulator: React.FC<SimulatorProps> = ({
+  defaults,
+  pricesHistory,
+  showDisclaimer = true,
+}) => {
   // Deep clone defaults to avoid in-place mutations
   const [params, setParams] = useState<SimulationParameters>(() =>
     JSON.parse(JSON.stringify(defaults))
   );
+
+  useEffect(() => {
+    setSharedSimulationParams(params);
+  }, [params]);
 
   const [activePresetId, setActivePresetId] = useState<string>('default');
   const [fleetSize, setFleetSize] = useState<number>(1);
@@ -432,9 +442,11 @@ export const Simulator: React.FC<SimulatorProps> = ({ defaults, pricesHistory })
       </section>
 
       {/* 5. Methodology §10 Transparency Disclaimers near results */}
-      <section aria-label="Transparência e Limitações Metodológicas">
-        <TransparencyDisclaimer />
-      </section>
+      {showDisclaimer && (
+        <section aria-label="Transparência e Limitações Metodológicas">
+          <TransparencyDisclaimer />
+        </section>
+      )}
     </div>
   );
 };

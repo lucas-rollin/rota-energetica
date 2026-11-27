@@ -5,11 +5,13 @@ import { GlobalSourceModal } from '../components/common/SourceModal';
 interface Props {
   title?: string;
   description?: string;
+  fullWidth?: boolean;
 }
 
 const {
   title = 'Rota Energética',
   description = 'Simulador educacional de transição energética para frotas pesadas de transporte de carga.',
+  fullWidth = false,
 } = Astro.props;
 
 const baseUrl = import.meta.env.BASE_URL.endsWith('/')
@@ -18,25 +20,46 @@ const baseUrl = import.meta.env.BASE_URL.endsWith('/')
 
 const currentPath = Astro.url.pathname;
 
-const navItems = [
+const navItems: {
+  href: string;
+  label: string;
+  sectionId?: string;
+  match: (p: string) => boolean;
+}[] = [
   {
-    href: baseUrl,
-    label: 'Simulador TCO',
-    match: (p: string) => p === baseUrl || p === `${baseUrl}index.html` || p === '/',
+    href: `${baseUrl}#metodologia`,
+    label: 'Metodologia',
+    sectionId: 'metodologia',
+    match: () => false,
   },
   {
-    href: `${baseUrl}pollutants-esg`,
+    href: `${baseUrl}#simulador`,
+    label: 'Simulador TCO',
+    sectionId: 'simulador',
+    match: () => false,
+  },
+  {
+    href: `${baseUrl}#historico`,
+    label: 'Histórico',
+    sectionId: 'historico',
+    match: () => false,
+  },
+  {
+    href: `${baseUrl}#emissoes`,
     label: 'Emissões & ESG',
+    sectionId: 'emissoes',
     match: (p: string) => p.includes('pollutants-esg'),
   },
   {
-    href: `${baseUrl}corridors`,
-    label: 'Corredores & Infra',
+    href: `${baseUrl}#corredores`,
+    label: 'Corredores',
+    sectionId: 'corredores',
     match: (p: string) => p.includes('corridors'),
   },
   {
-    href: `${baseUrl}global-benchmarks`,
-    label: 'Benchmark Global',
+    href: `${baseUrl}#benchmark-global`,
+    label: 'Global',
+    sectionId: 'benchmark-global',
     match: (p: string) => p.includes('global-benchmarks'),
   },
   {
@@ -48,7 +71,7 @@ const navItems = [
 ---
 
 <!doctype html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="scroll-smooth">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -129,10 +152,11 @@ const navItems = [
                 return (
                   <a
                     href={item.href}
-                    class={`btn btn-sm text-xs font-semibold whitespace-nowrap transition-colors ${
+                    data-section-link={item.sectionId}
+                    class={`btn btn-sm btn-ghost text-xs whitespace-nowrap transition-colors ${
                       active
-                        ? 'text-primary font-bold shadow-xs'
-                        : 'btn-ghost text-base-content/85 hover:text-base-content'
+                        ? 'bg-base-200/80 text-primary font-bold shadow-xs'
+                        : 'font-semibold text-base-content/85 hover:text-base-content'
                     }`}
                   >
                     {item.label}
@@ -211,12 +235,22 @@ const navItems = [
     </header>
 
     <!-- Main Content Area -->
-    <main class="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <main
+      class={
+        fullWidth
+          ? 'flex-1 w-full'
+          : 'flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6'
+      }
+    >
       <slot />
     </main>
 
     <!-- Footer -->
-    <footer class="w-full bg-base-100 border-t border-base-200 py-8 mt-12 text-xs text-base-content/70">
+    <footer
+      class={`w-full bg-base-100 border-t border-base-300/70 py-8 text-xs text-base-content/75 ${
+        fullWidth ? '' : 'mt-12'
+      }`}
+    >
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
         <div>
           <p class="font-bold text-sm text-base-content mb-1">Rota Energética</p>
@@ -294,6 +328,83 @@ const navItems = [
           );
           syncToggle();
         });
+      })();
+
+      (() => {
+        const links = Array.from(
+          document.querySelectorAll('a[data-section-link]')
+        ).filter((el) => el instanceof HTMLAnchorElement);
+        if (links.length === 0) return;
+
+        const sectionIds = links
+          .map((el) => el.getAttribute('data-section-link'))
+          .filter((id) => Boolean(id));
+
+        const targets = ['topo', ...sectionIds]
+          .map((id) => (id ? document.getElementById(id) : null))
+          .filter((el) => el instanceof HTMLElement);
+        if (targets.length === 0) return;
+
+        const ACTIVE_CLASSES = [
+          'bg-base-200/80',
+          'text-primary',
+          'font-bold',
+          'shadow-xs',
+        ];
+        const IDLE_CLASSES = ['font-semibold', 'text-base-content/85'];
+
+        const setActiveSection = (activeId) => {
+          for (const link of links) {
+            const id = link.getAttribute('data-section-link');
+            const isActive = Boolean(activeId) && id === activeId;
+            for (const cls of ACTIVE_CLASSES) link.classList.toggle(cls, isActive);
+            for (const cls of IDLE_CLASSES) link.classList.toggle(cls, !isActive);
+          }
+        };
+
+        let clickLockUntil = 0;
+        for (const link of links) {
+          link.addEventListener('click', () => {
+            const id = link.getAttribute('data-section-link');
+            if (id && document.getElementById(id)) {
+              clickLockUntil = Date.now() + 700;
+              setActiveSection(id);
+            }
+          });
+        }
+
+        const initialHash = window.location.hash.replace(/^#/, '');
+        if (initialHash && sectionIds.includes(initialHash)) {
+          setActiveSection(initialHash);
+        }
+
+        const visibleSet = new Set();
+        const observer = new IntersectionObserver(
+          (entries) => {
+            for (const entry of entries) {
+              if (entry.isIntersecting) {
+                visibleSet.add(entry.target);
+              } else {
+                visibleSet.delete(entry.target);
+              }
+            }
+            if (Date.now() < clickLockUntil) return;
+            if (window.scrollY < 80) {
+              setActiveSection(null);
+              return;
+            }
+            if (visibleSet.size === 0) return;
+
+            const ordered = Array.from(visibleSet).sort(
+              (a, b) => a.getBoundingClientRect().top - b.getBoundingClientRect().top
+            );
+            const currentId = ordered[ordered.length - 1].id;
+            setActiveSection(currentId === 'topo' ? null : currentId);
+          },
+          { rootMargin: '-15% 0px -60% 0px', threshold: 0 }
+        );
+
+        for (const el of targets) observer.observe(el);
       })();
     </script>
   </body>

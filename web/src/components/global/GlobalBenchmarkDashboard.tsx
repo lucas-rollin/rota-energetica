@@ -1,5 +1,6 @@
 import React from 'react';
 import { DollarSign, Fuel, Globe, Leaf, Scale, Zap, ShieldCheck } from 'lucide-react';
+import { useSharedSimulationParams } from '../../lib/calc/paramsStore';
 import type { GlobalBenchmarksCatalog, RegionBenchmark } from '../../lib/types/catalogs';
 import type { SimulationParameters } from '../../lib/types/parameters';
 import { formatNumber } from '../../lib/utils/format';
@@ -9,6 +10,7 @@ import { TransparencyDisclaimer } from '../common/TransparencyDisclaimer';
 interface GlobalBenchmarkDashboardProps {
   benchmarksData: GlobalBenchmarksCatalog;
   parameters: SimulationParameters;
+  showDisclaimer?: boolean;
 }
 
 const REFERENCE_DIESEL_THERMAL_EFFICIENCY = 0.42;
@@ -17,7 +19,9 @@ const REFERENCE_ELECTRIC_DRIVETRAIN_EFFICIENCY = 0.9;
 export const GlobalBenchmarkDashboard: React.FC<GlobalBenchmarkDashboardProps> = ({
   benchmarksData,
   parameters,
+  showDisclaimer = true,
 }) => {
+  const liveParameters = useSharedSimulationParams(parameters);
   const regions = benchmarksData.regions;
   const regionKeys: (keyof typeof regions)[] = [
     'brasil',
@@ -43,10 +47,10 @@ export const GlobalBenchmarkDashboard: React.FC<GlobalBenchmarkDashboardProps> =
   const minForeignSubsidy = foreignSubsidies.length ? Math.min(...foreignSubsidies) : 0;
   const maxForeignSubsidy = foreignSubsidies.length ? Math.max(...foreignSubsidies) : 0;
 
-  // Dynamic Brazil parameters from parameters.json
-  const diesel = parameters.vehicles.diesel;
-  const biometano = parameters.vehicles.biometano;
-  const eletrico = parameters.vehicles.eletrico;
+  // Dynamic Brazil parameters from live simulator state / parameters.json
+  const diesel = liveParameters.vehicles.diesel;
+  const biometano = liveParameters.vehicles.biometano;
+  const eletrico = liveParameters.vehicles.eletrico;
 
   const dieselPrice = diesel.energy_price.value;
   const bioPrice = biometano.energy_price.value;
@@ -813,7 +817,7 @@ export const GlobalBenchmarkDashboard: React.FC<GlobalBenchmarkDashboardProps> =
         </div>
       </div>
 
-      <TransparencyDisclaimer />
+      {showDisclaimer && <TransparencyDisclaimer />}
     </div>
   );
 };
