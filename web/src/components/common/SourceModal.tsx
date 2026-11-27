@@ -131,7 +131,10 @@ export const SourceModal: React.FC<SourceModalProps> = ({
                     Categoria {source.category}
                   </span>
                 </div>
-                <h3 id="source-dialog-title" className="text-base-content text-xl font-bold">
+                <h3
+                  id="source-dialog-title"
+                  className="text-base-content text-xl font-bold"
+                >
                   {source.name}
                 </h3>
                 {contextLabel && (
@@ -162,7 +165,9 @@ export const SourceModal: React.FC<SourceModalProps> = ({
                 <span className="text-base-content/75 mb-1 block text-xs font-semibold tracking-wider uppercase">
                   Descrição
                 </span>
-                <p className="text-base-content/90 leading-relaxed">{source.description}</p>
+                <p className="text-base-content/90 leading-relaxed">
+                  {source.description}
+                </p>
               </div>
 
               {source.notes && (
