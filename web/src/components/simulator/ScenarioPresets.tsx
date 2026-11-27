@@ -73,7 +73,7 @@ export const ScenarioPresets: React.FC<ScenarioPresetsProps> = ({
     <div className="card bg-base-100 border-base-200 overflow-hidden rounded-2xl border p-4 shadow-xs sm:p-5">
       <div className="flex flex-col justify-between gap-1 pb-3 sm:flex-row sm:items-center">
         <div>
-          <span className="text-base-content/50 block text-[10px] font-bold tracking-wider uppercase">
+          <span className="text-base-content/75 block text-[11px] font-bold tracking-wider uppercase">
             Cenários Rápidos em 1 Clique
           </span>
           <h2 className="text-base-content text-sm font-bold sm:text-base">
@@ -109,8 +109,8 @@ export const ScenarioPresets: React.FC<ScenarioPresetsProps> = ({
                     {preset.label}
                   </span>
                   <span
-                    className={`badge badge-xs font-mono text-[10px] ${
-                      isActive ? 'badge-primary' : 'badge-ghost text-base-content/70'
+                    className={`badge badge-xs font-mono text-[11px] ${
+                      isActive ? 'badge-primary' : 'badge-ghost text-base-content/75'
                     }`}
                   >
                     {preset.badge}

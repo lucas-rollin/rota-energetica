@@ -32,9 +32,9 @@ export const FUEL_THEME: Record<AlternativeId, FuelThemeConfig> = {
     dotClass: 'bg-slate-500',
     textClass: 'text-slate-700 dark:text-slate-300',
     borderAccent: 'border-l-4 border-l-slate-400 dark:border-l-slate-500',
-    pillClass: 'bg-base-200/70 text-base-content/75 font-medium',
-    barClass: 'bg-slate-400',
-    barSecondaryClass: 'bg-slate-600',
+    pillClass: 'bg-base-200/70 text-base-content/80 font-medium',
+    barClass: 'bg-slate-600',
+    barSecondaryClass: 'bg-slate-700',
     activeButtonClass: 'bg-slate-700 text-white border-slate-700 hover:bg-slate-800',
   },
   biometano: {
@@ -47,10 +47,10 @@ export const FUEL_THEME: Record<AlternativeId, FuelThemeConfig> = {
     textClass: 'text-emerald-700 dark:text-emerald-400',
     borderAccent: 'border-l-4 border-l-emerald-500',
     pillClass: 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 font-semibold',
-    barClass: 'bg-emerald-500',
-    barSecondaryClass: 'bg-emerald-600',
+    barClass: 'bg-emerald-700',
+    barSecondaryClass: 'bg-emerald-800',
     activeButtonClass:
-      'bg-emerald-600 text-white border-emerald-600 hover:bg-emerald-700',
+      'bg-emerald-700 text-white border-emerald-700 hover:bg-emerald-800',
   },
   eletrico: {
     id: 'eletrico',
@@ -62,9 +62,9 @@ export const FUEL_THEME: Record<AlternativeId, FuelThemeConfig> = {
     textClass: 'text-cyan-700 dark:text-cyan-400',
     borderAccent: 'border-l-4 border-l-cyan-500',
     pillClass: 'bg-cyan-500/10 text-cyan-700 dark:text-cyan-400 font-semibold',
-    barClass: 'bg-cyan-500',
-    barSecondaryClass: 'bg-cyan-600',
-    activeButtonClass: 'bg-cyan-600 text-white border-cyan-600 hover:bg-cyan-700',
+    barClass: 'bg-cyan-700',
+    barSecondaryClass: 'bg-cyan-800',
+    activeButtonClass: 'bg-cyan-700 text-white border-cyan-700 hover:bg-cyan-800',
   },
   gnv: {
     id: 'gnv',
@@ -78,6 +78,6 @@ export const FUEL_THEME: Record<AlternativeId, FuelThemeConfig> = {
     pillClass: 'bg-amber-500/10 text-amber-700 dark:text-amber-400 font-semibold',
     barClass: 'bg-amber-400',
     barSecondaryClass: 'bg-amber-600',
-    activeButtonClass: 'bg-amber-600 text-white border-amber-600 hover:bg-amber-700',
+    activeButtonClass: 'bg-amber-700 text-white border-amber-700 hover:bg-amber-800',
   },
 };

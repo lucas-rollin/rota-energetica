@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { BarChart2, Table } from 'lucide-react';
+import { useDebouncedValue } from '../../../lib/utils/useDebouncedValue';
 
 export interface ChartTableData {
   headers: string[];
@@ -28,6 +29,7 @@ export const ChartContainer: React.FC<ChartContainerProps> = ({
   children,
 }) => {
   const [viewMode, setViewMode] = useState<'chart' | 'table'>('chart');
+  const liveSummaryText = useDebouncedValue(summaryText, 600);
 
   // Trigger resize when switching from table back to chart
   useEffect(() => {
@@ -90,16 +92,16 @@ export const ChartContainer: React.FC<ChartContainerProps> = ({
         </div>
       </div>
 
-      {/* Screen reader summary */}
+      {/* Screen reader summary (debounced during rapid slider drags) */}
       <div className="sr-only" aria-live="polite">
-        {summaryText}
+        {liveSummaryText}
       </div>
 
       {/* Body: Chart and Table both maintained in DOM to preserve ECharts state */}
       <div className="p-3 sm:p-5">
         <div className={viewMode === 'chart' ? 'block' : 'hidden'}>
           <div className="w-full">{children}</div>
-          <p className="text-base-content/60 mt-3 text-xs italic">{summaryText}</p>
+          <p className="text-base-content/75 mt-3 text-xs italic">{summaryText}</p>
         </div>
 
         <div className={viewMode === 'table' ? 'block' : 'hidden'}>

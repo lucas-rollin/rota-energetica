@@ -87,30 +87,30 @@ export const FleetImpactBanner: React.FC<FleetImpactBannerProps> = ({
       <div className="relative z-10 flex flex-col justify-between gap-4 lg:flex-row lg:items-center">
         <div>
           <div className="flex items-center gap-2">
-            <span className="badge badge-sm badge-success font-mono text-[10px] font-bold tracking-wider uppercase">
+            <span className="badge badge-sm badge-success font-mono text-[11px] font-bold tracking-wider uppercase">
               Economia Consolidada da Frota
             </span>
-            <span className="text-base-content/60 text-xs">
+            <span className="text-base-content/75 text-xs">
               {fleetSize} {fleetSize === 1 ? 'caminhão' : 'caminhões'} · {horizonYears}{' '}
               anos
             </span>
           </div>
 
           <div className="mt-2 flex flex-wrap items-baseline gap-2">
-            <span className="font-mono text-2xl font-black tracking-tight text-emerald-600 sm:text-3xl dark:text-emerald-400">
+            <span className="font-mono text-2xl font-black tracking-tight text-emerald-700 sm:text-3xl dark:text-emerald-400">
               {formatCurrency(maxSavings, 0)}
             </span>
-            <span className="text-base-content/80 text-xs font-semibold sm:text-sm">
+            <span className="text-base-content/85 text-xs font-semibold sm:text-sm">
               de economia estimada com{' '}
               <strong className="text-base-content">{bestAlt.name}</strong>
             </span>
           </div>
 
-          <p className="text-base-content/70 mt-1 max-w-2xl text-xs">
+          <p className="text-base-content/75 mt-1 max-w-2xl text-xs">
             Frente à linha de base do Diesel B15, considerando a redução acumulada de
             despesas com combustível e manutenção trazidas a valor presente.
           </p>
-          <p className="text-base-content/60 mt-1 text-[11px] font-medium">
+          <p className="text-base-content/75 mt-1 text-[11px] font-medium">
             Nota: exclui CapEx de infraestrutura de recarga/abastecimento em garagem,
             reforços de rede elétrica e custos de financiamento.
           </p>
@@ -119,25 +119,25 @@ export const FleetImpactBanner: React.FC<FleetImpactBannerProps> = ({
         {/* Aggregate KPI Badges */}
         <div className="flex shrink-0 flex-wrap gap-2.5 sm:gap-3">
           <div className="bg-base-200/70 border-base-300/80 rounded-xl border px-3 py-2 text-center">
-            <span className="text-base-content/60 block text-[10px] font-semibold tracking-wider uppercase">
+            <span className="text-base-content/75 block text-[11px] font-semibold tracking-wider uppercase">
               Abatimento CO₂
             </span>
-            <span className="font-mono text-sm font-bold text-emerald-600 sm:text-base dark:text-emerald-400">
+            <span className="font-mono text-sm font-bold text-emerald-700 sm:text-base dark:text-emerald-400">
               {formatNumber(co2AbatedTon, 0)} t
             </span>
-            <span className="text-base-content/50 block text-[10px]">
+            <span className="text-base-content/75 block text-[11px]">
               Poço à Roda (WtW)
             </span>
           </div>
 
           <div className="bg-base-200/70 border-base-300/80 rounded-xl border px-3 py-2 text-center">
-            <span className="text-base-content/60 block text-[10px] font-semibold tracking-wider uppercase">
+            <span className="text-base-content/75 block text-[11px] font-semibold tracking-wider uppercase">
               Economia OPEX
             </span>
             <span className="text-base-content font-mono text-sm font-bold sm:text-base">
               {formatCurrency(annualOpexSavings, 0)}
             </span>
-            <span className="text-base-content/50 block text-[10px]">
+            <span className="text-base-content/75 block text-[11px]">
               por ano de operação
             </span>
           </div>

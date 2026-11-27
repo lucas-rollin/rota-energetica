@@ -40,19 +40,19 @@ export const VehicleParametersPanel: React.FC<VehicleParametersPanelProps> = ({
         {/* Derived Sobrepreço Box */}
         <div className="bg-base-200/60 border-base-300/80 flex items-center gap-3 rounded-xl border p-2.5 sm:px-4">
           <div className="text-xs">
-            <span className="text-base-content/60 block text-[10px] font-semibold tracking-wider uppercase">
+            <span className="text-base-content/75 block text-[11px] font-semibold tracking-wider uppercase">
               Sobrepreço vs. Diesel B (derivado)
             </span>
             <div className="text-base-content font-mono text-sm font-bold">
               {isDiesel ? (
-                <span className="text-base-content/70">Referência (R$ 0)</span>
+                <span className="text-base-content/75">Referência (R$ 0)</span>
               ) : (
                 <>
                   <span
                     className={
                       sobreprecoDiff > 0
-                        ? 'text-amber-600 dark:text-amber-400'
-                        : 'text-success'
+                        ? 'text-amber-700 dark:text-amber-400'
+                        : 'text-emerald-700 dark:text-emerald-400'
                     }
                   >
                     {sobreprecoDiff > 0 ? '+' : ''}

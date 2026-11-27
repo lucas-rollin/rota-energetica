@@ -52,10 +52,10 @@ export const ParameterControl: React.FC<ParameterControlProps> = ({
 
   const badgeColorClass =
     item.badge === 'Primária'
-      ? 'badge-success text-white'
+      ? 'badge-success'
       : item.badge === 'Adaptada'
-        ? 'badge-info text-white'
-        : 'badge-ghost border-base-300 text-base-content/70';
+        ? 'badge-info'
+        : 'badge-ghost border-base-300 text-base-content/75';
 
   return (
     <div
@@ -71,7 +71,7 @@ export const ParameterControl: React.FC<ParameterControlProps> = ({
           className="text-base-content flex cursor-pointer items-center gap-1.5 text-sm font-semibold"
         >
           <span>{label}</span>
-          <span className="text-base-content/60 text-xs font-normal">({item.unit})</span>
+          <span className="text-base-content/75 text-xs font-normal">({item.unit})</span>
         </label>
 
         <div className="flex flex-wrap items-center gap-1.5">
@@ -86,7 +86,7 @@ export const ParameterControl: React.FC<ParameterControlProps> = ({
                   onClick={onReset}
                   title="Restaurar valor padrão"
                   aria-label={`Restaurar ${label} para padrão`}
-                  className="btn btn-ghost btn-xs text-base-content/60 hover:text-primary px-1"
+                  className="btn btn-ghost btn-xs text-base-content/75 hover:text-primary px-1"
                 >
                   ↺
                 </button>
@@ -106,7 +106,7 @@ export const ParameterControl: React.FC<ParameterControlProps> = ({
       </div>
 
       {item.notes && (
-        <p className="text-base-content/60 mb-2 text-xs leading-relaxed">{item.notes}</p>
+        <p className="text-base-content/75 mb-2 text-xs leading-relaxed">{item.notes}</p>
       )}
 
       <div className="flex items-center gap-3">
@@ -126,13 +126,13 @@ export const ParameterControl: React.FC<ParameterControlProps> = ({
               aria-valuenow={item.value}
               className="range range-primary range-sm focus:outline-primary w-full cursor-pointer"
             />
-            <div className="text-base-content/50 mt-0.5 flex justify-between px-0.5 font-mono text-[11px]">
+            <div className="text-base-content/75 mt-0.5 flex justify-between px-0.5 font-mono text-[11px]">
               <span>{min}</span>
               <span>{max}</span>
             </div>
           </div>
         ) : (
-          <div className="text-base-content/60 flex-1 text-xs">
+          <div className="text-base-content/75 flex-1 text-xs">
             Constante física / referência fixa ({min} {item.unit})
           </div>
         )}

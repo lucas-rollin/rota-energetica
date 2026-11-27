@@ -58,7 +58,7 @@ export const TransparencyDisclaimer: React.FC<TransparencyDisclaimerProps> = ({
       <details className="bg-base-100 border-base-200 group rounded-2xl border p-4 shadow-xs">
         <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-xs select-none">
           <div className="flex items-center gap-2.5">
-            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400">
+            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-amber-500/10 text-amber-700 dark:text-amber-400">
               <TriangleAlert className="h-3.5 w-3.5" aria-hidden="true" />
             </span>
             <div>

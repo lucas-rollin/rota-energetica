@@ -12,7 +12,7 @@ import { SVGRenderer } from 'echarts/renderers';
 import type { AlternativeId } from '../../../lib/types/parameters';
 import type { SimulationResults } from '../../../lib/types/scenario';
 import { useDarkMode } from '../../../lib/theme/useDarkMode';
-import { formatCurrency, formatNumber } from '../../../lib/utils/format';
+import { escapeHtml, formatCurrency, formatNumber } from '../../../lib/utils/format';
 import { SourceRef } from '../../common/SourceRef';
 import { ChartContainer } from './ChartContainer';
 
@@ -211,7 +211,7 @@ export const TcoComparisonChart: React.FC<TcoComparisonChartProps> = ({
           }
 
           let html = `<div style="font-family: inherit; font-size: 12px; min-width: 180px;">`;
-          html += `<div style="font-weight: bold; margin-bottom: 6px; border-bottom: 1px solid ${tooltipBorder}; padding-bottom: 4px;">${title}</div>`;
+          html += `<div style="font-weight: bold; margin-bottom: 6px; border-bottom: 1px solid ${tooltipBorder}; padding-bottom: 4px;">${escapeHtml(title)}</div>`;
 
           for (const item of items) {
             if (item.value <= 0) continue;
@@ -221,8 +221,8 @@ export const TcoComparisonChart: React.FC<TcoComparisonChartProps> = ({
               : `R$ ${formatNumber(item.value, 2)}/km`;
 
             html += `<div style="display: flex; justify-content: space-between; gap: 12px; margin-bottom: 3px;">
-              <span><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background-color:${item.color};margin-right:6px;"></span>${item.seriesName}</span>
-              <span style="font-weight: 600; font-family: monospace;">${valStr} <span style="font-weight: normal; color: ${tooltipMuted};">(${pct}%)</span></span>
+              <span><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background-color:${escapeHtml(item.color)};margin-right:6px;"></span>${escapeHtml(item.seriesName)}</span>
+              <span style="font-weight: 600; font-family: monospace;">${escapeHtml(valStr)} <span style="font-weight: normal; color: ${tooltipMuted};">(${pct}%)</span></span>
             </div>`;
           }
 

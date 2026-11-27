@@ -23,7 +23,7 @@ interface DeltaBadgeProps {
 const DeltaBadge: React.FC<DeltaBadgeProps> = ({ delta, lowerIsBetter = true }) => {
   if (!delta || Math.abs(delta.diff) < 1e-6) {
     return (
-      <span className="text-base-content/50 bg-base-200/80 rounded px-1.5 py-0.5 text-[10px] font-medium">
+      <span className="text-base-content/75 bg-base-200/80 rounded px-1.5 py-0.5 text-[11px] font-medium">
         Ref.
       </span>
     );
@@ -36,7 +36,7 @@ const DeltaBadge: React.FC<DeltaBadgeProps> = ({ delta, lowerIsBetter = true }) 
 
   return (
     <span
-      className={`rounded px-1.5 py-0.5 font-mono text-[10px] font-bold ${colorClass}`}
+      className={`rounded px-1.5 py-0.5 font-mono text-[11px] font-bold ${colorClass}`}
       title={`Diferença absoluta: ${delta.diff > 0 ? '+' : ''}${formatNumber(delta.diff, 2)}`}
     >
       {formatPercent(delta.pct, 1)}
@@ -128,7 +128,7 @@ export const ResultCards: React.FC<ResultCardsProps> = ({
               <div>
                 {/* Header: Tag + Icon */}
                 <div className="mb-1.5 flex items-center justify-between gap-1">
-                  <span className="text-base-content/60 text-[10px] font-bold tracking-wider uppercase">
+                  <span className="text-base-content/75 text-[11px] font-bold tracking-wider uppercase">
                     {config.tag}
                   </span>
                   <span className="text-base" aria-hidden="true">
@@ -142,7 +142,7 @@ export const ResultCards: React.FC<ResultCardsProps> = ({
                     {res.label}
                   </h3>
                   {energyPrice && (
-                    <span className="text-base-content/60 font-mono text-[11px] font-medium">
+                    <span className="text-base-content/75 font-mono text-[11px] font-medium">
                       R$ {formatNumber(energyPrice.value, 2)}
                       {energyPrice.unit.replace('R$', '')}
                     </span>
@@ -156,7 +156,7 @@ export const ResultCards: React.FC<ResultCardsProps> = ({
                       <span className="text-base-content font-mono text-xl font-black sm:text-2xl">
                         {formatCurrency(res.operationalCostPerKm, 2)}
                       </span>
-                      <span className="text-base-content/60 text-[11px] font-medium">
+                      <span className="text-base-content/75 text-[11px] font-medium">
                         / km
                       </span>
                     </div>
@@ -167,16 +167,16 @@ export const ResultCards: React.FC<ResultCardsProps> = ({
                 {/* Secondary Metrics: TCO and Emissions */}
                 <div className="space-y-1 text-xs">
                   <div className="flex items-center justify-between">
-                    <span className="text-base-content/70 text-[11px]">TCO Total:</span>
+                    <span className="text-base-content/75 text-[11px]">TCO Total:</span>
                     <span className="text-base-content font-mono font-bold">
                       {formatCurrency(res.tco, 0)}
                     </span>
                   </div>
 
                   {residualBand?.[alt] && (
-                    <div className="flex items-center justify-between text-[10px]">
-                      <span className="text-base-content/60">Sens. residual (§4.4):</span>
-                      <span className="text-base-content/75 font-mono">
+                    <div className="flex items-center justify-between text-[11px]">
+                      <span className="text-base-content/75">Sens. residual (§4.4):</span>
+                      <span className="text-base-content/80 font-mono">
                         {formatCurrency(residualBand[alt].highTco, 0)} –{' '}
                         {formatCurrency(residualBand[alt].lowTco, 0)}
                       </span>
@@ -184,17 +184,17 @@ export const ResultCards: React.FC<ResultCardsProps> = ({
                   )}
 
                   <div className="flex items-center justify-between">
-                    <span className="text-base-content/70 text-[11px]">
+                    <span className="text-base-content/75 text-[11px]">
                       Emissões anuais:
                     </span>
-                    <span className="text-base-content/80 font-mono text-[11px]">
+                    <span className="text-base-content/85 font-mono text-[11px]">
                       {formatNumber(res.annualEmissionsTon, 0)} tCO₂e/ano
                     </span>
                   </div>
 
                   {!isDiesel && (
                     <div className="flex items-center justify-between text-[11px]">
-                      <span className="text-base-content/70">Sobrepreço caminhão:</span>
+                      <span className="text-base-content/75">Sobrepreço caminhão:</span>
                       <span
                         className={`font-mono font-medium ${
                           sobreprecoDiff > 0
@@ -212,8 +212,8 @@ export const ResultCards: React.FC<ResultCardsProps> = ({
                     res.annualCbioRevenue !== undefined &&
                     res.annualCbioRevenue > 0 && (
                       <div className="flex items-center justify-between text-[11px]">
-                        <span className="text-base-content/70">Receita CBIO/ano:</span>
-                        <span className="font-mono font-semibold text-emerald-600 dark:text-emerald-400">
+                        <span className="text-base-content/75">Receita CBIO/ano:</span>
+                        <span className="font-mono font-semibold text-emerald-700 dark:text-emerald-400">
                           +{formatCurrency(res.annualCbioRevenue, 0)}
                         </span>
                       </div>
@@ -221,12 +221,12 @@ export const ResultCards: React.FC<ResultCardsProps> = ({
 
                   {res.payloadPenaltyKg !== undefined && res.payloadPenaltyKg !== 0 && (
                     <div className="flex items-center justify-between text-[11px]">
-                      <span className="text-base-content/70">Lei da Balança:</span>
+                      <span className="text-base-content/75">Lei da Balança:</span>
                       <span
                         className={`font-mono font-medium ${
                           res.payloadPenaltyKg < 0
-                            ? 'text-amber-600 dark:text-amber-400'
-                            : 'text-base-content/80'
+                            ? 'text-amber-700 dark:text-amber-400'
+                            : 'text-base-content/85'
                         }`}
                       >
                         {res.payloadPenaltyKg > 0 ? '+' : ''}
@@ -239,7 +239,7 @@ export const ResultCards: React.FC<ResultCardsProps> = ({
 
               {/* Bottom Highlight Pill */}
               <div
-                className={`mt-2.5 rounded px-2 py-1 text-center text-[10px] font-medium ${config.highlightClass}`}
+                className={`mt-2.5 rounded px-2 py-1 text-center text-[11px] font-medium ${config.highlightClass}`}
               >
                 {highlightText}
               </div>

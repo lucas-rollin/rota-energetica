@@ -36,15 +36,15 @@ const ParamProvenance: React.FC<{ item: ParameterItem; label: string }> = ({
 }) => {
   const badgeClass =
     item.badge === 'Primária'
-      ? 'badge-success text-white'
+      ? 'badge-success'
       : item.badge === 'Adaptada'
-        ? 'badge-info text-white'
-        : 'badge-ghost border-base-300 text-base-content/75';
+        ? 'badge-info'
+        : 'badge-ghost border-base-300 text-base-content/80';
 
   return (
     <span className="inline-flex items-center gap-1">
       <span
-        className={`badge badge-xs px-1.5 text-[9px] font-medium ${badgeClass}`}
+        className={`badge badge-xs px-1.5 text-[11px] font-medium ${badgeClass}`}
         title={`Selo metodológico: ${item.badge}`}
       >
         {item.badge}
@@ -143,7 +143,7 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
             !includeCbio
           }
           aria-label="Restaurar parâmetros para os padrões originais"
-          className="btn btn-ghost btn-xs text-base-content/70 hover:text-base-content text-[11px]"
+          className="btn btn-ghost btn-xs text-base-content/75 hover:text-base-content text-[11px]"
         >
           ↺ Padrão
         </button>
@@ -172,7 +172,7 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
                 }}
                 className="text-base-content w-10 bg-transparent text-right font-mono font-bold focus:outline-none"
               />
-              <span className="text-base-content/60 text-[10px]">un</span>
+              <span className="text-base-content/75 text-[11px]">un</span>
             </div>
           </div>
           <input
@@ -184,7 +184,7 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
             className="range range-primary range-xs w-full"
             aria-label="Tamanho da frota em número de cavalos mecânicos"
           />
-          <div className="text-base-content/50 mt-0.5 flex justify-between text-[10px]">
+          <div className="text-base-content/75 mt-0.5 flex justify-between text-[11px]">
             <span>1 un</span>
             <span>Frota Dedicada</span>
             <span>100+ un</span>
@@ -220,7 +220,7 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
                 }}
                 className="text-base-content w-16 bg-transparent text-right font-mono font-bold focus:outline-none"
               />
-              <span className="text-base-content/60 text-[10px]">km</span>
+              <span className="text-base-content/75 text-[11px]">km</span>
             </div>
           </div>
           <input
@@ -235,7 +235,7 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
             className="range range-primary range-xs w-full"
             aria-label="Quilometragem média anual por caminhão"
           />
-          <div className="text-base-content/50 mt-0.5 flex justify-between text-[10px]">
+          <div className="text-base-content/75 mt-0.5 flex justify-between text-[11px]">
             <span>Regional (40k)</span>
             <span>Padrão (120k)</span>
             <span>Longo Curso (180k)</span>
@@ -247,7 +247,7 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
           {/* Horizon Pills */}
           <div className="bg-base-200/40 border-base-200 rounded-xl border p-2.5">
             <div className="mb-1.5 flex items-center justify-between gap-1">
-              <span className="text-base-content/70 text-[10px] font-semibold">
+              <span className="text-base-content/75 text-[11px] font-semibold">
                 Horizonte
               </span>
               <ParamProvenance
@@ -264,7 +264,7 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
                   className={`flex-1 rounded py-1 font-mono text-[11px] font-bold transition-colors ${
                     horizonYears === h
                       ? 'bg-primary text-primary-content shadow-xs'
-                      : 'bg-base-100 text-base-content/70 hover:bg-base-200'
+                      : 'bg-base-100 text-base-content/75 hover:bg-base-200'
                   }`}
                 >
                   {h}a
@@ -276,7 +276,7 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
           {/* Discount Rate */}
           <div className="bg-base-200/40 border-base-200 flex flex-col justify-between rounded-xl border p-2.5">
             <div className="mb-1 flex items-center justify-between gap-1">
-              <span className="text-base-content/70 text-[10px] font-semibold">
+              <span className="text-base-content/75 text-[11px] font-semibold">
                 Desconto
               </span>
               <ParamProvenance
@@ -300,7 +300,7 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
                 className="text-base-content min-w-0 flex-1 bg-transparent text-right font-mono font-bold focus:outline-none"
                 aria-label="Taxa de desconto anual real (% a.a.)"
               />
-              <span className="text-base-content/60 shrink-0 text-[10px]">% a.a.</span>
+              <span className="text-base-content/75 shrink-0 text-[11px]">% a.a.</span>
             </div>
           </div>
         </div>
@@ -308,7 +308,7 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
         {/* 3b. Residual Value Scenario (§4.4) */}
         <div className="bg-base-200/40 border-base-200 rounded-xl border p-2.5">
           <div className="mb-1.5 flex items-center justify-between gap-1">
-            <span className="text-base-content/75 text-[10px] font-semibold">
+            <span className="text-base-content/80 text-[11px] font-semibold">
               Cenário Residual (§4.4)
             </span>
             <ParamProvenance
@@ -333,10 +333,10 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
                 type="button"
                 onClick={() => onResidualScenarioChange(opt.id)}
                 aria-pressed={residualScenario === opt.id}
-                className={`rounded py-1 text-[10px] font-bold transition-colors ${
+                className={`rounded py-1 text-[11px] font-bold transition-colors ${
                   residualScenario === opt.id
                     ? 'bg-primary text-primary-content shadow-xs'
-                    : 'bg-base-100 text-base-content/70 hover:bg-base-200'
+                    : 'bg-base-100 text-base-content/75 hover:bg-base-200'
                 }`}
               >
                 {opt.label}
@@ -348,7 +348,7 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
         {/* 4. Fuel & Energy Prices (Dense List) */}
         <div className="border-base-200 space-y-2 border-t pt-3">
           <div className="flex items-center justify-between">
-            <span className="text-base-content/60 text-[10px] font-bold tracking-wider uppercase">
+            <span className="text-base-content/75 text-[11px] font-bold tracking-wider uppercase">
               Preços de Mercado (Bomba / Insumos)
             </span>
           </div>
@@ -382,7 +382,7 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
                     </div>
 
                     <div className="bg-base-100 border-base-300 flex shrink-0 items-center gap-1 rounded border px-1.5 py-0.5">
-                      <span className="text-base-content/50 font-mono text-[10px]">
+                      <span className="text-base-content/75 font-mono text-[11px]">
                         R$
                       </span>
                       <DecimalInput
@@ -398,14 +398,14 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
                         className="text-base-content w-12 bg-transparent text-right font-mono text-xs font-bold focus:outline-none"
                         aria-label={`Preço do ${fuel.label}`}
                       />
-                      <span className="text-base-content/60 font-mono text-[10px]">
+                      <span className="text-base-content/75 font-mono text-[11px]">
                         {fuel.unit.replace('R$', '')}
                       </span>
                     </div>
                   </div>
 
                   {isOutOfRange && (
-                    <div className="flex items-center justify-between border-t border-amber-300/30 pt-0.5 font-mono text-[10px] text-amber-700 dark:text-amber-300">
+                    <div className="flex items-center justify-between border-t border-amber-300/30 pt-0.5 font-mono text-[11px] text-amber-700 dark:text-amber-300">
                       <span>Aviso: fora da ref. ANP/ANEEL</span>
                       <span>
                         [{minVal} - {maxVal}]
@@ -423,11 +423,11 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
           <button
             type="button"
             onClick={() => setShowVehicleDetails(!showVehicleDetails)}
-            className="text-base-content/70 hover:text-primary flex w-full items-center justify-between py-1 text-xs font-semibold transition-colors"
+            className="text-base-content/80 hover:text-primary flex w-full items-center justify-between py-1 text-xs font-semibold transition-colors"
             aria-expanded={showVehicleDetails}
           >
             <span>CAPEX, Residual, Eficiência &amp; Insumos</span>
-            <span className="font-mono text-[10px]">
+            <span className="font-mono text-[11px]">
               {showVehicleDetails ? '▲ Fechar' : '▼ Ajustar'}
             </span>
           </button>
@@ -442,10 +442,10 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
                       key={alt}
                       type="button"
                       onClick={() => setSelectedAltTab(alt)}
-                      className={`inline-flex items-center justify-center gap-1 rounded py-1 text-[10px] font-bold uppercase transition-colors ${
+                      className={`inline-flex items-center justify-center gap-1 rounded py-1 text-[11px] font-bold uppercase transition-colors ${
                         selectedAltTab === alt
                           ? FUEL_THEME[alt].activeButtonClass
-                          : 'bg-base-100 text-base-content/70 hover:bg-base-200'
+                          : 'bg-base-100 text-base-content/75 hover:bg-base-200'
                       }`}
                     >
                       <span

@@ -13,7 +13,7 @@ import { SVGRenderer } from 'echarts/renderers';
 import type { PricesHistory, PricePoint } from '../../../lib/types/prices';
 import { FUEL_THEME } from '../../../lib/theme/fuels';
 import { useDarkMode } from '../../../lib/theme/useDarkMode';
-import { formatNumber } from '../../../lib/utils/format';
+import { escapeHtml, formatNumber } from '../../../lib/utils/format';
 import { SourceRef } from '../../common/SourceRef';
 import { ChartContainer, type ChartTableData } from './ChartContainer';
 
@@ -288,17 +288,17 @@ export const PriceHistoryChart: React.FC<PriceHistoryChartProps> = ({
           const hasFallback = Boolean(dPt?.is_fallback || gPt?.is_fallback);
 
           let html = `<div style="font-family: inherit; font-size: 12px; min-width: 195px;">`;
-          html += `<div style="font-weight: bold; margin-bottom: 4px; border-bottom: 1px solid ${tooltipBorder}; padding-bottom: 4px;">${week}${refDate ? ` (${refDate})` : ''}</div>`;
+          html += `<div style="font-weight: bold; margin-bottom: 4px; border-bottom: 1px solid ${tooltipBorder}; padding-bottom: 4px;">${escapeHtml(week)}${refDate ? ` (${escapeHtml(refDate)})` : ''}</div>`;
           for (const item of items) {
             if (item.value === null || item.value === undefined) continue;
             const dec = unitMode === 'energy' ? 4 : 2;
             html += `<div style="display:flex; justify-content:space-between; gap:10px; margin-bottom:2px;">
-              <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background-color:${item.color};margin-right:6px;"></span>${item.seriesName}</span>
-              <span style="font-family:monospace; font-weight:600;">${formatNumber(item.value, dec)}</span>
+              <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background-color:${escapeHtml(item.color)};margin-right:6px;"></span>${escapeHtml(item.seriesName)}</span>
+              <span style="font-family:monospace; font-weight:600;">${escapeHtml(formatNumber(item.value, dec))}</span>
             </div>`;
           }
           if (hasFallback) {
-            html += `<div style="margin-top:4px; font-size:10px; color:#d97706;">⚠ Semana com fallback nacional (BR)</div>`;
+            html += `<div style="margin-top:4px; font-size:11px; color:${isDark ? '#fbbf24' : '#b45309'};">⚠ Semana com fallback nacional (BR)</div>`;
           }
           html += `</div>`;
           return html;
@@ -407,14 +407,14 @@ export const PriceHistoryChart: React.FC<PriceHistoryChartProps> = ({
       <span>ANP — Diesel S10 e GNV ({pricesHistory.reference_uf})</span>
       <SourceRef id={dieselSeries?.source_id ?? 'P01'} context="Série Histórica ANP" />
       {dieselSeries?.retrieved_at && (
-        <span className="font-mono text-[10px] opacity-80">
+        <span className="font-mono text-[11px] opacity-90">
           (acesso {dieselSeries.retrieved_at})
         </span>
       )}
       <span>· EIA — Petróleo Brent</span>
       <SourceRef id={brentSeries?.source_id ?? 'P02'} context="Série Histórica Brent" />
       {brentSeries?.retrieved_at && (
-        <span className="font-mono text-[10px] opacity-80">
+        <span className="font-mono text-[11px] opacity-90">
           (acesso {brentSeries.retrieved_at})
         </span>
       )}

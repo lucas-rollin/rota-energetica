@@ -14,7 +14,7 @@ import type { SimulationResults } from '../../../lib/types/scenario';
 import { calculateAnnuityDiscountFactor } from '../../../lib/calc/tco';
 import { FUEL_THEME } from '../../../lib/theme/fuels';
 import { useDarkMode } from '../../../lib/theme/useDarkMode';
-import { formatCurrency, formatNumber } from '../../../lib/utils/format';
+import { escapeHtml, formatCurrency, formatNumber } from '../../../lib/utils/format';
 import { SourceRef } from '../../common/SourceRef';
 import { ChartContainer, type ChartTableData } from './ChartContainer';
 
@@ -201,13 +201,13 @@ export const PaybackTimelineChart: React.FC<PaybackTimelineChartProps> = ({
 
           let html = `<div style="font-family: inherit; font-size: 12px; min-width: 170px;">`;
           html += `<div style="font-weight: bold; margin-bottom: 6px; border-bottom: 1px solid ${tooltipBorder}; padding-bottom: 4px;">${
-            year === '0' ? 'Ano 0 (Investimento Inicial)' : `Ano ${year}`
+            year === '0' ? 'Ano 0 (Investimento Inicial)' : `Ano ${escapeHtml(year)}`
           }</div>`;
 
           for (const item of items) {
             html += `<div style="display: flex; justify-content: space-between; gap: 12px; margin-bottom: 3px;">
-              <span><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background-color:${item.color};margin-right:6px;"></span>${item.seriesName}</span>
-              <span style="font-weight: 600; font-family: monospace;">${formatCurrency(item.value, 0)}</span>
+              <span><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background-color:${escapeHtml(item.color)};margin-right:6px;"></span>${escapeHtml(item.seriesName)}</span>
+              <span style="font-weight: 600; font-family: monospace;">${escapeHtml(formatCurrency(item.value, 0))}</span>
             </div>`;
           }
           html += `</div>`;

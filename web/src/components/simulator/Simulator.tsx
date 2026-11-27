@@ -14,6 +14,7 @@ import type {
   VehicleParameters,
 } from '../../lib/types/parameters';
 import type { PricesHistory } from '../../lib/types/prices';
+import { useDebouncedValue } from '../../lib/utils/useDebouncedValue';
 import { TransparencyDisclaimer } from '../common/TransparencyDisclaimer';
 import { FleetImpactBanner } from './FleetImpactBanner';
 import { FleetTunerSidebar } from './FleetTunerSidebar';
@@ -130,6 +131,12 @@ export const Simulator: React.FC<SimulatorProps> = ({ defaults, pricesHistory })
       };
     }
   }, [params, effectiveParams, includeCbio]);
+
+  const debouncedWarnings = useDebouncedValue(simulationWarnings, 600);
+  const liveWarningsText =
+    debouncedWarnings.length > 0
+      ? `Cenário de sensibilidade: ${debouncedWarnings.join('; ')}`
+      : '';
 
   // Handle Preset application
   const handleApplyPreset = (newParams: SimulationParameters, presetId: string) => {
@@ -249,27 +256,28 @@ export const Simulator: React.FC<SimulatorProps> = ({ defaults, pricesHistory })
         />
       </section>
 
+      {/* Screen-reader debounced warnings announcement */}
+      <div className="sr-only" role="status" aria-live="polite">
+        {liveWarningsText}
+      </div>
+
       {/* Mild Warning for Out-of-Bound Sensitivity Scenarios */}
       {simulationWarnings && simulationWarnings.length > 0 && (
-        <div
-          role="status"
-          aria-live="polite"
-          className="flex items-start gap-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-3.5 text-xs text-amber-900 shadow-xs dark:text-amber-200"
-        >
+        <div className="flex items-start gap-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-3.5 text-xs text-amber-900 shadow-xs dark:text-amber-200">
           <TriangleAlert
-            className="mt-0.5 h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400"
+            className="mt-0.5 h-4 w-4 shrink-0 text-amber-700 dark:text-amber-400"
             aria-hidden="true"
           />
           <div className="space-y-1">
             <span className="text-base-content block font-semibold">
               Cenário de Sensibilidade — Parâmetro fora da faixa de referência:
             </span>
-            <ul className="text-base-content/80 list-inside list-disc space-y-0.5 text-[11px]">
+            <ul className="text-base-content/85 list-inside list-disc space-y-0.5 text-[11px]">
               {simulationWarnings.map((w, idx) => (
                 <li key={idx}>{w}</li>
               ))}
             </ul>
-            <p className="text-base-content/60 pt-0.5 text-[10px]">
+            <p className="text-base-content/75 pt-0.5 text-[11px]">
               Os gráficos e métricas de TCO continuam sendo calculados e apresentados
               normalmente com base no valor personalizado.
             </p>
@@ -367,7 +375,7 @@ export const Simulator: React.FC<SimulatorProps> = ({ defaults, pricesHistory })
               </div>
             </div>
             <ChevronDown
-              className="text-base-content/60 h-4 w-4 shrink-0 transition-transform duration-200 group-open:rotate-180"
+              className="text-base-content/75 h-4 w-4 shrink-0 transition-transform duration-200 group-open:rotate-180"
               aria-hidden="true"
             />
           </summary>

@@ -83,48 +83,48 @@ export const EsgDashboard: React.FC<EsgDashboardProps> = ({
           <div
             className={`mt-1 font-mono text-2xl font-black ${
               reductionPercent >= 0
-                ? 'text-emerald-600 dark:text-emerald-400'
-                : 'text-amber-600 dark:text-amber-400'
+                ? 'text-emerald-700 dark:text-emerald-400'
+                : 'text-amber-700 dark:text-amber-400'
             }`}
           >
             {reductionPercent >= 0
               ? `-${formatNumber(reductionPercent, 1)}%`
               : `+${formatNumber(Math.abs(reductionPercent), 1)}%`}
           </div>
-          <div className="text-base-content/60 mt-1 text-[11px]">
+          <div className="text-base-content/75 mt-1 text-[11px]">
             vs linha de base Diesel S10 B15
           </div>
         </div>
 
         <div className="bg-base-100 border-base-200 rounded-xl border p-4 shadow-xs">
-          <div className="text-base-content/70 text-xs font-semibold">
+          <div className="text-base-content/75 text-xs font-semibold">
             CO₂e Evitado por Ano
           </div>
           <div className="text-base-content mt-1 font-mono text-2xl font-black">
             {formatNumber(tonsAvoided, 0)}{' '}
-            <span className="text-base-content/60 text-sm font-normal">t/ano</span>
+            <span className="text-base-content/75 text-sm font-normal">t/ano</span>
           </div>
-          <div className="text-base-content/60 mt-1 text-[11px]">
+          <div className="text-base-content/75 mt-1 text-[11px]">
             Emissões líquidas Well-to-Wheel
           </div>
         </div>
 
         <div className="bg-base-100 border-base-200 rounded-xl border p-4 shadow-xs">
-          <div className="text-base-content/70 text-xs font-semibold">
+          <div className="text-base-content/75 text-xs font-semibold">
             Emissão Total da Frota (WtW)
           </div>
           <div className="text-base-content mt-1 font-mono text-2xl font-black">
             {formatNumber(annualAltTon, 0)}{' '}
-            <span className="text-base-content/60 text-sm font-normal">tCO₂e/ano</span>
+            <span className="text-base-content/75 text-sm font-normal">tCO₂e/ano</span>
           </div>
-          <div className="text-base-content/60 mt-1 text-[11px]">
+          <div className="text-base-content/75 mt-1 text-[11px]">
             {formatNumber(esg.altEmissionsGPerKm, 0)} gCO₂eq/km por veículo
           </div>
         </div>
 
         <div className="bg-base-100 border-base-200 rounded-xl border p-4 shadow-xs">
           <div className="flex items-center justify-between gap-2">
-            <span className="text-base-content/70 text-xs font-semibold">
+            <span className="text-base-content/75 text-xs font-semibold">
               Sensibilidade CBIO (Hipotética)
             </span>
             <input
@@ -135,12 +135,12 @@ export const EsgDashboard: React.FC<EsgDashboardProps> = ({
               aria-label="Incluir sensibilidade hipotética de CBIOs"
             />
           </div>
-          <div className="mt-1 font-mono text-2xl font-black text-emerald-600 dark:text-emerald-400">
+          <div className="mt-1 font-mono text-2xl font-black text-emerald-700 dark:text-emerald-400">
             {showCbioSensitivity
               ? formatCurrency(hypotheticalCbioRevenue, 0)
               : 'Desativado'}
           </div>
-          <div className="text-base-content/60 mt-1 text-[11px]">
+          <div className="text-base-content/75 mt-1 text-[11px]">
             {showCbioSensitivity
               ? targetFuel === 'biometano'
                 ? `Cotação B3 (${formatCurrency(cbioPrice, 0)}/CBIO) — emitido ao produtor, não ao frotista`
@@ -245,7 +245,7 @@ export const EsgDashboard: React.FC<EsgDashboardProps> = ({
                 onChange={(e) => setFleetSize(parseInt(e.target.value, 10))}
                 className="range range-xs range-primary w-full"
               />
-              <div className="text-base-content/50 mt-1 flex justify-between text-[10px]">
+              <div className="text-base-content/75 mt-1 flex justify-between text-[11px]">
                 <span>1 veículo (piloto)</span>
                 <span>50 un.</span>
                 <span>120 un.</span>
@@ -271,7 +271,7 @@ export const EsgDashboard: React.FC<EsgDashboardProps> = ({
                 onChange={(e) => setMonthlyMileage(parseInt(e.target.value, 10))}
                 className="range range-xs range-secondary w-full"
               />
-              <div className="text-base-content/50 mt-1 flex justify-between text-[10px]">
+              <div className="text-base-content/75 mt-1 flex justify-between text-[11px]">
                 <span>4.000 km (urbano/regional)</span>
                 <span>10.000 km (médio)</span>
                 <span>18.000 km (safra/longo curso)</span>
@@ -280,12 +280,12 @@ export const EsgDashboard: React.FC<EsgDashboardProps> = ({
           </div>
 
           <div className="bg-base-200/50 border-base-300 space-y-3 rounded-lg border p-4">
-            <h3 className="text-base-content/70 text-xs font-bold tracking-wider uppercase">
+            <h3 className="text-base-content/75 text-xs font-bold tracking-wider uppercase">
               Balanço Operacional Anual da Frota
             </h3>
             <div className="grid grid-cols-2 gap-2 text-xs">
               <div>
-                <span className="text-base-content/60 block text-[11px]">
+                <span className="text-base-content/75 block text-[11px]">
                   Diesel fóssil substituído:
                 </span>
                 <span className="text-base-content font-mono font-bold">
@@ -293,15 +293,15 @@ export const EsgDashboard: React.FC<EsgDashboardProps> = ({
                 </span>
               </div>
               <div>
-                <span className="text-base-content/60 block text-[11px]">
+                <span className="text-base-content/75 block text-[11px]">
                   Emissões evitadas (WtW):
                 </span>
-                <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">
+                <span className="font-mono font-bold text-emerald-700 dark:text-emerald-400">
                   {formatNumber(tonsAvoided, 0)} tCO₂e/ano
                 </span>
               </div>
               <div>
-                <span className="text-base-content/60 block text-[11px]">
+                <span className="text-base-content/75 block text-[11px]">
                   Quilômetros rodados:
                 </span>
                 <span className="text-base-content font-mono font-bold">
@@ -309,14 +309,14 @@ export const EsgDashboard: React.FC<EsgDashboardProps> = ({
                 </span>
               </div>
               <div>
-                <span className="text-base-content/60 block text-[11px]">
+                <span className="text-base-content/75 block text-[11px]">
                   Impacto Escopo 1 (Combustão):
                 </span>
                 <span
                   className={`font-mono font-bold ${
                     reductionScope1Percent >= 0
-                      ? 'text-emerald-600 dark:text-emerald-400'
-                      : 'text-amber-600 dark:text-amber-400'
+                      ? 'text-emerald-700 dark:text-emerald-400'
+                      : 'text-amber-700 dark:text-amber-400'
                   }`}
                 >
                   {formatSignedReduction(reductionScope1Percent)}{' '}
@@ -356,15 +356,15 @@ export const EsgDashboard: React.FC<EsgDashboardProps> = ({
                   {formatNumber(dieselCi, 2)} gCO₂eq/MJ
                 </span>
               </div>
-              <div className="bg-base-200 flex h-4 w-full overflow-hidden rounded-full">
+              <div className="bg-base-200 flex h-5 w-full overflow-hidden rounded-full">
                 <div
-                  className={`${FUEL_THEME.diesel.barClass} flex h-full items-center justify-center text-[9px] text-white`}
+                  className={`${FUEL_THEME.diesel.barClass} flex h-full items-center justify-center px-2 text-[11px] font-semibold text-white`}
                   style={{ width: `${Math.round((dieselCi / maxCi) * 100)}%` }}
                 >
                   WtW {formatNumber(dieselCi, 1)} gCO₂eq/MJ
                 </div>
               </div>
-              <div className="text-base-content/60 mt-1 text-[10px]">
+              <div className="text-base-content/75 mt-1 text-[11px]">
                 Intensidade média ponderada do Diesel B (85% fóssil + 15% biodiesel) em
                 ciclo de vida completo.
               </div>
@@ -388,9 +388,9 @@ export const EsgDashboard: React.FC<EsgDashboardProps> = ({
                   {formatDeltaVsDiesel(biometanoCi)})
                 </span>
               </div>
-              <div className="bg-base-200 flex h-4 w-full overflow-hidden rounded-full">
+              <div className="bg-base-200 flex h-5 w-full overflow-hidden rounded-full">
                 <div
-                  className={`${FUEL_THEME.biometano.barClass} flex h-full items-center justify-center text-[9px] text-white`}
+                  className={`${FUEL_THEME.biometano.barClass} flex h-full items-center justify-center px-2 text-[11px] font-semibold text-white`}
                   style={{
                     width: `${Math.max(8, Math.round((biometanoCi / maxCi) * 100))}%`,
                   }}
@@ -398,7 +398,7 @@ export const EsgDashboard: React.FC<EsgDashboardProps> = ({
                   {formatNumber(biometanoCi, 1)}
                 </div>
               </div>
-              <div className="text-base-content/60 mt-1 text-[10px]">
+              <div className="text-base-content/75 mt-1 text-[11px]">
                 Emissões concentradas no processamento e compressão (WtT); combustão
                 biogênica neutra no Escopo 1.
               </div>
@@ -421,9 +421,9 @@ export const EsgDashboard: React.FC<EsgDashboardProps> = ({
                   {formatDeltaVsDiesel(eletricoCi)})
                 </span>
               </div>
-              <div className="bg-base-200 flex h-4 w-full overflow-hidden rounded-full">
+              <div className="bg-base-200 flex h-5 w-full overflow-hidden rounded-full">
                 <div
-                  className={`${FUEL_THEME.eletrico.barClass} flex h-full items-center justify-center text-[9px] text-white`}
+                  className={`${FUEL_THEME.eletrico.barClass} flex h-full items-center justify-center px-2 text-[11px] font-semibold text-white`}
                   style={{
                     width: `${Math.max(10, Math.round((eletricoCi / maxCi) * 100))}%`,
                   }}
@@ -431,7 +431,7 @@ export const EsgDashboard: React.FC<EsgDashboardProps> = ({
                   {formatNumber(eletricoCi, 1)}
                 </div>
               </div>
-              <div className="text-base-content/60 mt-1 flex flex-wrap items-center gap-1 text-[10px]">
+              <div className="text-base-content/75 mt-1 flex flex-wrap items-center gap-1 text-[11px]">
                 <span>
                   Zero emissões de escapamento no ponto de uso; impacto restrito à geração
                   da rede (MCTI/SIRENE)
@@ -457,15 +457,15 @@ export const EsgDashboard: React.FC<EsgDashboardProps> = ({
                   {formatNumber(gnvCi, 2)} gCO₂eq/MJ ({formatDeltaVsDiesel(gnvCi)})
                 </span>
               </div>
-              <div className="bg-base-200 flex h-4 w-full overflow-hidden rounded-full">
+              <div className="bg-base-200 flex h-5 w-full overflow-hidden rounded-full">
                 <div
-                  className={`${FUEL_THEME.gnv.barClass} flex h-full items-center justify-center text-[9px] font-semibold text-slate-950`}
+                  className={`${FUEL_THEME.gnv.barClass} flex h-full items-center justify-center px-2 text-[11px] font-semibold text-slate-950`}
                   style={{ width: `${Math.round((gnvCi / maxCi) * 100)}%` }}
                 >
                   WtW {formatNumber(gnvCi, 1)} gCO₂eq/MJ
                 </div>
               </div>
-              <div className="text-base-content/60 mt-1 text-[10px]">
+              <div className="text-base-content/75 mt-1 text-[11px]">
                 Combustível de transição fóssil; intensidade WtW superior à do Diesel B
                 por km, com redução de poluentes locais (NOx e MP).
               </div>
@@ -479,7 +479,7 @@ export const EsgDashboard: React.FC<EsgDashboardProps> = ({
             <h2 className="text-base-content mb-1 text-base font-bold tracking-tight">
               Rastreabilidade por Escopo (GHG Protocol Brasil)
             </h2>
-            <p className="text-base-content/70 mb-4 text-xs">
+            <p className="text-base-content/75 mb-4 text-xs">
               Atribuição corporativa de inventário de carbono para frotas próprias e
               transportadores parceiros.
             </p>
@@ -494,7 +494,7 @@ export const EsgDashboard: React.FC<EsgDashboardProps> = ({
                     {formatNumber(scope1Ton, 0)} tCO₂e/ano
                   </span>
                 </div>
-                <p className="text-base-content/70 mt-1 text-[11px]">
+                <p className="text-base-content/75 mt-1 text-[11px]">
                   Queima direta de combustível nos cilindros da frota própria. O caminhão
                   elétrico e o biometano zeram a parcela fóssil direta (redução WtW
                   calculada de{' '}
@@ -512,11 +512,11 @@ export const EsgDashboard: React.FC<EsgDashboardProps> = ({
                   <span className="text-base-content font-bold">
                     Escopo 2 — Eletricidade e Recarga de Bateria
                   </span>
-                  <span className="font-mono font-bold text-cyan-600 dark:text-cyan-400">
+                  <span className="font-mono font-bold text-cyan-700 dark:text-cyan-400">
                     {formatNumber(scope2Ton, 0)} tCO₂e/ano
                   </span>
                 </div>
-                <p className="text-base-content/70 mt-1 text-[11px]">
+                <p className="text-base-content/75 mt-1 text-[11px]">
                   Consumo de eletricidade nas garagens e eletropostos públicos. Aplicável
                   exclusivamente aos BEVs, mensurado pelo fator médio anual do SIN (MCTI).
                 </p>
@@ -527,11 +527,11 @@ export const EsgDashboard: React.FC<EsgDashboardProps> = ({
                   <span className="text-base-content font-bold">
                     Escopo 3 — Cadeia Upstream (WtT)
                   </span>
-                  <span className="font-mono font-bold text-amber-600 dark:text-amber-400">
+                  <span className="font-mono font-bold text-amber-700 dark:text-amber-400">
                     {formatNumber(scope3Ton, 0)} tCO₂e/ano
                   </span>
                 </div>
-                <p className="text-base-content/70 mt-1 text-[11px]">
+                <p className="text-base-content/75 mt-1 text-[11px]">
                   Emissões upstream de processamento, compressão e transporte (WtT)
                   separadas para o biometano. Para o GNV, o fator WtW em parameters.json
                   agrega WtT + TtW no total acima.
@@ -540,7 +540,7 @@ export const EsgDashboard: React.FC<EsgDashboardProps> = ({
             </div>
           </div>
 
-          <div className="border-base-200 text-base-content/60 mt-4 flex items-center justify-between gap-2 border-t pt-3 text-xs">
+          <div className="border-base-200 text-base-content/75 mt-4 flex items-center justify-between gap-2 border-t pt-3 text-xs">
             <span>Metodologia: GHG Protocol Brasil &amp; ISO 14040/44</span>
             <span className="inline-flex items-center gap-1.5">
               <span className="badge badge-xs badge-outline">Fator SIN 2024</span>
@@ -604,14 +604,14 @@ export const EsgDashboard: React.FC<EsgDashboardProps> = ({
                       <span
                         className={
                           p.nox_g_kwh === 0
-                            ? 'font-bold text-emerald-600 dark:text-emerald-400'
+                            ? 'font-bold text-emerald-700 dark:text-emerald-400'
                             : ''
                         }
                       >
                         {formatNumber(p.nox_g_kwh, 2)}
                       </span>
                       {p.nox_reduction_percent > 0 && (
-                        <span className="block text-[10px] text-emerald-600 dark:text-emerald-400">
+                        <span className="block text-[11px] text-emerald-700 dark:text-emerald-400">
                           -{formatNumber(p.nox_reduction_percent, 0)}%
                         </span>
                       )}
@@ -620,14 +620,14 @@ export const EsgDashboard: React.FC<EsgDashboardProps> = ({
                       <span
                         className={
                           p.pm25_g_kwh === 0
-                            ? 'font-bold text-emerald-600 dark:text-emerald-400'
+                            ? 'font-bold text-emerald-700 dark:text-emerald-400'
                             : ''
                         }
                       >
                         {formatNumber(p.pm25_g_kwh, 3)}
                       </span>
                       {p.pm_reduction_percent > 0 && (
-                        <span className="block text-[10px] text-emerald-600 dark:text-emerald-400">
+                        <span className="block text-[11px] text-emerald-700 dark:text-emerald-400">
                           -{formatNumber(p.pm_reduction_percent, 0)}%
                         </span>
                       )}
@@ -635,7 +635,7 @@ export const EsgDashboard: React.FC<EsgDashboardProps> = ({
                     <td className="text-right font-mono text-xs">
                       {formatNumber(p.noise_db, 1)} dB
                     </td>
-                    <td className="text-base-content/80 text-xs">{p.urban_impact}</td>
+                    <td className="text-base-content/85 text-xs">{p.urban_impact}</td>
                   </tr>
                 );
               })}
@@ -643,7 +643,7 @@ export const EsgDashboard: React.FC<EsgDashboardProps> = ({
           </table>
         </div>
 
-        <div className="text-base-content/60 mt-3 flex flex-wrap items-center justify-between gap-2 text-[11px]">
+        <div className="text-base-content/75 mt-3 flex flex-wrap items-center justify-between gap-2 text-[11px]">
           <span>
             Limites legais Conama P8 (ciclo WHTC): NOx ≤ 0,40 g/kWh | Material Particulado
             ≤ 0,010 g/kWh
