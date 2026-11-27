@@ -10,6 +10,7 @@ interface ResultCardsProps {
   dieselPurchasePrice: number;
   vehiclePurchasePrices: Record<AlternativeId, number>;
   energyPrices?: Record<AlternativeId, { value: number; unit: string }>;
+  residualBand?: Record<AlternativeId, { lowTco: number; highTco: number }>;
 }
 
 const ALTERNATIVES_ORDER: AlternativeId[] = ['diesel', 'biometano', 'eletrico', 'gnv'];
@@ -88,6 +89,7 @@ export const ResultCards: React.FC<ResultCardsProps> = ({
   dieselPurchasePrice,
   vehiclePurchasePrices,
   energyPrices,
+  residualBand,
 }) => {
   const minTco = Math.min(
     ...ALTERNATIVES_ORDER.map((id) => results[id]?.tco ?? Number.POSITIVE_INFINITY)
@@ -170,6 +172,16 @@ export const ResultCards: React.FC<ResultCardsProps> = ({
                       {formatCurrency(res.tco, 0)}
                     </span>
                   </div>
+
+                  {residualBand?.[alt] && (
+                    <div className="flex items-center justify-between text-[10px]">
+                      <span className="text-base-content/60">Sens. residual (§4.4):</span>
+                      <span className="text-base-content/75 font-mono">
+                        {formatCurrency(residualBand[alt].highTco, 0)} –{' '}
+                        {formatCurrency(residualBand[alt].lowTco, 0)}
+                      </span>
+                    </div>
+                  )}
 
                   <div className="flex items-center justify-between">
                     <span className="text-base-content/70 text-[11px]">

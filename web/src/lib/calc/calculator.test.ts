@@ -8,6 +8,7 @@ import {
   calculateTco,
   getParameterWarnings,
   simulate,
+  simulateResidualSensitivity,
 } from './index';
 
 const defaultParams = defaultParametersJson as unknown as SimulationParameters;
@@ -229,6 +230,16 @@ describe('Calculator Engine Unit Tests', () => {
       expect(cbioRes.biometano.netLevelizedCostPerKm).toBeLessThan(
         cbioRes.biometano.levelizedCostPerKm
       );
+    });
+
+    it('computes Low / Base / High residual value scenarios per Methodology §4.4', () => {
+      const band = simulateResidualSensitivity(defaultParams);
+
+      for (const alt of ['diesel', 'gnv', 'biometano', 'eletrico'] as const) {
+        // Higher residual value lowers net TCO; lower residual raises net TCO
+        expect(band.high[alt].tco).toBeLessThan(band.base[alt].tco);
+        expect(band.base[alt].tco).toBeLessThan(band.low[alt].tco);
+      }
     });
   });
 });

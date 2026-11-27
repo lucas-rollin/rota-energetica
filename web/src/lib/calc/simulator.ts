@@ -329,6 +329,51 @@ export interface SimulateOptions {
   includeCbio?: boolean;
 }
 
+export type ResidualScenarioId = 'low' | 'base' | 'high';
+
+export const RESIDUAL_SCENARIO_DELTA: Record<ResidualScenarioId, number> = {
+  low: -0.15,
+  base: 0,
+  high: 0.15,
+};
+
+/**
+ * Returns a cloned parameter set with each vehicle's residual value ratio shifted
+ * for Low / Base / High residual value sensitivity (Methodology §4.4), clamped to [min, max].
+ */
+export function applyResidualScenario(
+  params: SimulationParameters,
+  scenario: ResidualScenarioId
+): SimulationParameters {
+  const delta = RESIDUAL_SCENARIO_DELTA[scenario];
+  const cloned = JSON.parse(JSON.stringify(params)) as SimulationParameters;
+  if (Math.abs(delta) < 1e-9) return cloned;
+
+  for (const alt of ALTERNATIVE_IDS) {
+    const resItem = cloned.vehicles[alt]?.residual_value_ratio;
+    if (!resItem) continue;
+    const min = resItem.min ?? 0;
+    const max = resItem.max ?? 0.9;
+    const shifted = Math.min(max, Math.max(min, resItem.value + delta));
+    resItem.value = Number(shifted.toFixed(4));
+  }
+  return cloned;
+}
+
+/**
+ * Simulates Low / Base / High residual value scenarios (Methodology §4.4).
+ */
+export function simulateResidualSensitivity(
+  params: SimulationParameters,
+  options: SimulateOptions = {}
+): Record<ResidualScenarioId, SimulationResults> {
+  return {
+    low: simulate(applyResidualScenario(params, 'low'), options),
+    base: simulate(applyResidualScenario(params, 'base'), options),
+    high: simulate(applyResidualScenario(params, 'high'), options),
+  };
+}
+
 /**
  * Simulates all energy powertrain scenarios for a given set of parameters.
  */
