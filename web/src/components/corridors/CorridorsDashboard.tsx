@@ -11,33 +11,26 @@ import {
   DEFAULT_CORRIDOR_DETOUR_KM,
 } from '../../lib/utils/geo';
 import { SourceRef } from '../common/SourceRef';
-import { TransparencyDisclaimer } from '../common/TransparencyDisclaimer';
-import { CorridorInfrastructureMap } from './CorridorInfrastructureMap';
+import { useSharedCorridorSelection } from './corridorSelection';
 
 interface CorridorsDashboardProps {
   corridorsData: CorridorsCatalog;
   stationsData: CorridorFuelStationsCatalog;
-  brazilGeoJson: unknown;
 }
 
 export const CorridorsDashboard: React.FC<CorridorsDashboardProps> = ({
   corridorsData,
   stationsData,
-  brazilGeoJson,
 }) => {
-  const [selectedCorridorId, setSelectedCorridorId] = useState<string>(
-    corridorsData.corridors[0]?.id ?? 'rondonopolis-santos'
-  );
+  const defaultCorridorId = corridorsData.corridors[0]?.id ?? 'rondonopolis-santos';
+  const [selectedCorridorId, setSelectedCorridorId] =
+    useSharedCorridorSelection(defaultCorridorId);
   const [selectedPowertrain, setSelectedPowertrain] = useState<
     'biometano' | 'diesel' | 'eletrico'
   >('biometano');
-  const [viewportScope, setViewportScope] = useState<'corridor' | 'brazil'>('corridor');
-  const [viewportTick, setViewportTick] = useState<number>(0);
 
   const handleCorridorChange = (corridorId: string) => {
     setSelectedCorridorId(corridorId);
-    setViewportScope('corridor');
-    setViewportTick((t) => t + 1);
   };
 
   const selectedCorridor = useMemo(() => {
@@ -79,10 +72,10 @@ export const CorridorsDashboard: React.FC<CorridorsDashboardProps> = ({
   // Objective coverage color helper
   const getCoverageColor = (coveredPct: number) => {
     if (coveredPct >= 85)
-      return 'text-emerald-600 dark:text-emerald-400 border-emerald-500 bg-emerald-500/10';
+      return 'text-emerald-700 dark:text-emerald-400 border-emerald-500 bg-emerald-500/10';
     if (coveredPct >= 50)
-      return 'text-amber-600 dark:text-amber-400 border-amber-500 bg-amber-500/10';
-    return 'text-rose-600 dark:text-rose-400 border-rose-500 bg-rose-500/10';
+      return 'text-amber-700 dark:text-amber-400 border-amber-500 bg-amber-500/10';
+    return 'text-rose-700 dark:text-rose-400 border-rose-500 bg-rose-500/10';
   };
 
   return (
@@ -145,7 +138,7 @@ export const CorridorsDashboard: React.FC<CorridorsDashboardProps> = ({
               />
               <span>
                 Biometano{' '}
-                <span className="block text-[10px] font-normal opacity-80 sm:inline">
+                <span className="block text-[11px] font-normal opacity-90 sm:inline">
                   (Bio-GNC / GNL)
                 </span>
               </span>
@@ -169,7 +162,7 @@ export const CorridorsDashboard: React.FC<CorridorsDashboardProps> = ({
               />
               <span>
                 Elétrico Pesado{' '}
-                <span className="block text-[10px] font-normal opacity-80 sm:inline">
+                <span className="block text-[11px] font-normal opacity-90 sm:inline">
                   (BEV)
                 </span>
               </span>
@@ -193,7 +186,7 @@ export const CorridorsDashboard: React.FC<CorridorsDashboardProps> = ({
               />
               <span>
                 Diesel S10 B15{' '}
-                <span className="block text-[10px] font-normal opacity-80 sm:inline">
+                <span className="block text-[11px] font-normal opacity-90 sm:inline">
                   (Baseline)
                 </span>
               </span>
@@ -216,7 +209,7 @@ export const CorridorsDashboard: React.FC<CorridorsDashboardProps> = ({
               <div>
                 <span className="bg-neutral text-neutral-content mb-1 inline-flex max-w-full items-center gap-1 rounded-md px-2 py-0.5 text-[11px] leading-tight font-medium">
                   <span>{selectedCorridor.origin}</span>
-                  <span className="text-neutral-content/60 font-mono">➔</span>
+                  <span className="text-neutral-content/85 font-mono">➔</span>
                   <span>{selectedCorridor.destination}</span>
                 </span>
                 <h3 className="text-base-content text-sm font-bold">
@@ -233,11 +226,11 @@ export const CorridorsDashboard: React.FC<CorridorsDashboardProps> = ({
             </p>
 
             <div className="border-base-300 space-y-2 border-t pt-2 text-xs">
-              <div className="text-base-content/60 text-[11px] font-bold tracking-wider uppercase">
+              <div className="text-base-content/75 text-[11px] font-bold tracking-wider uppercase">
                 Rede de Suprimento Identificada
               </div>
               <div>
-                <span className="text-base-content/60 block text-[11px]">
+                <span className="text-base-content/75 block text-[11px]">
                   Postos Diesel Rodoviários:
                 </span>
                 <span className="text-base-content font-medium">
@@ -245,18 +238,18 @@ export const CorridorsDashboard: React.FC<CorridorsDashboardProps> = ({
                 </span>
               </div>
               <div>
-                <span className="text-base-content/60 block text-[11px]">
+                <span className="text-base-content/75 block text-[11px]">
                   Rede Gás / Biometano:
                 </span>
-                <span className="font-medium text-emerald-600 dark:text-emerald-400">
+                <span className="font-medium text-emerald-700 dark:text-emerald-400">
                   {selectedCorridor.refueling_points.biomethane_cng}
                 </span>
               </div>
               <div>
-                <span className="text-base-content/60 block text-[11px]">
+                <span className="text-base-content/75 block text-[11px]">
                   Eletropostos Rápidos (&gt;150kW):
                 </span>
-                <span className="font-medium text-cyan-600 dark:text-cyan-400">
+                <span className="font-medium text-cyan-700 dark:text-cyan-400">
                   {selectedCorridor.refueling_points.electric_hpc}
                 </span>
               </div>
@@ -276,7 +269,7 @@ export const CorridorsDashboard: React.FC<CorridorsDashboardProps> = ({
                   {formatNumber(routeCoverage.coveredPercent, 0)}% —{' '}
                   {evalData.feasibility_label}
                 </div>
-                <div className="mt-0.5 text-[11px] opacity-85">
+                <div className="mt-0.5 text-[11px] opacity-90">
                   {selectedPowertrain === 'diesel'
                     ? 'Rede comercial consolidada ao longo da malha federal'
                     : `Autonomia ref. ${routeCoverage.referenceAutonomyKm} km (raio ${routeCoverage.referenceAutonomyKm! / 2} km, ≤${DEFAULT_CORRIDOR_DETOUR_KM} km do eixo · ${routeCoverage.onRouteStationsCount} hubs · vão máx. ${formatNumber(routeCoverage.maxUncoveredSpanKm, 0)} km)`}
@@ -289,28 +282,28 @@ export const CorridorsDashboard: React.FC<CorridorsDashboardProps> = ({
 
             <div className="grid grid-cols-2 gap-3 text-xs">
               <div className="bg-base-200/40 border-base-200 rounded-lg border p-3">
-                <span className="text-base-content/60 block text-[11px]">
+                <span className="text-base-content/75 block text-[11px]">
                   Tempo de Reabastecimento:
                 </span>
                 <span className="text-base-content font-mono font-bold">
                   ~{evalData.refuel_time_minutes} min
                 </span>
-                <span className="text-base-content/50 mt-0.5 block text-[10px]">
+                <span className="text-base-content/75 mt-0.5 block text-[11px]">
                   {evalData.stops_description}
                 </span>
               </div>
 
               <div className="bg-base-200/40 border-base-200 rounded-lg border p-3">
-                <span className="text-base-content/60 block text-[11px]">
+                <span className="text-base-content/75 block text-[11px]">
                   Impacto na Carga Útil:
                 </span>
                 <span
-                  className={`font-mono font-bold ${evalData.payload_penalty_kg < 0 ? 'text-amber-600 dark:text-amber-400' : 'text-base-content'}`}
+                  className={`font-mono font-bold ${evalData.payload_penalty_kg < 0 ? 'text-amber-700 dark:text-amber-400' : 'text-base-content'}`}
                 >
                   {evalData.payload_penalty_kg > 0 ? '+' : ''}
                   {formatNumber(evalData.payload_penalty_kg, 0)} kg
                 </span>
-                <span className="text-base-content/50 mt-0.5 block text-[10px]">
+                <span className="text-base-content/75 mt-0.5 block text-[11px]">
                   Lei da Balança (PBTC)
                 </span>
               </div>
@@ -318,10 +311,10 @@ export const CorridorsDashboard: React.FC<CorridorsDashboardProps> = ({
 
             <div className="bg-base-200/40 border-base-200 rounded-lg border p-3 text-xs">
               <div className="mb-1 flex items-center justify-between">
-                <span className="text-base-content/70">
+                <span className="text-base-content/75">
                   Abatimento de Emissões vs Diesel:
                 </span>
-                <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">
+                <span className="font-mono font-bold text-emerald-700 dark:text-emerald-400">
                   -{formatNumber(evalData.emission_reduction_percent, 1)}%
                 </span>
               </div>
@@ -337,7 +330,7 @@ export const CorridorsDashboard: React.FC<CorridorsDashboardProps> = ({
           {/* Column 3: Operational Recommendation */}
           <div className="bg-base-200/50 border-base-300 flex flex-col justify-between rounded-lg border p-4">
             <div>
-              <div className="text-base-content/70 mb-2 flex items-center gap-1.5 text-xs font-bold tracking-wider uppercase">
+              <div className="text-base-content/75 mb-2 flex items-center gap-1.5 text-xs font-bold tracking-wider uppercase">
                 <Info className="text-primary h-4 w-4 shrink-0" aria-hidden="true" />
                 Diagnóstico &amp; Recomendação Técnica
               </div>
@@ -346,7 +339,7 @@ export const CorridorsDashboard: React.FC<CorridorsDashboardProps> = ({
               </p>
             </div>
 
-            <div className="border-base-300 text-base-content/60 mt-4 border-t pt-3 text-[11px] leading-relaxed">
+            <div className="border-base-300 text-base-content/75 mt-4 border-t pt-3 text-[11px] leading-relaxed">
               Fontes: EPE Plano Nacional de Logística{' '}
               <SourceRef id="I12" context="Corredores Logísticos (PNL 2035)" />, CONTRAN
               Res. 882/2021{' '}
@@ -356,24 +349,6 @@ export const CorridorsDashboard: React.FC<CorridorsDashboardProps> = ({
           </div>
         </div>
       </div>
-
-      {/* Interactive Highway Infrastructure & Autonomy Coverage Map */}
-      <CorridorInfrastructureMap
-        corridors={corridorsData.corridors}
-        selectedCorridor={selectedCorridor}
-        onSelectCorridor={handleCorridorChange}
-        stations={stationsData.stations}
-        brazilGeoJson={brazilGeoJson}
-        viewportScope={viewportScope}
-        onViewportScopeChange={setViewportScope}
-        viewportTick={viewportTick}
-        onFocusCorridor={() => {
-          setViewportScope('corridor');
-          setViewportTick((t) => t + 1);
-        }}
-      />
-
-      <TransparencyDisclaimer />
     </div>
   );
 };

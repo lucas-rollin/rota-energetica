@@ -21,8 +21,10 @@ import {
 import type { FreightCorridor, FuelStation } from '../../lib/types/catalogs';
 import { FUEL_THEME } from '../../lib/theme/fuels';
 import { useDarkMode } from '../../lib/theme/useDarkMode';
-import { formatNumber } from '../../lib/utils/format';
+import { escapeHtml, formatNumber } from '../../lib/utils/format';
+import { useDebouncedValue } from '../../lib/utils/useDebouncedValue';
 import { SourceRef } from '../common/SourceRef';
+import { useSharedCorridorSelection } from './corridorSelection';
 import {
   buildCorridorCoverageSegments,
   computeCorridorCoverageStats,
@@ -51,14 +53,8 @@ type CoverageVisualMode = 'route' | 'unified' | 'rings';
 
 interface CorridorInfrastructureMapProps {
   corridors: FreightCorridor[];
-  selectedCorridor: FreightCorridor;
-  onSelectCorridor: (corridorId: string) => void;
   stations: FuelStation[];
-  brazilGeoJson: unknown;
-  viewportScope: 'corridor' | 'brazil';
-  onViewportScopeChange: (scope: 'corridor' | 'brazil') => void;
-  viewportTick: number;
-  onFocusCorridor: () => void;
+  initialCorridorId?: string;
 }
 
 const AUTONOMY_PRESETS = [
@@ -113,18 +109,43 @@ function ringCoordsToSvgPath(
 
 export const CorridorInfrastructureMap: React.FC<CorridorInfrastructureMapProps> = ({
   corridors,
-  selectedCorridor,
-  onSelectCorridor,
   stations,
-  brazilGeoJson,
-  viewportScope,
-  onViewportScopeChange,
-  viewportTick,
-  onFocusCorridor,
+  initialCorridorId,
 }) => {
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartInstanceRef = useRef<echarts.ECharts | null>(null);
   const lastViewportKeyRef = useRef<string>('');
+
+  const defaultCorridorId =
+    initialCorridorId ?? corridors[0]?.id ?? 'rondonopolis-santos';
+  const [selectedCorridorId, setSelectedCorridorId] =
+    useSharedCorridorSelection(defaultCorridorId);
+  const [viewportScope, setViewportScope] = useState<'corridor' | 'brazil'>('corridor');
+  const [viewportTick, setViewportTick] = useState<number>(0);
+  const [brazilGeoJson, setBrazilGeoJson] = useState<unknown>(null);
+
+  const selectedCorridor = useMemo(() => {
+    return corridors.find((c) => c.id === selectedCorridorId) ?? corridors[0];
+  }, [corridors, selectedCorridorId]);
+
+  const handleSelectCorridor = (corridorId: string) => {
+    setSelectedCorridorId(corridorId);
+    setViewportScope('corridor');
+    setViewportTick((t) => t + 1);
+  };
+
+  // Lazy-load Brazil UF GeoJSON only once this island is hydrated via client:visible
+  useEffect(() => {
+    let active = true;
+    import('../../../../data/processed/brazil_states.geo.json').then((mod) => {
+      if (active) {
+        setBrazilGeoJson('default' in mod ? mod.default : mod);
+      }
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const [viewMode, setViewMode] = useState<'map' | 'table'>('map');
   const [showBiomethaneCng, setShowBiomethaneCng] = useState<boolean>(true);
@@ -271,6 +292,8 @@ export const CorridorInfrastructureMap: React.FC<CorridorInfrastructureMapProps>
     coverageStats,
   ]);
 
+  const liveSummaryText = useDebouncedValue(summaryText, 600);
+
   // Resize chart cleanly when returning to 'map' view
   useEffect(() => {
     if (viewMode === 'map') {
@@ -283,7 +306,7 @@ export const CorridorInfrastructureMap: React.FC<CorridorInfrastructureMapProps>
 
   // Initialize and update ECharts GeoJSON map
   useEffect(() => {
-    if (!chartContainerRef.current) return;
+    if (!chartContainerRef.current || !brazilGeoJson) return;
 
     if (!echarts.getMap('brasil_uf')) {
       echarts.registerMap(
@@ -444,23 +467,23 @@ export const CorridorInfrastructureMap: React.FC<CorridorInfrastructureMapProps>
               st.km_marker != null ? ` • km ${formatNumber(st.km_marker, 0)}` : '';
             return `
               <div style="max-width:280px;white-space:normal;line-height:1.45;">
-                <div style="font-weight:700;margin-bottom:3px;">${st.name}</div>
+                <div style="font-weight:700;margin-bottom:3px;">${escapeHtml(st.name)}</div>
                 <div style="font-size:11px;margin-bottom:4px;">
                   <span style="display:inline-block;width:8px;height:8px;border-radius:999px;background:${badgeColor};margin-right:5px;"></span>
-                  <strong>${techLabel}</strong> (${st.status})
+                  <strong>${escapeHtml(techLabel)}</strong> (${escapeHtml(st.status)})
                 </div>
-                <div style="font-size:11px;opacity:0.85;">
-                  <div><strong>Rodovia:</strong> ${st.highway}${kmInfo}</div>
-                  <div><strong>Local:</strong> ${st.city} / ${st.state}</div>
-                  <div><strong>Capacidade:</strong> ${st.capacity_spec}</div>
-                  ${st.operator_network ? `<div><strong>Rede:</strong> ${st.operator_network}</div>` : ''}
-                  <div style="margin-top:4px;font-size:10px;opacity:0.75;">Anel exibido no mapa: ${formatNumber(effectiveRadiusKm, 0)} km • Fonte: ${st.source_id} (${st.badge})</div>
+                <div style="font-size:11px;opacity:0.9;">
+                  <div><strong>Rodovia:</strong> ${escapeHtml(st.highway)}${escapeHtml(kmInfo)}</div>
+                  <div><strong>Local:</strong> ${escapeHtml(st.city)} / ${escapeHtml(st.state)}</div>
+                  <div><strong>Capacidade:</strong> ${escapeHtml(st.capacity_spec)}</div>
+                  ${st.operator_network ? `<div><strong>Rede:</strong> ${escapeHtml(st.operator_network)}</div>` : ''}
+                  <div style="margin-top:4px;font-size:11px;opacity:0.8;">Anel exibido no mapa: ${escapeHtml(formatNumber(effectiveRadiusKm, 0))} km • Fonte: ${escapeHtml(st.source_id)} (${escapeHtml(st.badge)})</div>
                 </div>
               </div>
             `;
           }
 
-          return item.name ?? '';
+          return escapeHtml(item.name ?? '');
         },
       },
       geo: geoConfig,
@@ -699,7 +722,7 @@ export const CorridorInfrastructureMap: React.FC<CorridorInfrastructureMapProps>
             <select
               id="map-corridor-select"
               value={selectedCorridor.id}
-              onChange={(e) => onSelectCorridor(e.target.value)}
+              onChange={(e) => handleSelectCorridor(e.target.value)}
               className="select select-xs select-bordered max-w-65 text-xs font-medium"
             >
               {corridors.map((c) => (
@@ -745,7 +768,7 @@ export const CorridorInfrastructureMap: React.FC<CorridorInfrastructureMapProps>
       <div className="bg-base-200/40 border-base-200 grid grid-cols-1 gap-4 rounded-xl border p-4 lg:grid-cols-12">
         {/* Network & Layer Toggles */}
         <div className="space-y-2.5 lg:col-span-5">
-          <div className="text-base-content/60 text-[11px] font-bold tracking-wider uppercase">
+          <div className="text-base-content/75 text-[11px] font-bold tracking-wider uppercase">
             Camadas de Infraestrutura (Mapa)
           </div>
           <div className="flex flex-wrap gap-2">
@@ -757,7 +780,7 @@ export const CorridorInfrastructureMap: React.FC<CorridorInfrastructureMapProps>
                 onChange={(e) => setShowBiomethaneCng(e.target.checked)}
               />
               <Fuel
-                className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400"
+                className="h-3.5 w-3.5 text-emerald-700 dark:text-emerald-400"
                 aria-hidden="true"
               />
               <span>GNV / Biometano</span>
@@ -771,7 +794,7 @@ export const CorridorInfrastructureMap: React.FC<CorridorInfrastructureMapProps>
                 onChange={(e) => setShowElectricHpc(e.target.checked)}
               />
               <Zap
-                className="h-3.5 w-3.5 text-cyan-600 dark:text-cyan-400"
+                className="h-3.5 w-3.5 text-cyan-700 dark:text-cyan-400"
                 aria-hidden="true"
               />
               <span>Eletropostos HPC (&gt;150 kW)</span>
@@ -779,7 +802,7 @@ export const CorridorInfrastructureMap: React.FC<CorridorInfrastructureMapProps>
           </div>
 
           <div className="flex flex-wrap items-center gap-2 pt-1">
-            <label className="text-base-content/80 inline-flex cursor-pointer items-center gap-1.5 text-xs">
+            <label className="text-base-content/85 inline-flex cursor-pointer items-center gap-1.5 text-xs">
               <input
                 type="checkbox"
                 className="checkbox checkbox-xs"
@@ -796,7 +819,7 @@ export const CorridorInfrastructureMap: React.FC<CorridorInfrastructureMapProps>
           <div className="flex items-center justify-between text-xs">
             <label
               htmlFor="autonomy-slider"
-              className="text-base-content/60 text-[11px] font-bold tracking-wider uppercase"
+              className="text-base-content/75 text-[11px] font-bold tracking-wider uppercase"
             >
               Autonomia do Caminhão
             </label>
@@ -844,7 +867,7 @@ export const CorridorInfrastructureMap: React.FC<CorridorInfrastructureMapProps>
 
         {/* Radius Mode + Visual Style + Map Framing */}
         <div className="space-y-2 lg:col-span-3">
-          <div className="text-base-content/60 text-[11px] font-bold tracking-wider uppercase">
+          <div className="text-base-content/75 text-[11px] font-bold tracking-wider uppercase">
             Cálculo &amp; Estilo da Cobertura
           </div>
 
@@ -928,7 +951,10 @@ export const CorridorInfrastructureMap: React.FC<CorridorInfrastructureMapProps>
               <div className="flex items-center gap-1.5">
                 <button
                   type="button"
-                  onClick={onFocusCorridor}
+                  onClick={() => {
+                    setViewportScope('corridor');
+                    setViewportTick((t) => t + 1);
+                  }}
                   className={`btn btn-xs flex-1 gap-1 ${
                     viewportScope === 'corridor'
                       ? 'btn-secondary btn-outline'
@@ -940,7 +966,7 @@ export const CorridorInfrastructureMap: React.FC<CorridorInfrastructureMapProps>
                 </button>
                 <button
                   type="button"
-                  onClick={() => onViewportScopeChange('brazil')}
+                  onClick={() => setViewportScope('brazil')}
                   className={`btn btn-xs flex-1 gap-1 ${
                     viewportScope === 'brazil' ? 'btn-secondary btn-outline' : 'btn-ghost'
                   }`}
@@ -958,24 +984,24 @@ export const CorridorInfrastructureMap: React.FC<CorridorInfrastructureMapProps>
       <div className="grid grid-cols-1 gap-3 text-xs sm:grid-cols-3">
         <div className="bg-base-200/40 border-base-200 flex items-center justify-between rounded-lg border p-3">
           <div>
-            <span className="text-base-content/60 block text-[11px]">
+            <span className="text-base-content/75 block text-[11px]">
               Pontos na Rota (≤{DEFAULT_CORRIDOR_DETOUR_KM} km do eixo)
             </span>
             <span className="text-base-content font-mono text-base font-bold">
               {coverageStats.onRouteStationsCount} hubs elegíveis
             </span>
-            <span className="text-base-content/50 block text-[10px]">
+            <span className="text-base-content/75 block text-[11px]">
               {corridorStationsCount} associados ao corredor
             </span>
           </div>
-          <span className="text-base-content/60 font-mono text-[11px]">
+          <span className="text-base-content/75 font-mono text-[11px]">
             Raio: {formatNumber(effectiveRadiusKm, 0)} km
           </span>
         </div>
 
         <div className="bg-base-200/40 border-base-200 flex items-center justify-between rounded-lg border p-3">
           <div>
-            <span className="text-base-content/60 block text-[11px]">
+            <span className="text-base-content/75 block text-[11px]">
               Cobertura Geográfica na Rota
             </span>
             <span className="text-base-content font-mono text-base font-bold">
@@ -1023,23 +1049,30 @@ export const CorridorInfrastructureMap: React.FC<CorridorInfrastructureMapProps>
         </div>
       </div>
 
-      {/* Screen-reader live summary */}
+      {/* Screen-reader live summary (debounced during rapid slider drags) */}
       <div className="sr-only" aria-live="polite">
-        {summaryText}
+        {liveSummaryText}
       </div>
 
       {/* Map Container (always mounted, toggled via hidden/block to keep ECharts DOM isolated) */}
       <div key="map-panel" className={viewMode === 'map' ? 'block space-y-3' : 'hidden'}>
         <div className="border-base-200 bg-base-200/20 relative overflow-hidden rounded-xl border">
-          <div
-            ref={chartContainerRef}
-            className="h-115 w-full sm:h-135"
-            role="img"
-            aria-label={summaryText}
-          />
+          <div className="relative">
+            <div
+              ref={chartContainerRef}
+              className="h-115 w-full sm:h-135"
+              role="img"
+              aria-label={summaryText}
+            />
+            {!brazilGeoJson && (
+              <div className="text-base-content/75 pointer-events-none absolute inset-0 flex items-center justify-center text-xs font-medium">
+                Carregando malha territorial...
+              </div>
+            )}
+          </div>
 
           {/* Floating Legend */}
-          <div className="border-base-200 bg-base-100/95 text-base-content/80 flex flex-wrap items-center gap-4 border-t px-4 py-2.5 text-[11px]">
+          <div className="border-base-200 bg-base-100/95 text-base-content/85 flex flex-wrap items-center gap-4 border-t px-4 py-2.5 text-[11px]">
             <span className="inline-flex items-center gap-1.5">
               <span className="inline-block h-1 w-3.5 rounded-full bg-emerald-600" />
               <span>Trecho Coberto</span>
@@ -1056,14 +1089,14 @@ export const CorridorInfrastructureMap: React.FC<CorridorInfrastructureMapProps>
               <span className="inline-block h-2.5 w-2.5 rounded-full bg-cyan-500" />
               <span>Eletroposto HPC (&gt;150 kW)</span>
             </span>
-            <span className="text-base-content/60 ml-auto text-[10px]">
+            <span className="text-base-content/75 ml-auto text-[11px]">
               Passe o mouse sobre um posto para ver o anel de{' '}
               {formatNumber(effectiveRadiusKm, 0)} km
             </span>
           </div>
         </div>
 
-        <p className="text-base-content/65 text-xs italic">{summaryText}</p>
+        <p className="text-base-content/75 text-xs italic">{summaryText}</p>
       </div>
 
       {/* Accessible Table Panel */}
@@ -1073,7 +1106,7 @@ export const CorridorInfrastructureMap: React.FC<CorridorInfrastructureMapProps>
       >
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex flex-wrap items-center gap-1.5">
-            <span className="text-base-content/60 mr-1 text-xs">Filtrar UF:</span>
+            <span className="text-base-content/75 mr-1 text-xs">Filtrar UF:</span>
             {availableTableUfs.map((uf) => (
               <button
                 key={uf}
@@ -1087,7 +1120,7 @@ export const CorridorInfrastructureMap: React.FC<CorridorInfrastructureMapProps>
               </button>
             ))}
           </div>
-          <span className="text-base-content/60 text-xs">
+          <span className="text-base-content/75 text-xs">
             Exibindo {tableStations.length} pontos rodoviários
           </span>
         </div>
@@ -1098,7 +1131,7 @@ export const CorridorInfrastructureMap: React.FC<CorridorInfrastructureMapProps>
               Lista de pontos rodoviários de abastecimento e recarga rápida
             </caption>
             <thead>
-              <tr className="border-base-200 text-base-content/70 border-b text-xs font-semibold uppercase">
+              <tr className="border-base-200 text-base-content/80 border-b text-xs font-semibold uppercase">
                 <th>Ponto / Hub</th>
                 <th>Tecnologia</th>
                 <th>Rodovia</th>
@@ -1114,7 +1147,7 @@ export const CorridorInfrastructureMap: React.FC<CorridorInfrastructureMapProps>
                   <td className="text-xs font-semibold">
                     {st.name}
                     {st.operator_network && (
-                      <span className="text-base-content/60 block text-[10px] font-normal">
+                      <span className="text-base-content/75 block text-[11px] font-normal">
                         {st.operator_network}
                       </span>
                     )}
@@ -1135,7 +1168,7 @@ export const CorridorInfrastructureMap: React.FC<CorridorInfrastructureMapProps>
                   <td className="text-xs whitespace-nowrap">
                     {st.city} / <span className="font-semibold">{st.state}</span>
                   </td>
-                  <td className="text-base-content/80 text-xs">{st.capacity_spec}</td>
+                  <td className="text-base-content/85 text-xs">{st.capacity_spec}</td>
                   <td className="text-xs whitespace-nowrap">{st.status}</td>
                   <td className="text-xs whitespace-nowrap">
                     <div className="inline-flex items-center gap-1.5">
@@ -1143,7 +1176,7 @@ export const CorridorInfrastructureMap: React.FC<CorridorInfrastructureMapProps>
                         id={st.source_id}
                         context={`${st.name} (${st.highway})`}
                       />
-                      <span className="text-base-content/60 text-[11px]">
+                      <span className="text-base-content/75 text-[11px]">
                         ({st.badge})
                       </span>
                     </div>
@@ -1156,7 +1189,7 @@ export const CorridorInfrastructureMap: React.FC<CorridorInfrastructureMapProps>
       </div>
 
       {/* Attribution Footer */}
-      <div className="border-base-200 text-base-content/60 flex flex-col justify-between gap-2 border-t pt-3 text-[11px] sm:flex-row sm:items-center">
+      <div className="border-base-200 text-base-content/75 flex flex-col justify-between gap-2 border-t pt-3 text-[11px] sm:flex-row sm:items-center">
         <span>
           Nota: Pontos rodoviários agregados em nível de hub/entroncamento (sem exposição
           de dados cadastrais individuais).

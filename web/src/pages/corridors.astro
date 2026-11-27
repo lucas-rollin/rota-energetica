@@ -1,9 +1,10 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import { CorridorsDashboard } from '../components/corridors/CorridorsDashboard';
+import { CorridorInfrastructureMap } from '../components/corridors/CorridorInfrastructureMap';
+import { TransparencyDisclaimer } from '../components/common/TransparencyDisclaimer';
 import corridorsJson from '../../../data/processed/corridors.json';
 import stationsJson from '../../../data/processed/corridor_fuel_stations.json';
-import brazilStatesGeoJson from '../../../data/processed/brazil_states.geo.json';
 import type {
   CorridorFuelStationsCatalog,
   CorridorsCatalog,
@@ -24,7 +25,7 @@ const baseUrl = import.meta.env.BASE_URL.endsWith('/')
   <div class="space-y-6">
     <!-- Breadcrumbs & Page Header -->
     <div class="border-b border-base-200 pb-4">
-      <div class="breadcrumbs text-xs text-base-content/60 mb-2">
+      <div class="breadcrumbs text-xs text-base-content/75 mb-2">
         <ul>
           <li>
             <a href={baseUrl}>Início</a>
@@ -42,12 +43,20 @@ const baseUrl = import.meta.env.BASE_URL.endsWith('/')
       </p>
     </div>
 
-    <!-- Interactive Corridors & Infrastructure Map Dashboard -->
+    <!-- Interactive Corridors Feasibility Dashboard -->
     <CorridorsDashboard
       client:load
       corridorsData={corridorsData}
       stationsData={stationsData}
-      brazilGeoJson={brazilStatesGeoJson}
     />
+
+    <!-- Lazy-hydrated Highway Infrastructure & Autonomy Coverage Map (GeoJSON loaded client-side) -->
+    <CorridorInfrastructureMap
+      client:visible
+      corridors={corridorsData.corridors}
+      stations={stationsData.stations}
+    />
+
+    <TransparencyDisclaimer />
   </div>
 </Layout>
