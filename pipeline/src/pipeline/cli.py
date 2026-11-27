@@ -13,6 +13,7 @@ from pipeline.defaults import apply_default_prices_to_parameters, compute_defaul
 from pipeline.models import (
     CorridorFuelStationsCatalog,
     CorridorsCatalog,
+    Manifest,
     PricesHistory,
     SimulationParameters,
     SourcesCatalog,
@@ -92,12 +93,22 @@ def build_cmd(args: list[str]) -> int:
 
     brent_file = raw_dir / "eia" / "brent-weekly.csv"
 
+    manifest_path = repo_root / "data" / "manifest.json"
+    retrieved_at_by_source: dict[str, str] = {}
+    if manifest_path.exists():
+        manifest = Manifest.load(manifest_path)
+        for entry in manifest.entries:
+            prev = retrieved_at_by_source.get(entry.source_id)
+            if prev is None or entry.retrieved_at > prev:
+                retrieved_at_by_source[entry.source_id] = entry.retrieved_at
+
     print(f"Building prices history from {len(anp_files)} ANP files and EIA Brent...")
     history = build_prices_history(
         anp_files=anp_files,
         brent_file=brent_file,
         parameters=params,
         config=DEFAULT_CONFIG,
+        retrieved_at_by_source=retrieved_at_by_source,
     )
 
     history.save(output_path)

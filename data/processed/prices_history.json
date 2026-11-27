@@ -6,6 +6,7 @@
   "fuels": {
     "diesel_s10": {
       "source_id": "P01",
+      "retrieved_at": "2026-10-09",
       "unit_nominal": "R$/L",
       "unit_energy": "R$/MJ",
       "series": [
@@ -2661,6 +2662,7 @@
     },
     "gnv": {
       "source_id": "P01",
+      "retrieved_at": "2026-10-09",
       "unit_nominal": "R$/m³",
       "unit_energy": "R$/MJ",
       "series": [
@@ -5316,6 +5318,7 @@
     },
     "brent": {
       "source_id": "P02",
+      "retrieved_at": "2026-10-09",
       "unit_nominal": "US$/bbl",
       "series": [
         {

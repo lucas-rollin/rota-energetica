@@ -11,6 +11,19 @@
           "title": "Source Id",
           "type": "string"
         },
+        "retrieved_at": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Reference retrieval date from manifest.json (AAAA-MM-DD).",
+          "title": "Retrieved At"
+        },
         "unit_nominal": {
           "description": "Original nominal measurement unit (e.g. 'R$/L', 'R$/m³', 'US$/bbl').",
           "title": "Unit Nominal",

@@ -86,4 +86,4 @@ Os resultados dependem das premissas informadas; valores padrão ilustrativos n�
 | Textos e documentação originais | CC BY 4.0 |
 | Dados de terceiros | **Não são relicenciados.** Mantêm as licenças e os termos de uso de cada fonte, registrados em [`data/sources.json`](data/sources.json) |
 
-As regras completas de reuso, privacidade e termos de dados derivados estão em [`LICENSE-DATA.md`](LICENSE-DATA.md). Os JSONs em `data/processed/` incluem os campos `source` e `retrieved_at` em cada série, para que a atribuição acompanhe o dado onde quer que ele seja reutilizado.
+As regras completas de reuso, privacidade e termos de dados derivados estão em [`LICENSE-DATA.md`](LICENSE-DATA.md). Os JSONs em `data/processed/` incluem os campos `source_id` e `retrieved_at` (quando aplicável), para que a atribuição acompanhe o dado onde quer que ele seja reutilizado.

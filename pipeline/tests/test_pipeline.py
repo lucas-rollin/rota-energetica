@@ -290,6 +290,9 @@ def test_processed_files_referential_integrity():
         assert series.source_id in known_source_ids, (
             f"Fuel series '{fuel_key}' has unknown source_id '{series.source_id}'"
         )
+        assert series.retrieved_at is not None, (
+            f"Fuel series '{fuel_key}' must record retrieved_at"
+        )
         assert len(series.series) > 0, f"Fuel series '{fuel_key}' has empty series"
 
     # Verify no raw station/store lines exist in published processed file (LICENSE-DATA §5)

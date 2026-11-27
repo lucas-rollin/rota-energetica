@@ -523,6 +523,11 @@ class FuelSeries(BaseModel):
         description="Source ID registered in sources.json (e.g. P01, P02).",
         title="Source Id",
     )
+    retrieved_at: str | None = Field(
+        default=None,
+        description="Reference retrieval date from manifest.json (AAAA-MM-DD).",
+        title="Retrieved At",
+    )
     unit_nominal: str = Field(
         ...,
         description="Original nominal measurement unit (e.g. 'R$/L', 'R$/m³', 'US$/bbl').",

@@ -356,6 +356,7 @@ def build_prices_history(
     brent_file: Path | None,
     parameters: SimulationParameters,
     config: PipelineConfig,
+    retrieved_at_by_source: dict[str, str] | None = None,
 ) -> PricesHistory:
     """Build complete weekly PricesHistory dataset converted to R$/MJ where applicable."""
     anp_series = aggregate_anp_series(anp_files, config)
@@ -398,21 +399,25 @@ def build_prices_history(
     if brent_file and brent_file.exists():
         brent_points = parse_brent_csv(brent_file)
 
+    retrieved_map = retrieved_at_by_source or {}
     fuels = {
         "diesel_s10": FuelSeries(
             source_id=config.anp_source_id,
+            retrieved_at=retrieved_map.get(config.anp_source_id),
             unit_nominal="R$/L",
             unit_energy="R$/MJ",
             series=diesel_points,
         ),
         "gnv": FuelSeries(
             source_id=config.anp_source_id,
+            retrieved_at=retrieved_map.get(config.anp_source_id),
             unit_nominal="R$/m³",
             unit_energy="R$/MJ",
             series=gnv_points,
         ),
         "brent": FuelSeries(
             source_id=config.brent_source_id,
+            retrieved_at=retrieved_map.get(config.brent_source_id),
             unit_nominal="US$/bbl",
             unit_energy=None,
             series=brent_points,

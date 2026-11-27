@@ -16,6 +16,8 @@ export interface PricePoint {
 export interface FuelSeries {
   /** Source ID registered in sources.json (e.g. P01, P02) */
   source_id: string;
+  /** Reference retrieval date from manifest.json (AAAA-MM-DD) */
+  retrieved_at?: string | null;
   /** Original nominal measurement unit (e.g. 'R$/L', 'R$/m³', 'US$/bbl') */
   unit_nominal: string;
   /** Energy price unit, typically 'R$/MJ' */
