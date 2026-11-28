@@ -17,13 +17,10 @@ export const GeneralParametersPanel: React.FC<GeneralParametersPanelProps> = ({
 }) => {
   return (
     <div className="space-y-4">
-      <div className="border-base-200 border-b pb-2">
-        <h3 className="text-base-content text-base font-bold">
+      <div className="border-base-300/60 border-b pb-2">
+        <h3 className="text-base-content text-sm font-bold">
           Premissas Globais e Operacionais
         </h3>
-        <p className="text-base-content/70 text-xs">
-          Parâmetros econômicos, regulatórios e de operação comuns a toda a frota.
-        </p>
       </div>
 
       <div className="grid grid-cols-1 gap-3.5 md:grid-cols-2">

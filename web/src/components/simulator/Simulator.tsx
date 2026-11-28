@@ -15,6 +15,7 @@ import type {
   VehicleParameters,
 } from '../../lib/types/parameters';
 import type { PricesHistory } from '../../lib/types/prices';
+import { FUEL_THEME } from '../../lib/theme/fuels';
 import { useDebouncedValue } from '../../lib/utils/useDebouncedValue';
 import { TransparencyDisclaimer } from '../common/TransparencyDisclaimer';
 import { FleetImpactBanner } from './FleetImpactBanner';
@@ -256,7 +257,7 @@ export const Simulator: React.FC<SimulatorProps> = ({
   };
 
   return (
-    <div className="my-6 space-y-6">
+    <div className="mt-4 space-y-5">
       {/* 1. Quick 1-Click Operational Presets */}
       <section aria-label="Cenários Rápidos de Operação">
         <ScenarioPresets
@@ -273,31 +274,27 @@ export const Simulator: React.FC<SimulatorProps> = ({
 
       {/* Mild Warning for Out-of-Bound Sensitivity Scenarios */}
       {simulationWarnings && simulationWarnings.length > 0 && (
-        <div className="flex items-start gap-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-3.5 text-xs text-amber-900 shadow-xs dark:text-amber-200">
+        <div className="border-warning/40 bg-warning/10 flex items-start gap-2.5 rounded-xl border p-3 text-xs">
           <TriangleAlert
-            className="mt-0.5 h-4 w-4 shrink-0 text-amber-700 dark:text-amber-400"
+            className="text-warning mt-0.5 h-4 w-4 shrink-0"
             aria-hidden="true"
           />
-          <div className="space-y-1">
+          <div className="space-y-0.5">
             <span className="text-base-content block font-semibold">
-              Cenário de Sensibilidade — Parâmetro fora da faixa de referência:
+              Parâmetro fora da faixa de referência
             </span>
-            <ul className="text-base-content/85 list-inside list-disc space-y-0.5 text-[11px]">
+            <ul className="text-base-content/80 list-inside list-disc space-y-0.5 text-[11px]">
               {simulationWarnings.map((w, idx) => (
                 <li key={idx}>{w}</li>
               ))}
             </ul>
-            <p className="text-base-content/75 pt-0.5 text-[11px]">
-              Os gráficos e métricas de TCO continuam sendo calculados e apresentados
-              normalmente com base no valor personalizado.
-            </p>
           </div>
         </div>
       )}
 
       {/* Fatal Calculation Error Alert if any */}
       {simulationError && (
-        <div role="alert" className="alert alert-error rounded-2xl text-xs shadow-lg">
+        <div role="alert" className="alert alert-error rounded-xl text-xs">
           <span className="font-bold">Erro no cálculo:</span>
           <span>{simulationError}</span>
         </div>
@@ -317,9 +314,9 @@ export const Simulator: React.FC<SimulatorProps> = ({
       )}
 
       {/* 3. Main Workspace: Tuner Sidebar (Left 4 cols) + Analytics & Charts (Right 8 cols) */}
-      <div className="grid grid-cols-1 gap-6 xl:grid-cols-12 xl:items-start">
+      <div className="grid grid-cols-1 gap-5 xl:grid-cols-12 xl:items-start">
         {/* LEFT COLUMN: Fleet Parameters Tuner */}
-        <div className="xl:sticky xl:top-20 xl:col-span-4">
+        <div className="xl:sticky xl:top-18 xl:col-span-4">
           <FleetTunerSidebar
             params={params}
             fleetSize={fleetSize}
@@ -336,7 +333,7 @@ export const Simulator: React.FC<SimulatorProps> = ({
         </div>
 
         {/* RIGHT COLUMN: Fleet Impact Banner + Interactive Charts */}
-        <div className="space-y-6 xl:col-span-8">
+        <div className="space-y-5 xl:col-span-8">
           {results && (
             <>
               <FleetImpactBanner
@@ -345,7 +342,7 @@ export const Simulator: React.FC<SimulatorProps> = ({
                 fleetSize={fleetSize}
               />
 
-              <div className="space-y-6">
+              <div className="space-y-5">
                 <TcoComparisonChart
                   results={results}
                   horizonYears={Math.round(effectiveParams.general.horizon_years.value)}
@@ -367,30 +364,23 @@ export const Simulator: React.FC<SimulatorProps> = ({
 
       {/* 4. Full Editable Parameter Panels with Badges & Sources */}
       <section aria-label="Editor Avançado de Premissas e Proveniência">
-        <details className="card bg-base-100 border-base-200 group overflow-hidden rounded-2xl border shadow-xs">
-          <summary className="hover:bg-base-200/40 flex cursor-pointer list-none items-center justify-between gap-3 p-4 transition-colors select-none sm:p-5">
+        <details className="card bg-base-100 border-base-300/70 group overflow-hidden rounded-xl border">
+          <summary className="hover:bg-base-200/40 flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 transition-colors select-none">
             <div className="flex items-center gap-2.5">
-              <span className="bg-primary/10 text-primary flex h-8 w-8 shrink-0 items-center justify-center rounded-xl">
-                <SlidersHorizontal className="h-4 w-4" aria-hidden="true" />
+              <span className="bg-primary/10 text-primary flex h-7 w-7 shrink-0 items-center justify-center rounded-lg">
+                <SlidersHorizontal className="h-3.5 w-3.5" aria-hidden="true" />
               </span>
-              <div>
-                <h2 className="text-base-content text-sm font-bold sm:text-base">
-                  Parâmetros Completos, Selos de Qualidade e Fontes
-                </h2>
-                <p className="text-base-content/70 text-xs">
-                  Edite todas as premissas do modelo (incluindo valor residual, eficiência
-                  de recarga, ARLA, biodiesel, densidade energética e fatores WtW) com
-                  rastreabilidade por parâmetro.
-                </p>
-              </div>
+              <h2 className="text-base-content text-sm font-bold">
+                Parâmetros Completos, Selos de Qualidade e Fontes
+              </h2>
             </div>
             <ChevronDown
-              className="text-base-content/75 h-4 w-4 shrink-0 transition-transform duration-200 group-open:rotate-180"
+              className="text-base-content/70 h-4 w-4 shrink-0 transition-transform duration-200 group-open:rotate-180"
               aria-hidden="true"
             />
           </summary>
 
-          <div className="border-base-200 space-y-5 border-t p-4 sm:p-5">
+          <div className="border-base-300/60 space-y-4 border-t p-4">
             <div
               className="flex flex-wrap gap-1.5"
               role="tablist"
@@ -404,20 +394,36 @@ export const Simulator: React.FC<SimulatorProps> = ({
                   { id: 'eletrico', label: 'Elétrico (BEV)' },
                   { id: 'gnv', label: 'GNV' },
                 ] as const
-              ).map((tab) => (
-                <button
-                  key={tab.id}
-                  type="button"
-                  role="tab"
-                  aria-selected={advancedTab === tab.id}
-                  onClick={() => setAdvancedTab(tab.id)}
-                  className={`btn btn-xs sm:btn-sm ${
-                    advancedTab === tab.id ? 'btn-primary' : 'btn-outline border-base-300'
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              ))}
+              ).map((tab) => {
+                const isActive = advancedTab === tab.id;
+                const fuelTheme = tab.id !== 'general' ? FUEL_THEME[tab.id] : null;
+                return (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    role="tab"
+                    aria-selected={isActive}
+                    onClick={() => setAdvancedTab(tab.id)}
+                    className={`btn btn-xs gap-1.5 ${
+                      isActive
+                        ? fuelTheme
+                          ? fuelTheme.activeButtonClass
+                          : 'btn-primary'
+                        : 'btn-outline border-base-300'
+                    }`}
+                  >
+                    {fuelTheme && (
+                      <span
+                        className={`h-1.5 w-1.5 rounded-full ${
+                          isActive ? 'bg-white' : fuelTheme.dotClass
+                        }`}
+                        aria-hidden="true"
+                      />
+                    )}
+                    <span>{tab.label}</span>
+                  </button>
+                );
+              })}
             </div>
 
             {advancedTab === 'general' ? (

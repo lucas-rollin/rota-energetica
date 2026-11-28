@@ -5,7 +5,6 @@ import { FUEL_THEME } from '../../lib/theme/fuels';
 import type {
   AlternativeId,
   GeneralParameters,
-  ParameterItem,
   SimulationParameters,
   VehicleParameters,
 } from '../../lib/types/parameters';
@@ -29,30 +28,6 @@ interface FleetTunerSidebarProps {
   onResetAll: () => void;
   alteredCount: number;
 }
-
-const ParamProvenance: React.FC<{ item: ParameterItem; label: string }> = ({
-  item,
-  label,
-}) => {
-  const badgeClass =
-    item.badge === 'Primária'
-      ? 'badge-success'
-      : item.badge === 'Adaptada'
-        ? 'badge-info'
-        : 'badge-ghost border-base-300 text-base-content/80';
-
-  return (
-    <span className="inline-flex items-center gap-1">
-      <span
-        className={`badge badge-xs px-1.5 text-[11px] font-medium ${badgeClass}`}
-        title={`Selo metodológico: ${item.badge}`}
-      >
-        {item.badge}
-      </span>
-      <SourceRef id={item.source_id} context={label} />
-    </span>
-  );
-};
 
 export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
   params,
@@ -119,18 +94,16 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
   return (
     <aside
       aria-label="Painel de controle e ajuste de parâmetros da frota"
-      className="card bg-base-100 border-base-200 overflow-hidden rounded-2xl border shadow-sm"
+      className="card bg-base-100 border-base-300/70 overflow-hidden rounded-xl border"
     >
       {/* Sidebar Header */}
-      <div className="border-base-200 bg-base-200/30 flex items-center justify-between border-b px-4 py-3">
+      <div className="border-base-300/60 bg-base-200/35 flex items-center justify-between border-b px-3.5 py-2.5">
         <div className="flex items-center gap-2">
           <SlidersHorizontal
             className="text-primary h-4 w-4 shrink-0"
             aria-hidden="true"
           />
-          <h2 className="text-base-content text-sm font-bold sm:text-base">
-            Parâmetros da Frota
-          </h2>
+          <h2 className="text-base-content text-sm font-bold">Parâmetros da Frota</h2>
         </div>
 
         <button
@@ -143,15 +116,15 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
             !includeCbio
           }
           aria-label="Restaurar parâmetros para os padrões originais"
-          className="btn btn-ghost btn-xs text-base-content/75 hover:text-base-content text-[11px]"
+          className="btn btn-ghost btn-xs text-base-content/70 hover:text-base-content text-[11px]"
         >
           ↺ Padrão
         </button>
       </div>
 
-      <div className="space-y-4 p-4 text-xs">
+      <div className="space-y-3 p-3.5 text-xs">
         {/* 1. Fleet Size Controller */}
-        <div className="bg-base-200/40 border-base-200 rounded-xl border p-3">
+        <div className="bg-base-200/45 border-base-300/60 rounded-lg border p-2.5">
           <div className="mb-1.5 flex items-center justify-between">
             <label
               htmlFor="tuner-fleet-size"
@@ -172,7 +145,7 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
                 }}
                 className="text-base-content w-10 bg-transparent text-right font-mono font-bold focus:outline-none"
               />
-              <span className="text-base-content/75 text-[11px]">un</span>
+              <span className="text-base-content/65 text-[11px]">un</span>
             </div>
           </div>
           <input
@@ -184,16 +157,11 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
             className="range range-primary range-xs w-full"
             aria-label="Tamanho da frota em número de cavalos mecânicos"
           />
-          <div className="text-base-content/75 mt-0.5 flex justify-between text-[11px]">
-            <span>1 un</span>
-            <span>Frota Dedicada</span>
-            <span>100+ un</span>
-          </div>
         </div>
 
         {/* 2. Annual Distance Controller */}
-        <div className="bg-base-200/40 border-base-200 rounded-xl border p-3">
-          <div className="mb-1.5 flex flex-wrap items-center justify-between gap-1">
+        <div className="bg-base-200/45 border-base-300/60 rounded-lg border p-2.5">
+          <div className="mb-1.5 flex items-center justify-between gap-1">
             <div className="flex items-center gap-1.5">
               <label
                 htmlFor="tuner-mileage"
@@ -201,9 +169,9 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
               >
                 Distância Anual
               </label>
-              <ParamProvenance
-                item={params.general.annual_distance_km}
-                label="Distância Anual"
+              <SourceRef
+                id={params.general.annual_distance_km.source_id}
+                context="Distância Anual"
               />
             </div>
             <div className="bg-base-100 border-base-300 flex items-center gap-1 rounded border px-2 py-0.5">
@@ -220,7 +188,7 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
                 }}
                 className="text-base-content w-16 bg-transparent text-right font-mono font-bold focus:outline-none"
               />
-              <span className="text-base-content/75 text-[11px]">km</span>
+              <span className="text-base-content/65 text-[11px]">km</span>
             </div>
           </div>
           <input
@@ -235,24 +203,18 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
             className="range range-primary range-xs w-full"
             aria-label="Quilometragem média anual por caminhão"
           />
-          <div className="text-base-content/75 mt-0.5 flex justify-between text-[11px]">
-            <span>Regional (40k)</span>
-            <span>Padrão (120k)</span>
-            <span>Longo Curso (180k)</span>
-          </div>
         </div>
 
         {/* 3. Economic Horizon & Discount Rate */}
         <div className="grid grid-cols-2 gap-2">
-          {/* Horizon Pills */}
-          <div className="bg-base-200/40 border-base-200 rounded-xl border p-2.5">
+          <div className="bg-base-200/45 border-base-300/60 rounded-lg border p-2.5">
             <div className="mb-1.5 flex items-center justify-between gap-1">
               <span className="text-base-content/75 text-[11px] font-semibold">
                 Horizonte
               </span>
-              <ParamProvenance
-                item={params.general.horizon_years}
-                label="Horizonte Econômico"
+              <SourceRef
+                id={params.general.horizon_years.source_id}
+                context="Horizonte Econômico"
               />
             </div>
             <div className="flex gap-1">
@@ -261,9 +223,9 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
                   key={h}
                   type="button"
                   onClick={() => onGeneralChange('horizon_years', h)}
-                  className={`flex-1 rounded py-1 font-mono text-[11px] font-bold transition-colors ${
+                  className={`flex-1 cursor-pointer rounded py-1 font-mono text-[11px] font-bold transition-colors ${
                     horizonYears === h
-                      ? 'bg-primary text-primary-content shadow-xs'
+                      ? 'bg-primary text-primary-content'
                       : 'bg-base-100 text-base-content/75 hover:bg-base-200'
                   }`}
                 >
@@ -273,15 +235,14 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
             </div>
           </div>
 
-          {/* Discount Rate */}
-          <div className="bg-base-200/40 border-base-200 flex flex-col justify-between rounded-xl border p-2.5">
+          <div className="bg-base-200/45 border-base-300/60 flex flex-col justify-between rounded-lg border p-2.5">
             <div className="mb-1 flex items-center justify-between gap-1">
               <span className="text-base-content/75 text-[11px] font-semibold">
                 Desconto
               </span>
-              <ParamProvenance
-                item={params.general.discount_rate}
-                label="Taxa de Desconto"
+              <SourceRef
+                id={params.general.discount_rate.source_id}
+                context="Taxa de Desconto"
               />
             </div>
             <div className="bg-base-100 border-base-300 flex items-center justify-end gap-1 rounded border px-2 py-1">
@@ -300,20 +261,20 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
                 className="text-base-content min-w-0 flex-1 bg-transparent text-right font-mono font-bold focus:outline-none"
                 aria-label="Taxa de desconto anual real (% a.a.)"
               />
-              <span className="text-base-content/75 shrink-0 text-[11px]">% a.a.</span>
+              <span className="text-base-content/65 shrink-0 text-[11px]">% a.a.</span>
             </div>
           </div>
         </div>
 
-        {/* 3b. Residual Value Scenario (§4.4) */}
-        <div className="bg-base-200/40 border-base-200 rounded-xl border p-2.5">
+        {/* 3b. Residual Value Scenario */}
+        <div className="bg-base-200/45 border-base-300/60 rounded-lg border p-2.5">
           <div className="mb-1.5 flex items-center justify-between gap-1">
             <span className="text-base-content/80 text-[11px] font-semibold">
-              Cenário Residual (§4.4)
+              Cenário Residual
             </span>
-            <ParamProvenance
-              item={params.vehicles.diesel.residual_value_ratio}
-              label="Cenário de Valor Residual"
+            <SourceRef
+              id={params.vehicles.diesel.residual_value_ratio.source_id}
+              context="Cenário de Valor Residual"
             />
           </div>
           <div
@@ -323,9 +284,9 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
           >
             {(
               [
-                { id: 'low', label: 'Baixo (-15p.p.)' },
+                { id: 'low', label: 'Baixo (-15pp)' },
                 { id: 'base', label: 'Base' },
-                { id: 'high', label: 'Alto (+15p.p.)' },
+                { id: 'high', label: 'Alto (+15pp)' },
               ] as const
             ).map((opt) => (
               <button
@@ -333,9 +294,9 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
                 type="button"
                 onClick={() => onResidualScenarioChange(opt.id)}
                 aria-pressed={residualScenario === opt.id}
-                className={`rounded py-1 text-[11px] font-bold transition-colors ${
+                className={`cursor-pointer rounded py-1 text-[11px] font-bold transition-colors ${
                   residualScenario === opt.id
-                    ? 'bg-primary text-primary-content shadow-xs'
+                    ? 'bg-primary text-primary-content'
                     : 'bg-base-100 text-base-content/75 hover:bg-base-200'
                 }`}
               >
@@ -345,13 +306,11 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
           </div>
         </div>
 
-        {/* 4. Fuel & Energy Prices (Dense List) */}
-        <div className="border-base-200 space-y-2 border-t pt-3">
-          <div className="flex items-center justify-between">
-            <span className="text-base-content/75 text-[11px] font-bold tracking-wider uppercase">
-              Preços de Mercado (Bomba / Insumos)
-            </span>
-          </div>
+        {/* 4. Fuel & Energy Prices */}
+        <div className="border-base-300/60 space-y-1.5 border-t pt-2.5">
+          <span className="text-base-content/65 block text-[11px] font-bold tracking-wider uppercase">
+            Preços de Energia
+          </span>
 
           <div className="space-y-1.5">
             {fuels.map((fuel) => {
@@ -366,23 +325,25 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
               return (
                 <div
                   key={fuel.alt}
-                  className={`border-base-200 flex flex-col gap-1 rounded-lg border p-2 transition-colors ${
+                  className={`flex flex-col gap-1 rounded-lg border px-2.5 py-1.5 transition-colors ${
                     isOutOfRange
-                      ? 'border-amber-400/60 bg-amber-500/10'
-                      : 'bg-base-200/40 hover:bg-base-200/70'
+                      ? 'border-warning/50 bg-warning/10'
+                      : 'border-base-300/60 bg-base-200/40 hover:bg-base-200/70'
                   }`}
                 >
-                  <div className="flex items-center justify-between gap-1">
-                    <div className="flex flex-wrap items-center gap-1.5">
-                      <span className={`h-2 w-2 rounded-full ${fuel.dotColor}`}></span>
-                      <span className="text-base-content text-xs font-medium">
+                  <div className="flex items-center justify-between gap-1.5">
+                    <div className="flex min-w-0 items-center gap-1.5">
+                      <span
+                        className={`h-2 w-2 shrink-0 rounded-full ${fuel.dotColor}`}
+                      />
+                      <span className="text-base-content truncate text-xs font-medium">
                         {fuel.label}
                       </span>
-                      <ParamProvenance item={priceObj} label={fuel.label} />
+                      <SourceRef id={priceObj.source_id} context={fuel.label} />
                     </div>
 
                     <div className="bg-base-100 border-base-300 flex shrink-0 items-center gap-1 rounded border px-1.5 py-0.5">
-                      <span className="text-base-content/75 font-mono text-[11px]">
+                      <span className="text-base-content/65 font-mono text-[11px]">
                         R$
                       </span>
                       <DecimalInput
@@ -398,17 +359,17 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
                         className="text-base-content w-12 bg-transparent text-right font-mono text-xs font-bold focus:outline-none"
                         aria-label={`Preço do ${fuel.label}`}
                       />
-                      <span className="text-base-content/75 font-mono text-[11px]">
+                      <span className="text-base-content/65 font-mono text-[11px]">
                         {fuel.unit.replace('R$', '')}
                       </span>
                     </div>
                   </div>
 
                   {isOutOfRange && (
-                    <div className="flex items-center justify-between border-t border-amber-300/30 pt-0.5 font-mono text-[11px] text-amber-700 dark:text-amber-300">
-                      <span>Aviso: fora da ref. ANP/ANEEL</span>
+                    <div className="border-warning/30 text-warning flex items-center justify-between border-t pt-0.5 font-mono text-[11px]">
+                      <span>Fora da ref. ANP/ANEEL</span>
                       <span>
-                        [{minVal} - {maxVal}]
+                        [{minVal} – {maxVal}]
                       </span>
                     </div>
                   )}
@@ -419,21 +380,21 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
         </div>
 
         {/* 5. Collapsible Truck Technical Details & Regulatory Inputs */}
-        <div className="border-base-200 border-t pt-2.5">
+        <div className="border-base-300/60 border-t pt-2">
           <button
             type="button"
             onClick={() => setShowVehicleDetails(!showVehicleDetails)}
-            className="text-base-content/80 hover:text-primary flex w-full items-center justify-between py-1 text-xs font-semibold transition-colors"
+            className="text-base-content/80 hover:text-primary flex w-full cursor-pointer items-center justify-between py-1 text-xs font-semibold transition-colors"
             aria-expanded={showVehicleDetails}
           >
-            <span>CAPEX, Residual, Eficiência &amp; Insumos</span>
+            <span>CAPEX, Consumo &amp; Insumos</span>
             <span className="font-mono text-[11px]">
               {showVehicleDetails ? '▲ Fechar' : '▼ Ajustar'}
             </span>
           </button>
 
           {showVehicleDetails && (
-            <div className="bg-base-200/30 border-base-200 mt-2.5 space-y-2.5 rounded-xl border p-2.5">
+            <div className="bg-base-200/35 border-base-300/60 mt-2 space-y-2 rounded-lg border p-2.5">
               {/* Powertrain mini tabs */}
               <div className="grid grid-cols-4 gap-1">
                 {(['diesel', 'biometano', 'eletrico', 'gnv'] as AlternativeId[]).map(
@@ -442,7 +403,7 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
                       key={alt}
                       type="button"
                       onClick={() => setSelectedAltTab(alt)}
-                      className={`inline-flex items-center justify-center gap-1 rounded py-1 text-[11px] font-bold uppercase transition-colors ${
+                      className={`inline-flex cursor-pointer items-center justify-center gap-1 rounded py-1 text-[11px] font-bold uppercase transition-colors ${
                         selectedAltTab === alt
                           ? FUEL_THEME[alt].activeButtonClass
                           : 'bg-base-100 text-base-content/75 hover:bg-base-200'
@@ -468,13 +429,11 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
 
               {/* Purchase price */}
               <div className="flex items-center justify-between gap-1">
-                <div className="flex flex-wrap items-center gap-1">
-                  <span className="text-base-content/70 text-[11px]">
-                    Aquisição (R$):
-                  </span>
-                  <ParamProvenance
-                    item={selectedVehicle.vehicle_purchase_price}
-                    label={`Aquisição (${selectedVehicle.label})`}
+                <div className="flex items-center gap-1">
+                  <span className="text-base-content/75 text-[11px]">Aquisição (R$)</span>
+                  <SourceRef
+                    id={selectedVehicle.vehicle_purchase_price.source_id}
+                    context={`Aquisição (${selectedVehicle.label})`}
                   />
                 </div>
                 <input
@@ -492,13 +451,13 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
 
               {/* Consumption */}
               <div className="flex items-center justify-between gap-1">
-                <div className="flex flex-wrap items-center gap-1">
-                  <span className="text-base-content/70 text-[11px]">
-                    Consumo ({selectedVehicle.consumption.unit}):
+                <div className="flex items-center gap-1">
+                  <span className="text-base-content/75 text-[11px]">
+                    Consumo ({selectedVehicle.consumption.unit})
                   </span>
-                  <ParamProvenance
-                    item={selectedVehicle.consumption}
-                    label={`Consumo (${selectedVehicle.label})`}
+                  <SourceRef
+                    id={selectedVehicle.consumption.source_id}
+                    context={`Consumo (${selectedVehicle.label})`}
                   />
                 </div>
                 <DecimalInput
@@ -515,13 +474,11 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
 
               {/* Maintenance */}
               <div className="flex items-center justify-between gap-1">
-                <div className="flex flex-wrap items-center gap-1">
-                  <span className="text-base-content/70 text-[11px]">
-                    Manut. (R$/km):
-                  </span>
-                  <ParamProvenance
-                    item={selectedVehicle.maintenance_cost_per_km}
-                    label={`Manutenção (${selectedVehicle.label})`}
+                <div className="flex items-center gap-1">
+                  <span className="text-base-content/75 text-[11px]">Manut. (R$/km)</span>
+                  <SourceRef
+                    id={selectedVehicle.maintenance_cost_per_km.source_id}
+                    context={`Manutenção (${selectedVehicle.label})`}
                   />
                 </div>
                 <DecimalInput
@@ -538,13 +495,13 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
 
               {/* Residual value */}
               <div className="flex items-center justify-between gap-1">
-                <div className="flex flex-wrap items-center gap-1">
-                  <span className="text-base-content/70 text-[11px]">
-                    Residual (% V₀):
+                <div className="flex items-center gap-1">
+                  <span className="text-base-content/75 text-[11px]">
+                    Residual (% V₀)
                   </span>
-                  <ParamProvenance
-                    item={selectedVehicle.residual_value_ratio}
-                    label={`Valor Residual (${selectedVehicle.label})`}
+                  <SourceRef
+                    id={selectedVehicle.residual_value_ratio.source_id}
+                    context={`Valor Residual (${selectedVehicle.label})`}
                   />
                 </div>
                 <DecimalInput
@@ -563,13 +520,13 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
               {/* Charging efficiency (BEV only) */}
               {selectedVehicle.charging_efficiency && (
                 <div className="flex items-center justify-between gap-1">
-                  <div className="flex flex-wrap items-center gap-1">
-                    <span className="text-base-content/70 text-[11px]">
-                      Efic. recarga (%):
+                  <div className="flex items-center gap-1">
+                    <span className="text-base-content/75 text-[11px]">
+                      Efic. recarga (%)
                     </span>
-                    <ParamProvenance
-                      item={selectedVehicle.charging_efficiency}
-                      label="Eficiência de Recarga"
+                    <SourceRef
+                      id={selectedVehicle.charging_efficiency.source_id}
+                      context="Eficiência de Recarga"
                     />
                   </div>
                   <DecimalInput
@@ -587,15 +544,15 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
               )}
 
               {/* ARLA & Biodiesel & CBIO globals */}
-              <div className="border-base-200 space-y-2 border-t pt-2">
+              <div className="border-base-300/60 space-y-2 border-t pt-2">
                 <div className="flex items-center justify-between gap-1">
-                  <div className="flex flex-wrap items-center gap-1">
-                    <span className="text-base-content/70 text-[11px]">
-                      ARLA 32 (R$/L):
+                  <div className="flex items-center gap-1">
+                    <span className="text-base-content/75 text-[11px]">
+                      ARLA 32 (R$/L)
                     </span>
-                    <ParamProvenance
-                      item={params.general.arla_price}
-                      label="Preço ARLA 32"
+                    <SourceRef
+                      id={params.general.arla_price.source_id}
+                      context="Preço ARLA 32"
                     />
                   </div>
                   <DecimalInput
@@ -610,13 +567,13 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
                 </div>
 
                 <div className="flex items-center justify-between gap-1">
-                  <div className="flex flex-wrap items-center gap-1">
-                    <span className="text-base-content/70 text-[11px]">
-                      Biodiesel (% v/v):
+                  <div className="flex items-center gap-1">
+                    <span className="text-base-content/75 text-[11px]">
+                      Biodiesel (% v/v)
                     </span>
-                    <ParamProvenance
-                      item={params.general.biodiesel_blend}
-                      label="Teor de Biodiesel"
+                    <SourceRef
+                      id={params.general.biodiesel_blend.source_id}
+                      context="Teor de Biodiesel"
                     />
                   </div>
                   <DecimalInput
@@ -637,20 +594,20 @@ export const FleetTunerSidebar: React.FC<FleetTunerSidebarProps> = ({
                     </span>
                     <input
                       type="checkbox"
-                      className="toggle toggle-xs toggle-success"
+                      className="toggle toggle-xs toggle-primary"
                       checked={includeCbio}
                       onChange={(e) => onIncludeCbioChange(e.target.checked)}
                     />
                   </label>
                   {includeCbio && params.general.cbio_price && (
                     <div className="flex items-center justify-between gap-1">
-                      <div className="flex flex-wrap items-center gap-1">
-                        <span className="text-base-content/70 text-[11px]">
-                          CBIO (R$/un):
+                      <div className="flex items-center gap-1">
+                        <span className="text-base-content/75 text-[11px]">
+                          CBIO (R$/un)
                         </span>
-                        <ParamProvenance
-                          item={params.general.cbio_price}
-                          label="Preço CBIO"
+                        <SourceRef
+                          id={params.general.cbio_price.source_id}
+                          context="Preço CBIO"
                         />
                       </div>
                       <DecimalInput

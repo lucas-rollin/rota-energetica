@@ -19,16 +19,16 @@ interface ScenarioPresetsProps {
 export const PRESETS: ScenarioPreset[] = [
   {
     id: 'default',
-    label: 'Padrão SC (Referência)',
-    badge: '120.000 km/ano',
+    label: 'Padrão SC',
+    badge: '120k km/ano',
     description:
       'Operação média rodoviária em Santa Catarina com preços e parâmetros originais.',
     apply: (def) => JSON.parse(JSON.stringify(def)),
   },
   {
     id: 'long-haul',
-    label: 'Longa Distância / Corredor',
-    badge: '140.000 km/ano',
+    label: 'Longa Distância',
+    badge: '140k km/ano',
     description:
       'Rotas rodoviárias intensivas (BR-101 / Grãos) onde a economia por km é maximizada.',
     apply: (def) => {
@@ -39,8 +39,8 @@ export const PRESETS: ScenarioPreset[] = [
   },
   {
     id: 'regional',
-    label: 'Distribuição Regional',
-    badge: '50.000 km/ano',
+    label: 'Regional',
+    badge: '50k km/ano',
     description:
       'Operação de tiro curto com retorno diário à base e menor rodagem anual.',
     apply: (def) => {
@@ -51,8 +51,8 @@ export const PRESETS: ScenarioPreset[] = [
   },
   {
     id: 'biomethane-agro',
-    label: 'Agro / Usina de Biometano',
-    badge: 'Biometano R$ 3,20/m³',
+    label: 'Agro / Usina',
+    badge: 'Bio R$ 3,20/m³',
     description:
       'Operação sucroalcooleira ou de suinocultura com biometano próprio a preço de custo.',
     apply: (def) => {
@@ -70,60 +70,48 @@ export const ScenarioPresets: React.FC<ScenarioPresetsProps> = ({
   activePresetId,
 }) => {
   return (
-    <div className="card bg-base-100 border-base-200 overflow-hidden rounded-2xl border p-4 shadow-xs sm:p-5">
-      <div className="flex flex-col justify-between gap-1 pb-3 sm:flex-row sm:items-center">
-        <div>
-          <span className="text-base-content/75 block text-[11px] font-bold tracking-wider uppercase">
-            Cenários Rápidos em 1 Clique
-          </span>
-          <h2 className="text-base-content text-sm font-bold sm:text-base">
-            Selecione um perfil de operação ou personalize os parâmetros abaixo
-          </h2>
+    <div className="bg-base-100 border-base-300/70 flex flex-col gap-2.5 rounded-xl border px-3.5 py-2.5 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="text-base-content/65 text-[11px] font-bold tracking-wider uppercase">
+          Cenário
+        </span>
+
+        <div className="flex flex-wrap items-center gap-1.5">
+          {PRESETS.map((preset) => {
+            const isActive = activePresetId === preset.id;
+            return (
+              <button
+                key={preset.id}
+                type="button"
+                title={preset.description}
+                onClick={() => onApplyPreset(preset.apply(defaults), preset.id)}
+                className={`inline-flex cursor-pointer items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-semibold transition-colors ${
+                  isActive
+                    ? 'border-primary bg-primary text-primary-content'
+                    : 'border-base-300/80 bg-base-100 text-base-content/85 hover:bg-base-200/70'
+                }`}
+                aria-pressed={isActive}
+              >
+                <span>{preset.label}</span>
+                <span
+                  className={`font-mono text-[11px] ${
+                    isActive ? 'text-primary-content/85' : 'text-base-content/60'
+                  }`}
+                >
+                  {preset.badge}
+                </span>
+              </button>
+            );
+          })}
         </div>
-        {activePresetId === 'custom' && (
-          <span className="badge badge-outline badge-warning gap-1 self-start text-xs font-medium sm:self-auto">
-            <SlidersHorizontal className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
-            <span>Cenário Personalizado</span>
-          </span>
-        )}
       </div>
 
-      <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-4">
-        {PRESETS.map((preset) => {
-          const isActive = activePresetId === preset.id;
-          return (
-            <button
-              key={preset.id}
-              type="button"
-              onClick={() => onApplyPreset(preset.apply(defaults), preset.id)}
-              className={`flex flex-col justify-between rounded-xl border p-3 text-left transition-all ${
-                isActive
-                  ? 'border-primary bg-primary/5 ring-primary/30 ring-2'
-                  : 'border-base-200 bg-base-100 hover:border-base-300 hover:bg-base-200/40'
-              }`}
-              aria-pressed={isActive}
-            >
-              <div>
-                <div className="mb-1 flex items-center justify-between gap-1">
-                  <span className="text-base-content text-xs font-bold sm:text-sm">
-                    {preset.label}
-                  </span>
-                  <span
-                    className={`badge badge-xs font-mono text-[11px] ${
-                      isActive ? 'badge-primary' : 'badge-ghost text-base-content/75'
-                    }`}
-                  >
-                    {preset.badge}
-                  </span>
-                </div>
-                <p className="text-base-content/70 line-clamp-2 text-[11px] leading-snug">
-                  {preset.description}
-                </p>
-              </div>
-            </button>
-          );
-        })}
-      </div>
+      {activePresetId === 'custom' && (
+        <span className="badge badge-outline badge-warning badge-sm gap-1 self-start text-[11px] font-medium sm:self-auto">
+          <SlidersHorizontal className="h-3 w-3 shrink-0" aria-hidden="true" />
+          <span>Personalizado</span>
+        </span>
+      )}
     </div>
   );
 };

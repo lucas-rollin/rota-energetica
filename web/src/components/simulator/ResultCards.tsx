@@ -23,7 +23,7 @@ interface DeltaBadgeProps {
 const DeltaBadge: React.FC<DeltaBadgeProps> = ({ delta, lowerIsBetter = true }) => {
   if (!delta || Math.abs(delta.diff) < 1e-6) {
     return (
-      <span className="text-base-content/75 bg-base-200/80 rounded px-1.5 py-0.5 text-[11px] font-medium">
+      <span className="text-base-content/70 bg-base-200 rounded px-1.5 py-0.5 text-[11px] font-medium">
         Ref.
       </span>
     );
@@ -31,8 +31,8 @@ const DeltaBadge: React.FC<DeltaBadgeProps> = ({ delta, lowerIsBetter = true }) 
 
   const isGood = lowerIsBetter ? delta.diff < 0 : delta.diff > 0;
   const colorClass = isGood
-    ? 'text-emerald-700 bg-emerald-50 dark:text-emerald-300 dark:bg-emerald-950/60 border border-emerald-200/50 dark:border-emerald-800/50'
-    : 'text-rose-700 bg-rose-50 dark:text-rose-300 dark:bg-rose-950/60 border border-rose-200/50 dark:border-rose-800/50';
+    ? 'text-success bg-success/10 border border-success/25'
+    : 'text-error bg-error/10 border border-error/25';
 
   return (
     <span
@@ -44,44 +44,17 @@ const DeltaBadge: React.FC<DeltaBadgeProps> = ({ delta, lowerIsBetter = true }) 
   );
 };
 
-const POWERTRAIN_CONFIG: Record<
-  AlternativeId,
-  {
-    icon: React.ReactNode;
-    tag: string;
-    borderAccent: string;
-    neutralLabel: string;
-    highlightClass: string;
-  }
-> = {
-  diesel: {
-    icon: <Fuel className="h-4 w-4 text-slate-500" aria-hidden="true" />,
-    tag: 'Linha de Base',
-    borderAccent: FUEL_THEME.diesel.borderAccent,
-    neutralLabel: 'Referência de Mercado',
-    highlightClass: FUEL_THEME.diesel.pillClass,
-  },
-  biometano: {
-    icon: <Leaf className="h-4 w-4 text-emerald-500" aria-hidden="true" />,
-    tag: 'Bioenergia Agro',
-    borderAccent: FUEL_THEME.biometano.borderAccent,
-    neutralLabel: 'Combustível Renovável',
-    highlightClass: FUEL_THEME.biometano.pillClass,
-  },
-  eletrico: {
-    icon: <Zap className="h-4 w-4 text-cyan-500" aria-hidden="true" />,
-    tag: 'Tração Elétrica',
-    borderAccent: FUEL_THEME.eletrico.borderAccent,
-    neutralLabel: 'Tração 100% Elétrica',
-    highlightClass: FUEL_THEME.eletrico.pillClass,
-  },
-  gnv: {
-    icon: <Flame className="h-4 w-4 text-amber-500" aria-hidden="true" />,
-    tag: 'Gás de Transição',
-    borderAccent: FUEL_THEME.gnv.borderAccent,
-    neutralLabel: 'Gás Natural Veicular',
-    highlightClass: FUEL_THEME.gnv.pillClass,
-  },
+const POWERTRAIN_ICONS: Record<AlternativeId, React.ReactNode> = {
+  diesel: (
+    <Fuel className={`h-4 w-4 ${FUEL_THEME.diesel.iconClass}`} aria-hidden="true" />
+  ),
+  biometano: (
+    <Leaf className={`h-4 w-4 ${FUEL_THEME.biometano.iconClass}`} aria-hidden="true" />
+  ),
+  eletrico: (
+    <Zap className={`h-4 w-4 ${FUEL_THEME.eletrico.iconClass}`} aria-hidden="true" />
+  ),
+  gnv: <Flame className={`h-4 w-4 ${FUEL_THEME.gnv.iconClass}`} aria-hidden="true" />,
 };
 
 export const ResultCards: React.FC<ResultCardsProps> = ({
@@ -101,7 +74,7 @@ export const ResultCards: React.FC<ResultCardsProps> = ({
   );
 
   return (
-    <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
       {ALTERNATIVES_ORDER.map((alt) => {
         const res = results[alt];
         if (!res) return null;
@@ -109,65 +82,54 @@ export const ResultCards: React.FC<ResultCardsProps> = ({
         const isDiesel = alt === 'diesel';
         const purchasePrice = vehiclePurchasePrices[alt] ?? 0;
         const sobreprecoDiff = purchasePrice - dieselPurchasePrice;
-        const config = POWERTRAIN_CONFIG[alt];
+        const fuelTheme = FUEL_THEME[alt];
         const energyPrice = energyPrices?.[alt];
         const isLowestTco = Math.abs(res.tco - minTco) < 1e-2;
         const isLowestEmissions = Math.abs(res.annualEmissionsTon - minEmissions) < 1e-4;
-        const highlightText = isLowestTco
-          ? 'Menor TCO Acumulado'
+        const winnerBadge = isLowestTco
+          ? 'Menor TCO'
           : isLowestEmissions
             ? 'Menor Emissão WtW'
-            : config.neutralLabel;
+            : null;
 
         return (
           <div
             key={alt}
-            className={`card bg-base-100 border-base-200 rounded-xl border shadow-xs transition-all hover:shadow-md ${config.borderAccent}`}
+            className={`card bg-base-100 border-base-300/70 rounded-xl border transition-colors ${fuelTheme.borderAccent}`}
           >
-            <div className="card-body flex flex-col justify-between p-3.5 sm:p-4">
+            <div className="card-body flex flex-col justify-between gap-2.5 p-3.5">
               <div>
-                {/* Header: Tag + Icon */}
-                <div className="mb-1.5 flex items-center justify-between gap-1">
-                  <span className="text-base-content/75 text-[11px] font-bold tracking-wider uppercase">
-                    {config.tag}
-                  </span>
-                  <span className="text-base" aria-hidden="true">
-                    {config.icon}
-                  </span>
-                </div>
-
-                {/* Powertrain Label + Energy Price */}
-                <div className="mb-2 flex items-baseline justify-between">
-                  <h3 className="text-base-content text-sm leading-tight font-bold sm:text-base">
-                    {res.label}
-                  </h3>
+                {/* Header: Icon + Label + Energy Price */}
+                <div className="mb-2 flex items-center justify-between gap-2">
+                  <div className="flex min-w-0 items-center gap-1.5">
+                    {POWERTRAIN_ICONS[alt]}
+                    <h3 className="text-base-content truncate text-sm font-bold">
+                      {res.label}
+                    </h3>
+                  </div>
                   {energyPrice && (
-                    <span className="text-base-content/75 font-mono text-[11px] font-medium">
+                    <span className="text-base-content/65 shrink-0 font-mono text-[11px]">
                       R$ {formatNumber(energyPrice.value, 2)}
                       {energyPrice.unit.replace('R$', '')}
                     </span>
                   )}
                 </div>
 
-                {/* Primary Metric: Custo Operacional / km */}
-                <div className="bg-base-200/40 mb-2.5 rounded-lg p-2">
-                  <div className="flex items-baseline justify-between">
-                    <div className="flex items-baseline gap-1">
-                      <span className="text-base-content font-mono text-xl font-black sm:text-2xl">
-                        {formatCurrency(res.operationalCostPerKm, 2)}
-                      </span>
-                      <span className="text-base-content/75 text-[11px] font-medium">
-                        / km
-                      </span>
-                    </div>
-                    <DeltaBadge delta={res.deltas?.operationalCostPerKm} />
+                {/* Primary Metric: Operational Cost / km */}
+                <div className="bg-base-200/55 mb-2.5 flex items-baseline justify-between rounded-lg px-2.5 py-2">
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-base-content font-mono text-xl font-black">
+                      {formatCurrency(res.operationalCostPerKm, 2)}
+                    </span>
+                    <span className="text-base-content/65 text-[11px]">/km</span>
                   </div>
+                  <DeltaBadge delta={res.deltas?.operationalCostPerKm} />
                 </div>
 
-                {/* Secondary Metrics: TCO and Emissions */}
+                {/* Secondary Metrics */}
                 <div className="space-y-1 text-xs">
                   <div className="flex items-center justify-between">
-                    <span className="text-base-content/75 text-[11px]">TCO Total:</span>
+                    <span className="text-base-content/70 text-[11px]">TCO Total</span>
                     <span className="text-base-content font-mono font-bold">
                       {formatCurrency(res.tco, 0)}
                     </span>
@@ -175,31 +137,27 @@ export const ResultCards: React.FC<ResultCardsProps> = ({
 
                   {residualBand?.[alt] && (
                     <div className="flex items-center justify-between text-[11px]">
-                      <span className="text-base-content/75">Sens. residual (§4.4):</span>
-                      <span className="text-base-content/80 font-mono">
+                      <span className="text-base-content/65">Faixa residual</span>
+                      <span className="text-base-content/75 font-mono">
                         {formatCurrency(residualBand[alt].highTco, 0)} –{' '}
                         {formatCurrency(residualBand[alt].lowTco, 0)}
                       </span>
                     </div>
                   )}
 
-                  <div className="flex items-center justify-between">
-                    <span className="text-base-content/75 text-[11px]">
-                      Emissões anuais:
-                    </span>
-                    <span className="text-base-content/85 font-mono text-[11px]">
+                  <div className="flex items-center justify-between text-[11px]">
+                    <span className="text-base-content/70">Emissões WtW</span>
+                    <span className="text-base-content/85 font-mono">
                       {formatNumber(res.annualEmissionsTon, 0)} tCO₂e/ano
                     </span>
                   </div>
 
                   {!isDiesel && (
                     <div className="flex items-center justify-between text-[11px]">
-                      <span className="text-base-content/75">Sobrepreço caminhão:</span>
+                      <span className="text-base-content/70">Sobrepreço</span>
                       <span
                         className={`font-mono font-medium ${
-                          sobreprecoDiff > 0
-                            ? 'text-amber-700 dark:text-amber-400'
-                            : 'text-emerald-700 dark:text-emerald-400'
+                          sobreprecoDiff > 0 ? 'text-warning' : 'text-success'
                         }`}
                       >
                         {sobreprecoDiff > 0 ? '+' : ''}
@@ -212,8 +170,8 @@ export const ResultCards: React.FC<ResultCardsProps> = ({
                     res.annualCbioRevenue !== undefined &&
                     res.annualCbioRevenue > 0 && (
                       <div className="flex items-center justify-between text-[11px]">
-                        <span className="text-base-content/75">Receita CBIO/ano:</span>
-                        <span className="font-mono font-semibold text-emerald-700 dark:text-emerald-400">
+                        <span className="text-base-content/70">CBIO/ano</span>
+                        <span className="text-success font-mono font-semibold">
                           +{formatCurrency(res.annualCbioRevenue, 0)}
                         </span>
                       </div>
@@ -221,28 +179,30 @@ export const ResultCards: React.FC<ResultCardsProps> = ({
 
                   {res.payloadPenaltyKg !== undefined && res.payloadPenaltyKg !== 0 && (
                     <div className="flex items-center justify-between text-[11px]">
-                      <span className="text-base-content/75">Lei da Balança:</span>
+                      <span className="text-base-content/70">Carga útil</span>
                       <span
                         className={`font-mono font-medium ${
                           res.payloadPenaltyKg < 0
-                            ? 'text-amber-700 dark:text-amber-400'
+                            ? 'text-warning'
                             : 'text-base-content/85'
                         }`}
                       >
                         {res.payloadPenaltyKg > 0 ? '+' : ''}
-                        {formatNumber(res.payloadPenaltyKg, 0)} kg carga útil
+                        {formatNumber(res.payloadPenaltyKg, 0)} kg
                       </span>
                     </div>
                   )}
                 </div>
               </div>
 
-              {/* Bottom Highlight Pill */}
-              <div
-                className={`mt-2.5 rounded px-2 py-1 text-center text-[11px] font-medium ${config.highlightClass}`}
-              >
-                {highlightText}
-              </div>
+              {/* Winner Highlight Pill (only when winning) */}
+              {winnerBadge && (
+                <div
+                  className={`rounded-md px-2 py-1 text-center text-[11px] ${fuelTheme.pillClass}`}
+                >
+                  {winnerBadge}
+                </div>
+              )}
             </div>
           </div>
         );

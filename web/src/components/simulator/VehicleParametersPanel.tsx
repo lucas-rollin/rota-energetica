@@ -29,42 +29,27 @@ export const VehicleParametersPanel: React.FC<VehicleParametersPanelProps> = ({
   return (
     <div className="space-y-4">
       {/* Header and Sobrepreço derived display */}
-      <div className="border-base-200 flex flex-col justify-between gap-3 border-b pb-3 sm:flex-row sm:items-center">
-        <div>
-          <h3 className="text-base-content text-base font-bold">{parameters.label}</h3>
-          <p className="text-base-content/70 text-xs">
-            Parâmetros técnicos, energéticos e de capital do cavalo mecânico.
-          </p>
-        </div>
+      <div className="border-base-300/60 flex flex-col justify-between gap-2.5 border-b pb-2.5 sm:flex-row sm:items-center">
+        <h3 className="text-base-content text-sm font-bold">{parameters.label}</h3>
 
         {/* Derived Sobrepreço Box */}
-        <div className="bg-base-200/60 border-base-300/80 flex items-center gap-3 rounded-xl border p-2.5 sm:px-4">
-          <div className="text-xs">
-            <span className="text-base-content/75 block text-[11px] font-semibold tracking-wider uppercase">
-              Sobrepreço vs. Diesel B (derivado)
-            </span>
-            <div className="text-base-content font-mono text-sm font-bold">
-              {isDiesel ? (
-                <span className="text-base-content/75">Referência (R$ 0)</span>
-              ) : (
-                <>
-                  <span
-                    className={
-                      sobreprecoDiff > 0
-                        ? 'text-amber-700 dark:text-amber-400'
-                        : 'text-emerald-700 dark:text-emerald-400'
-                    }
-                  >
-                    {sobreprecoDiff > 0 ? '+' : ''}
-                    {formatCurrency(sobreprecoDiff, 0)}
-                  </span>
-                  <span className="text-base-content/70 ml-1.5 text-xs font-normal">
-                    ({formatPercent(sobreprecoPct, 1)})
-                  </span>
-                </>
-              )}
-            </div>
-          </div>
+        <div className="bg-base-200/60 border-base-300/70 flex items-center gap-2 rounded-lg border px-3 py-1.5 text-xs">
+          <span className="text-base-content/70">Sobrepreço vs. Diesel:</span>
+          <span className="text-base-content font-mono font-bold">
+            {isDiesel ? (
+              <span className="text-base-content/70">Ref. (R$ 0)</span>
+            ) : (
+              <>
+                <span className={sobreprecoDiff > 0 ? 'text-warning' : 'text-success'}>
+                  {sobreprecoDiff > 0 ? '+' : ''}
+                  {formatCurrency(sobreprecoDiff, 0)}
+                </span>
+                <span className="text-base-content/65 ml-1 font-normal">
+                  ({formatPercent(sobreprecoPct, 1)})
+                </span>
+              </>
+            )}
+          </span>
         </div>
       </div>
 
