@@ -681,11 +681,6 @@ class PowertrainEvaluation(BaseModel):
         description="Redução percentual de emissões de GEE vs diesel.",
         title="Emission Reduction Percent",
     )
-    recommendation: str = Field(
-        ...,
-        description="Recomendação técnico-operacional para a rota.",
-        title="Recommendation",
-    )
 
 
 class FreightCorridor(BaseModel):

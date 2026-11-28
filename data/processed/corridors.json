@@ -71,24 +71,21 @@
           "stops_description": "2 a 3 paradas de abastecimento (~15 min cada)",
           "refuel_time_minutes": 35,
           "payload_penalty_kg": -280.0,
-          "emission_reduction_percent": 92.4,
-          "recommendation": "Forte cobertura de GNC/Biometano em SP (SP-330) e Triângulo Mineiro, porém com vazio operacional entre o Sul de MT e o Sudoeste de GO — exige autonomia >= 700 km ou ponto dedicado em Rondonópolis/Jataí."
+          "emission_reduction_percent": 92.4
         },
         "diesel": {
           "feasibility_label": "Linha de Base Operacional",
           "stops_description": "1 a 2 paradas rápidas",
           "refuel_time_minutes": 20,
           "payload_penalty_kg": 0.0,
-          "emission_reduction_percent": 0.0,
-          "recommendation": "Linha de base tradicional. Total cobertura de postos, porém com 100% de exposição à volatilidade do diesel fóssil e sem créditos de descarbonização (CBIO)."
+          "emission_reduction_percent": 0.0
         },
         "eletrico": {
           "feasibility_label": "Inviável no Curto Prazo",
           "stops_description": "5 a 7 horas de recarga acumulada",
           "refuel_time_minutes": 360,
           "payload_penalty_kg": -2400.0,
-          "emission_reduction_percent": 88.5,
-          "recommendation": "Gargalo Crítico: Perda de até 2.400 kg de carga líquida de grãos sob a Lei da Balança e ausência de eletropostos >150 kW em mais de 1.100 km entre MT, GO e norte de SP."
+          "emission_reduction_percent": 88.5
         }
       },
       "source_ids": [
@@ -143,24 +140,21 @@
           "stops_description": "Abastecimento na base (bate-e-volta sem paradas no percurso)",
           "refuel_time_minutes": 15,
           "payload_penalty_kg": -280.0,
-          "emission_reduction_percent": 91.0,
-          "recommendation": "Distância curta permite ciclo duplo diário. Rede de gás e biometano da agroindústria paranaense (Compagás Corredores Sustentáveis) viabilizam custo operacional atrativo."
+          "emission_reduction_percent": 91.0
         },
         "diesel": {
           "feasibility_label": "Operacional Padrão",
           "stops_description": "Sem paradas necessárias na descida",
           "refuel_time_minutes": 15,
           "payload_penalty_kg": 0.0,
-          "emission_reduction_percent": 0.0,
-          "recommendation": "Operação padrão sem risco de rota, porém com custos crescentes de combustíveis fósseis e pressão ESG de tradings exportadoras no Porto de Paranaguá."
+          "emission_reduction_percent": 0.0
         },
         "eletrico": {
           "feasibility_label": "Alta Eficiência Regenerativa",
           "stops_description": "Recarga nos pátios de triagem portuária",
           "refuel_time_minutes": 45,
           "payload_penalty_kg": -1900.0,
-          "emission_reduction_percent": 92.0,
-          "recommendation": "Perfil topográfico de serra ideal para frenagem regenerativa pesada, recuperando até 18% da carga da bateria na descida da BR-277."
+          "emission_reduction_percent": 92.0
         }
       },
       "source_ids": [
@@ -222,24 +216,21 @@
           "stops_description": "1 parada curta (15 min)",
           "refuel_time_minutes": 15,
           "payload_penalty_kg": -280.0,
-          "emission_reduction_percent": 90.5,
-          "recommendation": "Corredor Dutra possui ampla rede de gás canalizado (NTS) e biometano de aterros sanitários (Paulínia e Seropédica). Cobertura contínua mesmo com autonomia conservadora."
+          "emission_reduction_percent": 90.5
         },
         "diesel": {
           "feasibility_label": "Operacional Padrão",
           "stops_description": "Sem paradas obrigatórias",
           "refuel_time_minutes": 15,
           "payload_penalty_kg": 0.0,
-          "emission_reduction_percent": 0.0,
-          "recommendation": "Corredor industrial de alto fluxo com custo estável de manutenção e oficinas autorizadas."
+          "emission_reduction_percent": 0.0
         },
         "eletrico": {
           "feasibility_label": "Corredor Elétrico Mais Maduro do Brasil",
           "stops_description": "1 recarga rápida intermediária (~45-50 min em hub 150kW-350kW)",
           "refuel_time_minutes": 50,
           "payload_penalty_kg": -2100.0,
-          "emission_reduction_percent": 90.2,
-          "recommendation": "Melhor infraestrutura de recarga rápida do Brasil (São Paulo, São José dos Campos, Resende e Rio). Ideal para frotas de e-commerce com compromissos Scope 1 zero."
+          "emission_reduction_percent": 90.2
         }
       },
       "source_ids": [
@@ -301,24 +292,21 @@
           "stops_description": "Viagem direta de 408 km (apoio em Taboão da Serra e Campina Grande do Sul)",
           "refuel_time_minutes": 15,
           "payload_penalty_kg": -280.0,
-          "emission_reduction_percent": 91.2,
-          "recommendation": "Embora o Vale do Ribeira (SP) não possua rede de gás canalizado (nem Comgás nem Naturgy SP Sul alcançam o trecho), a extensão de 408 km permite travessia direta para caminhões a Bio-GNC (650–900 km), conectando os hubs de alta vazão da Comgás (Taboão da Serra) e Compagás (Campina Grande do Sul / São José dos Pinhais)."
+          "emission_reduction_percent": 91.2
         },
         "diesel": {
           "feasibility_label": "Operacional Padrão",
           "stops_description": "Sem paradas obrigatórias",
           "refuel_time_minutes": 15,
           "payload_penalty_kg": 0.0,
-          "emission_reduction_percent": 0.0,
-          "recommendation": "Eixo consolidado de ligação Sudeste–Sul com ampla rede de serviços na Serra do Cafezal duplicada e Vale do Ribeira."
+          "emission_reduction_percent": 0.0
         },
         "eletrico": {
           "feasibility_label": "Dependente de Apoio Intermediário HPC",
           "stops_description": "1 recarga intermediária recomendada para margem em aclives de serra",
           "refuel_time_minutes": 60,
           "payload_penalty_kg": -2100.0,
-          "emission_reduction_percent": 90.8,
-          "recommendation": "Pontos existentes em Miracatu (km 385) e Cajati (km 500) operam até 150 kW para veículos leves; travessia pesada com carga cheia depende de hubs HPC >150 kW dedicados nas pontas e reforço na serra."
+          "emission_reduction_percent": 90.8
         }
       },
       "source_ids": [
@@ -383,24 +371,21 @@
           "stops_description": "1 abastecimento na rota (base litorânea SCGÁS e base Oeste)",
           "refuel_time_minutes": 20,
           "payload_penalty_kg": -280.0,
-          "emission_reduction_percent": 93.0,
-          "recommendation": "Conecta o maior polo de dejetos agropecuários do Brasil (Oeste SC) aos portos exportadores de Itajaí e Navegantes. Exige atenção ao trecho serrano entre Campos Novos e Rio do Sul."
+          "emission_reduction_percent": 93.0
         },
         "diesel": {
           "feasibility_label": "Operacional Padrão",
           "stops_description": "1 parada regular",
           "refuel_time_minutes": 15,
           "payload_penalty_kg": 0.0,
-          "emission_reduction_percent": 0.0,
-          "recommendation": "Linha base do agronegócio de Santa Catarina com abastecimento garantido em todo o trecho da serra catarinense."
+          "emission_reduction_percent": 0.0
         },
         "eletrico": {
           "feasibility_label": "Viável com Hubs Dedicados",
           "stops_description": "1 a 2 recargas intermediárias no planalto serrano",
           "refuel_time_minutes": 90,
           "payload_penalty_kg": -2200.0,
-          "emission_reduction_percent": 91.5,
-          "recommendation": "Exige expansão de eletropostos pesados no trecho do Meio-Oeste da BR-282/BR-470. Viabilidade já consolidada para o trecho final litorâneo (Joinville–Itajaí–Florianópolis)."
+          "emission_reduction_percent": 91.5
         }
       },
       "source_ids": [
@@ -474,24 +459,21 @@
           "stops_description": "1 a 2 paradas (Uberlândia / Ribeirão Preto)",
           "refuel_time_minutes": 25,
           "payload_penalty_kg": -280.0,
-          "emission_reduction_percent": 91.8,
-          "recommendation": "Sinergia alta com usinas sucroenergéticas de MG e SP ao longo da BR-050 e Anhanguera. Trecho Goiânia–Uberlândia requer planejamento de autonomia."
+          "emission_reduction_percent": 91.8
         },
         "diesel": {
           "feasibility_label": "Operacional Padrão",
           "stops_description": "1 parada regular",
           "refuel_time_minutes": 15,
           "payload_penalty_kg": 0.0,
-          "emission_reduction_percent": 0.0,
-          "recommendation": "Rota tradicional de escoamento de grãos e manufaturados com ampla oferta de serviços."
+          "emission_reduction_percent": 0.0
         },
         "eletrico": {
           "feasibility_label": "Restrito a Trechos Curtos em SP",
           "stops_description": "3 a 4 recargas necessárias",
           "refuel_time_minutes": 220,
           "payload_penalty_kg": -2300.0,
-          "emission_reduction_percent": 89.0,
-          "recommendation": "Forte déficit de carregadores >150 kW no trecho entre Uberaba (MG) e Goiânia (GO)."
+          "emission_reduction_percent": 89.0
         }
       },
       "source_ids": [
@@ -544,24 +526,21 @@
           "stops_description": "Trecho direto com Bio-GNC (650+ km) ou 1 parada em Pouso Alegre",
           "refuel_time_minutes": 20,
           "payload_penalty_kg": -280.0,
-          "emission_reduction_percent": 90.0,
-          "recommendation": "Distância compatível com autonomia de caminhões a gás (650–900 km), permitindo operação entre os hubs Gasmig (Betim) e Comgás (Guarulhos)."
+          "emission_reduction_percent": 90.0
         },
         "diesel": {
           "feasibility_label": "Operacional Padrão",
           "stops_description": "1 parada rápida",
           "refuel_time_minutes": 15,
           "payload_penalty_kg": 0.0,
-          "emission_reduction_percent": 0.0,
-          "recommendation": "Operação consolidada em terreno montanhoso."
+          "emission_reduction_percent": 0.0
         },
         "eletrico": {
           "feasibility_label": "Dependente de Reforço Intermediário",
           "stops_description": "1 a 2 recargas em rota serrana",
           "refuel_time_minutes": 110,
           "payload_penalty_kg": -2100.0,
-          "emission_reduction_percent": 90.5,
-          "recommendation": "Aclives da Mantiqueira elevam o consumo específico; requer eletropostos rápidos intermediários em Pouso Alegre/Extrema."
+          "emission_reduction_percent": 90.5
         }
       },
       "source_ids": [
@@ -614,24 +593,21 @@
           "stops_description": "1 parada curta em Juiz de Fora ou viagem direta",
           "refuel_time_minutes": 15,
           "payload_penalty_kg": -280.0,
-          "emission_reduction_percent": 90.2,
-          "recommendation": "Presença estratégica de ponto GNV em Juiz de Fora preenche o trecho intermediário entre BH e Rio de Janeiro."
+          "emission_reduction_percent": 90.2
         },
         "diesel": {
           "feasibility_label": "Operacional Padrão",
           "stops_description": "Sem paradas obrigatórias",
           "refuel_time_minutes": 15,
           "payload_penalty_kg": 0.0,
-          "emission_reduction_percent": 0.0,
-          "recommendation": "Eixo tradicional da logística siderúrgica mineira."
+          "emission_reduction_percent": 0.0
         },
         "eletrico": {
           "feasibility_label": "Viável no Limite da Autonomia BEV",
           "stops_description": "1 recarga rápida intermediária recomendada",
           "refuel_time_minutes": 95,
           "payload_penalty_kg": -2050.0,
-          "emission_reduction_percent": 90.8,
-          "recommendation": "Trecho de 438 km exige ponto HPC em Juiz de Fora/Três Rios para margem operacional segura de caminhões carregados."
+          "emission_reduction_percent": 90.8
         }
       },
       "source_ids": [
@@ -698,24 +674,21 @@
           "stops_description": "1 parada estratégica (Criciúma, Itajaí ou Joinville)",
           "refuel_time_minutes": 15,
           "payload_penalty_kg": -280.0,
-          "emission_reduction_percent": 92.0,
-          "recommendation": "Um dos eixos mais bem servidos de gás natural e biometano do país, conectando Sulgás, SCGÁS e Compagás com sobreposição de cobertura."
+          "emission_reduction_percent": 92.0
         },
         "diesel": {
           "feasibility_label": "Operacional Padrão",
           "stops_description": "1 parada regular",
           "refuel_time_minutes": 15,
           "payload_penalty_kg": 0.0,
-          "emission_reduction_percent": 0.0,
-          "recommendation": "Eixo duplicado em grande extensão com plena disponibilidade."
+          "emission_reduction_percent": 0.0
         },
         "eletrico": {
           "feasibility_label": "Viável em Etapas Regionais",
           "stops_description": "2 recargas rápidas intermediárias",
           "refuel_time_minutes": 100,
           "payload_penalty_kg": -2000.0,
-          "emission_reduction_percent": 91.0,
-          "recommendation": "Boa presença de eletropostos nas capitais e polos industriais (Porto Alegre, Florianópolis, Joinville, Curitiba), com lacuna no extremo sul de SC."
+          "emission_reduction_percent": 91.0
         }
       },
       "source_ids": [
@@ -787,24 +760,21 @@
           "stops_description": "2 a 3 paradas nas RMs litorâneas",
           "refuel_time_minutes": 40,
           "payload_penalty_kg": -280.0,
-          "emission_reduction_percent": 90.8,
-          "recommendation": "Rede sólida de GNV entre Salvador, Aracaju, Maceió, Recife e João Pessoa; trecho Mossoró–Fortaleza requer autonomia >= 650 km."
+          "emission_reduction_percent": 90.8
         },
         "diesel": {
           "feasibility_label": "Operacional Padrão",
           "stops_description": "2 paradas rápidas",
           "refuel_time_minutes": 25,
           "payload_penalty_kg": 0.0,
-          "emission_reduction_percent": 0.0,
-          "recommendation": "Infraestrutura tradicional consolidada ao longo da BR-101 e BR-116."
+          "emission_reduction_percent": 0.0
         },
         "eletrico": {
           "feasibility_label": "Infraestrutura HPC Insuficiente",
           "stops_description": "5+ recargas com trechos descobertos",
           "refuel_time_minutes": 300,
           "payload_penalty_kg": -2200.0,
-          "emission_reduction_percent": 89.5,
-          "recommendation": "Eletropostos de alta potência (>150 kW) restritos a hubs isolados em Salvador, Recife e Fortaleza, inviabilizando rotas contínuas de pesados."
+          "emission_reduction_percent": 89.5
         }
       },
       "source_ids": [

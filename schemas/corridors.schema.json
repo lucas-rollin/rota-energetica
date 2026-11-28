@@ -143,11 +143,6 @@
           "description": "Redução percentual de emissões de GEE vs diesel.",
           "title": "Emission Reduction Percent",
           "type": "number"
-        },
-        "recommendation": {
-          "description": "Recomendação técnico-operacional para a rota.",
-          "title": "Recommendation",
-          "type": "string"
         }
       },
       "required": [
@@ -155,8 +150,7 @@
         "stops_description",
         "refuel_time_minutes",
         "payload_penalty_kg",
-        "emission_reduction_percent",
-        "recommendation"
+        "emission_reduction_percent"
       ],
       "title": "PowertrainEvaluation",
       "type": "object"
