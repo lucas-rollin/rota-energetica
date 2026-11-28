@@ -232,17 +232,13 @@ const baseUrl = import.meta.env.BASE_URL.endsWith('/')
         </h2>
       </div>
 
-      <CorridorsDashboard
-        client:visible
-        corridorsData={corridorsData}
-        stationsData={stationsData}
-      />
-
       <CorridorInfrastructureMap
         client:visible
         corridors={corridorsData.corridors}
         stations={stationsData.stations}
       />
+
+      <CorridorsDashboard client:visible corridorsData={corridorsData} />
     </div>
   </section>
 

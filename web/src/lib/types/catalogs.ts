@@ -12,7 +12,6 @@ export interface PowertrainEvaluation {
   refuel_time_minutes: number;
   payload_penalty_kg: number;
   emission_reduction_percent: number;
-  recommendation: string;
 }
 
 export interface FreightCorridor {
