@@ -48,19 +48,19 @@ const navItems: {
     href: `${baseUrl}#emissoes`,
     label: 'Emissões & ESG',
     sectionId: 'emissoes',
-    match: (p: string) => p.includes('pollutants-esg'),
+    match: () => false,
   },
   {
     href: `${baseUrl}#corredores`,
     label: 'Corredores',
     sectionId: 'corredores',
-    match: (p: string) => p.includes('corridors'),
+    match: () => false,
   },
   {
     href: `${baseUrl}#benchmark-global`,
     label: 'Global',
     sectionId: 'benchmark-global',
-    match: (p: string) => p.includes('global-benchmarks'),
+    match: () => false,
   },
   {
     href: `${baseUrl}fontes`,

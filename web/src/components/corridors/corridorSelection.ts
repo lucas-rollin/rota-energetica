@@ -13,7 +13,7 @@ declare global {
 }
 
 /**
- * Broadcasts corridor selection across decoupled Astro islands on `/corridors`.
+ * Broadcasts corridor selection across decoupled Astro islands in the `#corredores` section.
  */
 export function publishCorridorSelection(corridorId: string): void {
   if (typeof window === 'undefined') return;
