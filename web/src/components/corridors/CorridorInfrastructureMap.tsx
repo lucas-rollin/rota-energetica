@@ -50,7 +50,7 @@ echarts.use([
   CanvasRenderer,
 ]);
 
-type CoverageVisualMode = 'route' | 'unified' | 'rings';
+type ViewportScope = 'corridor' | 'brazil';
 
 interface CorridorInfrastructureMapProps {
   corridors: FreightCorridor[];
@@ -59,51 +59,18 @@ interface CorridorInfrastructureMapProps {
 }
 
 const AUTONOMY_PRESETS = [
-  { id: 'bev', label: 'Elétrico BEV', km: 350, sourceId: 'V08', badge: 'Adaptada' },
-  {
-    id: 'bio-gnc',
-    label: 'Biometano Bio-GNC',
-    km: 650,
-    sourceId: 'V07',
-    badge: 'Adaptada',
-  },
-  {
-    id: 'bio-gnl',
-    label: 'GNL Estendido',
-    km: 1400,
-    sourceId: null,
-    badge: 'Ilustrativa',
-  },
+  { id: 'bev', label: 'Elétrico BEV', km: 350, sourceId: 'V08' },
+  { id: 'bio-gnc', label: 'Biometano Bio-GNC', km: 650, sourceId: 'V07' },
 ] as const;
 
 const COLORS = {
   biomethane: FUEL_THEME.biometano.hex,
   biomethaneUnifiedFill: FUEL_THEME.biometano.fillRgba,
-  biomethaneStroke: FUEL_THEME.biometano.strokeRgba,
   electric: FUEL_THEME.eletrico.hex,
   electricUnifiedFill: FUEL_THEME.eletrico.fillRgba,
-  electricStroke: FUEL_THEME.eletrico.strokeRgba,
   corridorCovered: FUEL_THEME.biometano.hex,
   corridorCoveredElectric: FUEL_THEME.eletrico.hex,
 };
-
-function ringCoordsToSvgPath(
-  rings: [number, number][][],
-  coordFn: (val: [number, number]) => [number, number]
-): string {
-  const segments: string[] = [];
-  for (const ring of rings) {
-    if (ring.length < 3) continue;
-    const cmds: string[] = [];
-    for (let i = 0; i < ring.length; i++) {
-      const [px, py] = coordFn(ring[i]);
-      cmds.push(`${i === 0 ? 'M' : 'L'}${px.toFixed(1)} ${py.toFixed(1)}`);
-    }
-    cmds.push('Z');
-    segments.push(cmds.join(''));
-  }
-  return segments.join(' ');
-}
 
 export const CorridorInfrastructureMap: React.FC<CorridorInfrastructureMapProps> = ({
   corridors,
@@ -118,7 +85,7 @@ export const CorridorInfrastructureMap: React.FC<CorridorInfrastructureMapProps>
     initialCorridorId ?? corridors[0]?.id ?? 'rondonopolis-santos';
   const [selectedCorridorId, setSelectedCorridorId] =
     useSharedCorridorSelection(defaultCorridorId);
-  const [viewportScope, setViewportScope] = useState<'corridor' | 'brazil'>('corridor');
+  const [viewportScope, setViewportScope] = useState<ViewportScope>('corridor');
   const [viewportTick, setViewportTick] = useState<number>(0);
   const [brazilGeoJson, setBrazilGeoJson] = useState<unknown>(null);
 
@@ -152,8 +119,6 @@ export const CorridorInfrastructureMap: React.FC<CorridorInfrastructureMapProps>
     useState<boolean>(false);
   const [autonomyKm, setAutonomyKm] = useState<number>(650);
   const [radiusMode, setRadiusMode] = useState<CoverageRadiusMode>('half');
-  const [coverageVisualMode, setCoverageVisualMode] =
-    useState<CoverageVisualMode>('route');
   const [hoveredStationId, setHoveredStationId] = useState<string | null>(null);
   const [tableUfFilter, setTableUfFilter] = useState<string>('TODOS');
   const isDark = useDarkMode();
@@ -207,38 +172,6 @@ export const CorridorInfrastructureMap: React.FC<CorridorInfrastructureMapProps>
       ),
     [selectedCorridor, networkFilteredStations, effectiveRadiusKm]
   );
-
-  // Precompute geodesic rings grouped by technology (for unified area) and hovered station
-  const bioRingCoordsList = useMemo(() => {
-    if (coverageVisualMode === 'route' || !showBiomethaneCng) return [];
-    return visibleStations
-      .filter((s) => s.technology === 'biomethane_cng')
-      .map((s) =>
-        createGeodesicCircleCoords(s.longitude, s.latitude, effectiveRadiusKm, 28)
-      );
-  }, [coverageVisualMode, showBiomethaneCng, visibleStations, effectiveRadiusKm]);
-
-  const hpcRingCoordsList = useMemo(() => {
-    if (coverageVisualMode === 'route' || !showElectricHpc) return [];
-    return visibleStations
-      .filter((s) => s.technology === 'electric_hpc')
-      .map((s) =>
-        createGeodesicCircleCoords(s.longitude, s.latitude, effectiveRadiusKm, 28)
-      );
-  }, [coverageVisualMode, showElectricHpc, visibleStations, effectiveRadiusKm]);
-
-  const individualOutlineRings = useMemo(() => {
-    if (coverageVisualMode !== 'rings') return [];
-    return visibleStations.map((st) => ({
-      technology: st.technology,
-      coords: createGeodesicCircleCoords(
-        st.longitude,
-        st.latitude,
-        effectiveRadiusKm,
-        28
-      ),
-    }));
-  }, [coverageVisualMode, visibleStations, effectiveRadiusKm]);
 
   const hoveredStationRing = useMemo(() => {
     if (!hoveredStationId) return null;
@@ -388,26 +321,6 @@ export const CorridorInfrastructureMap: React.FC<CorridorInfrastructureMapProps>
     const borderColor = chartTheme.mapBorder;
     const emphasisAreaColor = chartTheme.mapEmphasis;
 
-    // Build custom coverage layer according to coverageVisualMode
-    const unifiedLayers: {
-      technology: 'biomethane_cng' | 'electric_hpc';
-      rings: [number, number][][];
-    }[] = [];
-    if (coverageVisualMode === 'unified') {
-      if (bioRingCoordsList.length > 0) {
-        unifiedLayers.push({
-          technology: 'biomethane_cng',
-          rings: bioRingCoordsList,
-        });
-      }
-      if (hpcRingCoordsList.length > 0) {
-        unifiedLayers.push({
-          technology: 'electric_hpc',
-          rings: hpcRingCoordsList,
-        });
-      }
-    }
-
     const currentViewportKey = `${viewportScope}:${selectedCorridor.id}:${viewportTick}`;
     const shouldResetViewport = lastViewportKeyRef.current !== currentViewportKey;
     lastViewportKeyRef.current = currentViewportKey;
@@ -501,59 +414,6 @@ export const CorridorInfrastructureMap: React.FC<CorridorInfrastructureMapProps>
             width: 1.5,
             type: 'dashed',
           },
-        },
-        {
-          name: 'Área Unificada de Cobertura',
-          type: 'custom',
-          coordinateSystem: 'geo',
-          silent: true,
-          zlevel: 1,
-          renderItem: (
-            params: { dataIndex: number },
-            api: { coord: (val: [number, number]) => [number, number] }
-          ) => {
-            const layer = unifiedLayers[params.dataIndex];
-            if (!layer) return null;
-            const pathData = ringCoordsToSvgPath(layer.rings, api.coord);
-            if (!pathData) return null;
-            const isBio = layer.technology === 'biomethane_cng';
-            return {
-              type: 'path',
-              shape: { pathData },
-              style: {
-                fill: isBio ? COLORS.biomethaneUnifiedFill : COLORS.electricUnifiedFill,
-                stroke: 'none',
-              },
-            };
-          },
-          data: unifiedLayers.map((l, i) => [i, l.rings.length]),
-        },
-        {
-          name: 'Contornos Individuais',
-          type: 'custom',
-          coordinateSystem: 'geo',
-          silent: true,
-          zlevel: 1,
-          renderItem: (
-            params: { dataIndex: number },
-            api: { coord: (val: [number, number]) => [number, number] }
-          ) => {
-            const ring = individualOutlineRings[params.dataIndex];
-            if (!ring) return null;
-            const points = ring.coords.map((pt) => api.coord(pt));
-            const isBio = ring.technology === 'biomethane_cng';
-            return {
-              type: 'polygon',
-              shape: { points },
-              style: {
-                fill: 'transparent',
-                stroke: isBio ? COLORS.biomethaneStroke : COLORS.electricStroke,
-                lineWidth: 1,
-                lineDash: [4, 4],
-              },
-            };
-          },
-          data: individualOutlineRings.map((_, i) => [i, 0]),
         },
         {
           name: 'Eixo Coberto',
@@ -660,10 +520,6 @@ export const CorridorInfrastructureMap: React.FC<CorridorInfrastructureMapProps>
     visibleStations,
     showBiomethaneCng,
     showElectricHpc,
-    coverageVisualMode,
-    bioRingCoordsList,
-    hpcRingCoordsList,
-    individualOutlineRings,
     hoveredStationRing,
     effectiveRadiusKm,
     viewport,
@@ -758,7 +614,7 @@ export const CorridorInfrastructureMap: React.FC<CorridorInfrastructureMapProps>
       </div>
 
       {/* Controls Bar */}
-      <div className="bg-base-200/45 border-base-300/60 grid grid-cols-1 gap-3.5 rounded-xl border p-3.5 lg:grid-cols-12">
+      <div className="bg-base-200/45 border-base-300/60 grid grid-cols-1 gap-4 rounded-xl border p-3.5 lg:grid-cols-12">
         {/* Network & Layer Toggles */}
         <div className="space-y-2 lg:col-span-5">
           <div className="text-base-content/65 text-[11px] font-bold tracking-wider uppercase">
@@ -798,31 +654,60 @@ export const CorridorInfrastructureMap: React.FC<CorridorInfrastructureMapProps>
             </label>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2 pt-0.5">
-            <label className="text-base-content/80 inline-flex cursor-pointer items-center gap-1.5 text-xs">
-              <input
-                type="checkbox"
-                className="checkbox checkbox-xs checkbox-primary"
-                checked={onlySelectedCorridorStations}
-                onChange={(e) => setOnlySelectedCorridorStations(e.target.checked)}
-              />
-              <span>Apenas pontos do eixo selecionado</span>
-            </label>
-          </div>
+          <label className="text-base-content/80 inline-flex cursor-pointer items-center gap-1.5 pt-0.5 text-xs">
+            <input
+              type="checkbox"
+              className="checkbox checkbox-xs checkbox-primary"
+              checked={onlySelectedCorridorStations}
+              onChange={(e) => setOnlySelectedCorridorStations(e.target.checked)}
+            />
+            <span>Apenas pontos do eixo selecionado</span>
+          </label>
         </div>
 
-        {/* Autonomy Slider + Presets */}
-        <div className="space-y-2 lg:col-span-4">
-          <div className="flex items-center justify-between text-xs">
-            <label
-              htmlFor="autonomy-slider"
-              className="text-base-content/65 text-[11px] font-bold tracking-wider uppercase"
+        {/* Autonomy Slider + Reference Presets + Radius Mode */}
+        <div className="space-y-2 lg:col-span-7">
+          <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
+            <div className="flex items-center gap-2">
+              <label
+                htmlFor="autonomy-slider"
+                className="text-base-content/65 text-[11px] font-bold tracking-wider uppercase"
+              >
+                Autonomia
+              </label>
+              <span className="text-primary font-mono font-bold">
+                {formatNumber(autonomyKm, 0)} km
+              </span>
+            </div>
+
+            <div
+              className="join"
+              role="group"
+              aria-label="Modo de cálculo do raio de cobertura"
             >
-              Autonomia
-            </label>
-            <span className="text-primary font-mono font-bold">
-              {formatNumber(autonomyKm, 0)} km
-            </span>
+              <button
+                type="button"
+                onClick={() => setRadiusMode('half')}
+                aria-pressed={radiusMode === 'half'}
+                className={`join-item btn btn-xs ${
+                  radiusMode === 'half' ? 'btn-primary' : 'btn-outline border-base-300'
+                }`}
+                title="Raio = Autonomia / 2 (margem segura / ida e volta)"
+              >
+                Raio ½ ({formatNumber(autonomyKm / 2, 0)} km)
+              </button>
+              <button
+                type="button"
+                onClick={() => setRadiusMode('full')}
+                aria-pressed={radiusMode === 'full'}
+                className={`join-item btn btn-xs ${
+                  radiusMode === 'full' ? 'btn-primary' : 'btn-outline border-base-300'
+                }`}
+                title="Raio = 1× Autonomia (salto contínuo entre postos)"
+              >
+                1× ({formatNumber(autonomyKm, 0)} km)
+              </button>
+            </div>
           </div>
 
           <input
@@ -836,7 +721,7 @@ export const CorridorInfrastructureMap: React.FC<CorridorInfrastructureMapProps>
             className="range range-xs range-primary w-full"
           />
 
-          <div className="flex flex-wrap gap-1.5">
+          <div className="flex flex-wrap items-center gap-2">
             {AUTONOMY_PRESETS.map((preset) => (
               <div key={preset.id} className="inline-flex items-center gap-1">
                 <button
@@ -850,131 +735,13 @@ export const CorridorInfrastructureMap: React.FC<CorridorInfrastructureMapProps>
                 >
                   {preset.label} ({formatNumber(preset.km, 0)} km)
                 </button>
-                {preset.sourceId && (
-                  <SourceRef
-                    id={preset.sourceId}
-                    context={`Autonomia de referência: ${preset.label}`}
-                  />
-                )}
+                <SourceRef
+                  id={preset.sourceId}
+                  context={`Autonomia de referência: ${preset.label}`}
+                />
               </div>
             ))}
           </div>
-        </div>
-
-        {/* Radius Mode + Visual Style + Map Framing */}
-        <div className="space-y-2 lg:col-span-3">
-          <div className="text-base-content/65 text-[11px] font-bold tracking-wider uppercase">
-            Cobertura &amp; Enquadramento
-          </div>
-
-          <div
-            className="join w-full"
-            role="group"
-            aria-label="Modo de cálculo do raio de cobertura"
-          >
-            <button
-              type="button"
-              onClick={() => setRadiusMode('half')}
-              aria-pressed={radiusMode === 'half'}
-              className={`join-item btn btn-xs flex-1 ${
-                radiusMode === 'half' ? 'btn-primary' : 'btn-outline border-base-300'
-              }`}
-              title="Raio = Autonomia / 2 (margem segura / ida e volta)"
-            >
-              ½ ({formatNumber(autonomyKm / 2, 0)} km)
-            </button>
-            <button
-              type="button"
-              onClick={() => setRadiusMode('full')}
-              aria-pressed={radiusMode === 'full'}
-              className={`join-item btn btn-xs flex-1 ${
-                radiusMode === 'full' ? 'btn-primary' : 'btn-outline border-base-300'
-              }`}
-              title="Raio = 1× Autonomia (salto contínuo entre postos)"
-            >
-              1× ({formatNumber(autonomyKm, 0)} km)
-            </button>
-          </div>
-
-          {viewMode === 'map' && (
-            <>
-              <div
-                className="join w-full"
-                role="group"
-                aria-label="Estilo visual da área de autonomia"
-              >
-                <button
-                  type="button"
-                  onClick={() => setCoverageVisualMode('route')}
-                  aria-pressed={coverageVisualMode === 'route'}
-                  className={`join-item btn btn-xs flex-1 ${
-                    coverageVisualMode === 'route'
-                      ? 'btn-primary'
-                      : 'btn-outline border-base-300'
-                  }`}
-                  title="Destaca trechos cobertos e desertos na rota; anel aparece ao passar o mouse no posto"
-                >
-                  Na Rota
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setCoverageVisualMode('unified')}
-                  aria-pressed={coverageVisualMode === 'unified'}
-                  className={`join-item btn btn-xs flex-1 ${
-                    coverageVisualMode === 'unified'
-                      ? 'btn-primary'
-                      : 'btn-outline border-base-300'
-                  }`}
-                  title="Zona contínua unificada sem acúmulo escuro de transparência"
-                >
-                  Unificada
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setCoverageVisualMode('rings')}
-                  aria-pressed={coverageVisualMode === 'rings'}
-                  className={`join-item btn btn-xs flex-1 ${
-                    coverageVisualMode === 'rings'
-                      ? 'btn-primary'
-                      : 'btn-outline border-base-300'
-                  }`}
-                  title="Contornos individuais finos sem preenchimento"
-                >
-                  Contornos
-                </button>
-              </div>
-
-              <div className="flex items-center gap-1.5">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setViewportScope('corridor');
-                    setViewportTick((t) => t + 1);
-                  }}
-                  className={`btn btn-xs flex-1 gap-1 ${
-                    viewportScope === 'corridor'
-                      ? 'btn-primary btn-outline'
-                      : 'btn-ghost text-base-content/70'
-                  }`}
-                >
-                  <Compass className="h-3 w-3" aria-hidden="true" />
-                  <span>Focar Eixo</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setViewportScope('brazil')}
-                  className={`btn btn-xs flex-1 gap-1 ${
-                    viewportScope === 'brazil'
-                      ? 'btn-primary btn-outline'
-                      : 'btn-ghost text-base-content/70'
-                  }`}
-                >
-                  <Maximize2 className="h-3 w-3" aria-hidden="true" />
-                  <span>Brasil</span>
-                </button>
-              </div>
-            </>
-          )}
         </div>
       </div>
 
@@ -1056,6 +823,35 @@ export const CorridorInfrastructureMap: React.FC<CorridorInfrastructureMapProps>
       <div key="map-panel" className={viewMode === 'map' ? 'block' : 'hidden'}>
         <div className="border-base-300/70 bg-base-200/20 relative overflow-hidden rounded-xl border">
           <div className="relative">
+            <button
+              type="button"
+              onClick={() => {
+                if (viewportScope === 'corridor') {
+                  setViewportScope('brazil');
+                } else {
+                  setViewportScope('corridor');
+                  setViewportTick((t) => t + 1);
+                }
+              }}
+              title={
+                viewportScope === 'corridor'
+                  ? 'Ver Brasil completo'
+                  : 'Reenquadrar eixo selecionado'
+              }
+              className="btn btn-xs bg-base-100/90 border-base-300 text-base-content hover:bg-base-100 absolute top-2.5 right-2.5 z-10 gap-1 border"
+            >
+              {viewportScope === 'corridor' ? (
+                <>
+                  <Maximize2 className="h-3 w-3" aria-hidden="true" />
+                  <span>Brasil</span>
+                </>
+              ) : (
+                <>
+                  <Compass className="h-3 w-3" aria-hidden="true" />
+                  <span>Focar Eixo</span>
+                </>
+              )}
+            </button>
             <div
               ref={chartContainerRef}
               className="h-108 w-full sm:h-128"
