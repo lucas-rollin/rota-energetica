@@ -98,42 +98,42 @@ const navItems: {
       })();
     </script>
   </head>
-  <body class="min-h-screen flex flex-col bg-base-200/40 text-base-content antialiased">
+  <body class="min-h-screen flex flex-col bg-base-200/50 text-base-content antialiased">
     <!-- Extension Project Header Notice -->
-    <header class="w-full bg-base-100 border-b border-base-200 sticky top-0 z-30 shadow-xs">
+    <header class="w-full bg-base-100 border-b border-base-300/70 sticky top-0 z-30">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex items-center justify-between h-16">
+        <div class="flex items-center justify-between h-14">
           <div class="flex items-center gap-3">
             <a
               href={baseUrl}
-              class="flex items-center gap-2.5 font-bold text-lg text-base-content tracking-tight hover:opacity-85 transition-opacity"
+              class="flex items-center gap-2 font-bold text-base text-base-content tracking-tight hover:opacity-85 transition-opacity"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 32 32"
                 fill="none"
-                class="w-8 h-8 shrink-0 rounded-lg shadow-xs"
+                class="w-7 h-7 shrink-0 rounded-lg"
                 aria-hidden="true"
               >
-                <rect width="32" height="32" rx="7" fill="#031427" />
+                <rect width="32" height="32" rx="7" fill="#233830" />
                 <path
                   d="M10 26L14 14H18L22 26"
-                  stroke="#4edea3"
+                  stroke="#e9e5dc"
                   stroke-width="1.8"
                   stroke-linecap="round"
                   stroke-linejoin="round"
                 />
                 <path
                   d="M16 16V18M16 22V25"
-                  stroke="#4edea3"
+                  stroke="#e9e5dc"
                   stroke-width="1.5"
                   stroke-linecap="round"
-                  opacity="0.6"
+                  opacity="0.55"
                 />
                 <path
                   d="M17 5L12 12H16L15 16L20 9H16L17 5Z"
-                  fill="#4cd7f6"
-                  stroke="#031427"
+                  fill="#d4a359"
+                  stroke="#233830"
                   stroke-width="0.5"
                   stroke-linejoin="round"
                 />
@@ -247,38 +247,27 @@ const navItems: {
 
     <!-- Footer -->
     <footer
-      class={`w-full bg-base-100 border-t border-base-300/70 py-8 text-xs text-base-content/75 ${
-        fullWidth ? '' : 'mt-12'
+      class={`w-full bg-base-100 border-t border-base-300/70 py-5 text-xs text-base-content/70 ${
+        fullWidth ? '' : 'mt-10'
       }`}
     >
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
-        <div>
-          <p class="font-bold text-sm text-base-content mb-1">Rota Energética</p>
-          <p>
-            Simulador educacional de transição para alternativas de baixa emissão em
-            transporte pesado de carga.
-          </p>
-          <p class="mt-1 text-[11px] text-base-content/75">
-            Estimativas para fins acadêmicos. Ver{' '}
-            <a href={`${baseUrl}fontes`} class="link link-primary">
-              Fontes & Licenças
-            </a>{' '}
-            e{' '}
-            <a
-              href="https://github.com/lucas-rollin/rota-energetica/blob/main/LICENSE-DATA.md"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="link link-primary"
-            >
-              LICENSE-DATA.md
-            </a>
-            .
-          </p>
-        </div>
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
+        <p>
+          <strong class="text-base-content font-semibold">Rota Energética</strong> ·
+          Estimativas educacionais de transição energética para frotas pesadas.
+        </p>
 
-        <div class="flex flex-wrap items-center justify-center gap-3 sm:gap-4 text-xs">
+        <div class="flex flex-wrap items-center justify-center gap-4 text-xs">
           <a href={`${baseUrl}fontes`} class="link link-hover">
-            Fontes & Metadados
+            Fontes &amp; Licenças
+          </a>
+          <a
+            href="https://github.com/lucas-rollin/rota-energetica/blob/main/LICENSE-DATA.md"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="link link-hover"
+          >
+            LICENSE-DATA.md
           </a>
           <a
             href="https://github.com/lucas-rollin/rota-energetica"
@@ -286,7 +275,7 @@ const navItems: {
             rel="noopener noreferrer"
             class="link link-hover"
           >
-            Código-fonte (MIT)
+            GitHub (MIT)
           </a>
         </div>
       </div>

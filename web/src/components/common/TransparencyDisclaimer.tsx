@@ -55,36 +55,34 @@ export const TransparencyDisclaimer: React.FC<TransparencyDisclaimerProps> = ({
 
   if (compact) {
     return (
-      <details className="bg-base-100 border-base-200 group rounded-2xl border p-4 shadow-xs">
+      <details className="bg-base-100 border-base-300/70 group rounded-xl border px-4 py-3">
         <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-xs select-none">
           <div className="flex items-center gap-2.5">
-            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-amber-500/10 text-amber-700 dark:text-amber-400">
+            <span className="bg-warning/15 text-warning flex h-6 w-6 shrink-0 items-center justify-center rounded-md">
               <TriangleAlert className="h-3.5 w-3.5" aria-hidden="true" />
             </span>
-            <div>
-              <span className="text-base-content font-bold">
-                Limitações Metodológicas e Transparência (Metodologia §10)
-              </span>
-              <span className="text-base-content/70 block text-[11px]">
-                Estimativas educacionais; exclui infraestrutura, reforço de rede e
-                financiamento. A incerteza pode superar a precisão exibida.
-              </span>
-            </div>
+            <span className="text-base-content/85">
+              <strong className="text-base-content font-semibold">
+                Limitações metodológicas:
+              </strong>{' '}
+              estimativas educacionais; exclui infraestrutura, reforço de rede e
+              financiamento.
+            </span>
           </div>
           <span className="text-primary shrink-0 text-[11px] font-semibold group-open:hidden">
-            Ver 7 pontos ▾
+            Detalhes ▾
           </span>
           <span className="text-primary hidden shrink-0 text-[11px] font-semibold group-open:inline">
             Ocultar ▴
           </span>
         </summary>
 
-        <div className="border-base-200 mt-3 space-y-3 border-t pt-3">
+        <div className="border-base-300/60 mt-3 space-y-3 border-t pt-3">
           <ol className="grid grid-cols-1 gap-2 text-[11px] sm:grid-cols-2 lg:grid-cols-3">
             {METHODOLOGY_LIMITATIONS.map((item) => (
               <li
                 key={item.id}
-                className="bg-base-200/40 border-base-200 rounded-xl border p-2.5"
+                className="bg-base-200/45 border-base-300/60 rounded-lg border p-2.5"
               >
                 <strong className="text-base-content block">{item.title}</strong>
                 <span className="text-base-content/75 leading-relaxed">{item.body}</span>

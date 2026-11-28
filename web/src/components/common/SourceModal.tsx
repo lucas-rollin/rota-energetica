@@ -106,7 +106,7 @@ export const SourceModal: React.FC<SourceModalProps> = ({
       ? 'badge-success'
       : source?.badge === 'Adaptada'
         ? 'badge-info'
-        : 'badge-warning';
+        : 'badge-ghost border-base-300 text-base-content/80';
 
   return (
     <dialog
