@@ -12,7 +12,12 @@ import { SVGRenderer } from 'echarts/renderers';
 import type { AlternativeId, SimulationParameters } from '../../../lib/types/parameters';
 import type { SimulationResults } from '../../../lib/types/scenario';
 import { calculateAnnuityDiscountFactor } from '../../../lib/calc/tco';
-import { getChartTheme } from '../../../lib/theme/chartTheme';
+import {
+  BASE_CHART_GRID,
+  BASE_CHART_LEGEND,
+  getChartTheme,
+  getNarrowChartMedia,
+} from '../../../lib/theme/chartTheme';
 import { FUEL_THEME } from '../../../lib/theme/fuels';
 import { useDarkMode } from '../../../lib/theme/useDarkMode';
 import { escapeHtml, formatCurrency, formatNumber } from '../../../lib/utils/format';
@@ -213,28 +218,17 @@ export const PaybackTimelineChart: React.FC<PaybackTimelineChartProps> = ({
         },
       },
       legend: {
+        ...BASE_CHART_LEGEND,
         data: ALTERNATIVES.map((a) => a.name),
-        bottom: 0,
-        textStyle: {
-          fontSize: 11,
-          color: 'currentColor',
-        },
       },
-      grid: {
-        left: '2%',
-        right: '4%',
-        bottom: '12%',
-        top: '6%',
-        containLabel: true,
-      },
+      grid: BASE_CHART_GRID,
       xAxis: {
         type: 'category',
-        name: 'Ano',
         data: yearlyData.years.map(String),
         axisLabel: {
           fontSize: 12,
           color: 'currentColor',
-          formatter: (val: string) => (val === '0' ? '0' : `${val}`),
+          formatter: (val: string) => (val === '0' ? '0' : `${val}a`),
         },
         axisLine: {
           lineStyle: { color: axisBorder },
@@ -267,6 +261,7 @@ export const PaybackTimelineChart: React.FC<PaybackTimelineChartProps> = ({
         },
       },
       series,
+      media: getNarrowChartMedia(11, 12),
     };
 
     chart.setOption(option, true);
@@ -320,7 +315,7 @@ export const PaybackTimelineChart: React.FC<PaybackTimelineChartProps> = ({
     >
       <div
         ref={chartRef}
-        className="h-68 w-full sm:h-76 md:h-84"
+        className="h-76 w-full sm:h-80 md:h-84"
         role="img"
         aria-label="Gráfico de linhas mostrando a evolução cumulativa dos custos e ponto de cruzamento de payback"
       />

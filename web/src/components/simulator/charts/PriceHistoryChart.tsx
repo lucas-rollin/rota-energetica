@@ -11,7 +11,12 @@ import {
 } from 'echarts/components';
 import { SVGRenderer } from 'echarts/renderers';
 import type { PricesHistory, PricePoint } from '../../../lib/types/prices';
-import { getChartTheme } from '../../../lib/theme/chartTheme';
+import {
+  BASE_CHART_GRID,
+  BASE_CHART_LEGEND,
+  getChartTheme,
+  getNarrowChartMedia,
+} from '../../../lib/theme/chartTheme';
 import { FUEL_THEME } from '../../../lib/theme/fuels';
 import { useDarkMode } from '../../../lib/theme/useDarkMode';
 import { escapeHtml, formatNumber } from '../../../lib/utils/format';
@@ -319,17 +324,8 @@ export const PriceHistoryChart: React.FC<PriceHistoryChartProps> = ({
           return html;
         },
       },
-      legend: {
-        bottom: 0,
-        textStyle: { fontSize: 11, color: 'currentColor' },
-      },
-      grid: {
-        left: '2%',
-        right: unitMode === 'nominal' ? '3%' : '2%',
-        bottom: '13%',
-        top: '10%',
-        containLabel: true,
-      },
+      legend: BASE_CHART_LEGEND,
+      grid: BASE_CHART_GRID,
       xAxis: {
         type: 'category',
         data: weeks,
@@ -376,6 +372,7 @@ export const PriceHistoryChart: React.FC<PriceHistoryChartProps> = ({
               },
             ],
       series: seriesList,
+      media: getNarrowChartMedia(10, 11),
     };
 
     chart.setOption(option, true);
@@ -500,7 +497,7 @@ export const PriceHistoryChart: React.FC<PriceHistoryChartProps> = ({
       <div className="relative">
         <div
           ref={chartRef}
-          className="h-68 w-full sm:h-76 md:h-84"
+          className="h-80 w-full sm:h-80 md:h-84"
           role="img"
           aria-label="Gráfico de linhas mostrando séries históricas semanais de Diesel S10, GNV e Petróleo Brent"
         />

@@ -1,3 +1,5 @@
+import type * as echarts from 'echarts/core';
+
 /**
  * Warm Stone & Deep Pine aligned ECharts surface, axis, map, and non-fuel series colors.
  * Keeps charts visually coherent with the light/dark DaisyUI themes without reusing fuel hues.
@@ -71,3 +73,61 @@ export const TCO_BREAKDOWN_COLORS = {
   maintenance: '#5c7c70', // Muted sage-teal
   arla: '#8e5d7a', // Muted mauve
 } as const;
+
+export const BASE_CHART_GRID = {
+  left: '2%',
+  right: '3%',
+  top: 34,
+  bottom: 32,
+  outerBoundsMode: 'same',
+  outerBoundsContain: 'axisLabel',
+} as const;
+
+export const BASE_CHART_LEGEND = {
+  bottom: 0,
+  itemGap: 14,
+  itemWidth: 20,
+  itemHeight: 12,
+  textStyle: {
+    fontSize: 11,
+    color: 'currentColor',
+  },
+} as const;
+
+type ChartMediaList = NonNullable<echarts.EChartsCoreOption['media']>;
+
+/**
+ * ECharts built-in responsive media rules so wrapped legends on mobile widths never
+ * overlap x-axis labels, and desktop sizing is restored when widening back breakpoint.
+ */
+export function getNarrowChartMedia(
+  narrowXAxisFontSize = 10.5,
+  wideXAxisFontSize = 12
+): ChartMediaList {
+  return [
+    {
+      query: { maxWidth: 540 },
+      option: {
+        grid: { left: 6, right: 10, bottom: 45 },
+        legend: {
+          itemGap: 8,
+          itemWidth: 14,
+          itemHeight: 10,
+          textStyle: { fontSize: 10.5 },
+        },
+        xAxis: {
+          axisLabel: { fontSize: narrowXAxisFontSize },
+        },
+      },
+    },
+    {
+      option: {
+        grid: BASE_CHART_GRID,
+        legend: BASE_CHART_LEGEND,
+        xAxis: {
+          axisLabel: { fontSize: wideXAxisFontSize },
+        },
+      },
+    },
+  ];
+}

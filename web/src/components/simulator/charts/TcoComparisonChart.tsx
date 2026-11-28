@@ -11,7 +11,13 @@ import {
 import { SVGRenderer } from 'echarts/renderers';
 import type { AlternativeId } from '../../../lib/types/parameters';
 import type { SimulationResults } from '../../../lib/types/scenario';
-import { getChartTheme, TCO_BREAKDOWN_COLORS } from '../../../lib/theme/chartTheme';
+import {
+  BASE_CHART_GRID,
+  BASE_CHART_LEGEND,
+  getChartTheme,
+  getNarrowChartMedia,
+  TCO_BREAKDOWN_COLORS,
+} from '../../../lib/theme/chartTheme';
 import { useDarkMode } from '../../../lib/theme/useDarkMode';
 import { escapeHtml, formatCurrency, formatNumber } from '../../../lib/utils/format';
 import { SourceRef } from '../../common/SourceRef';
@@ -229,29 +235,20 @@ export const TcoComparisonChart: React.FC<TcoComparisonChartProps> = ({
         },
       },
       legend: {
+        ...BASE_CHART_LEGEND,
         data: [
           'Investimento Líquido',
           'Combustível / Energia',
           'Manutenção & Pneus',
           'ARLA 32',
         ],
-        bottom: 0,
-        textStyle: {
-          fontSize: 11,
-          color: 'currentColor',
-        },
       },
-      grid: {
-        left: '2%',
-        right: '4%',
-        bottom: '12%',
-        top: '6%',
-        containLabel: true,
-      },
+      grid: BASE_CHART_GRID,
       xAxis: {
         type: 'category',
         data: categories,
         axisLabel: {
+          interval: 0,
           fontSize: 12,
           fontWeight: 600,
           color: 'currentColor',
@@ -324,6 +321,7 @@ export const TcoComparisonChart: React.FC<TcoComparisonChartProps> = ({
           emphasis: { focus: 'series' },
         },
       ],
+      media: getNarrowChartMedia(10.5, 12),
     };
 
     chart.setOption(option, true);
@@ -403,7 +401,7 @@ export const TcoComparisonChart: React.FC<TcoComparisonChartProps> = ({
     >
       <div
         ref={chartRef}
-        className="h-68 w-full sm:h-76 md:h-84"
+        className="h-80 w-full sm:h-80 md:h-84"
         role="img"
         aria-label="Gráfico de barras empilhadas comparando a composição do TCO entre Diesel B15, GNV, Biometano e Elétrico"
       />
