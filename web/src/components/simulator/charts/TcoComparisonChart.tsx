@@ -11,6 +11,7 @@ import {
 import { SVGRenderer } from 'echarts/renderers';
 import type { AlternativeId } from '../../../lib/types/parameters';
 import type { SimulationResults } from '../../../lib/types/scenario';
+import { getChartTheme, TCO_BREAKDOWN_COLORS } from '../../../lib/theme/chartTheme';
 import { useDarkMode } from '../../../lib/theme/useDarkMode';
 import { escapeHtml, formatCurrency, formatNumber } from '../../../lib/utils/format';
 import { SourceRef } from '../../common/SourceRef';
@@ -42,13 +43,7 @@ const ALTERNATIVES: { id: AlternativeId; name: string }[] = [
   { id: 'eletrico', name: 'Elétrico' },
 ];
 
-// Okabe-Ito Colorblind-Safe Palette
-const COLORS = {
-  netInvestment: '#56B4E9', // Sky Blue
-  energy: '#E69F00', // Orange
-  maintenance: '#009E73', // Bluish Green
-  arla: '#CC79A7', // Reddish Purple
-};
+const COLORS = TCO_BREAKDOWN_COLORS;
 
 export const TcoComparisonChart: React.FC<TcoComparisonChartProps> = ({
   results,
@@ -174,12 +169,8 @@ export const TcoComparisonChart: React.FC<TcoComparisonChartProps> = ({
         : res.tcoBreakdown.pvArla / (res.levelizedKm || 1);
     });
 
-    const tooltipBg = isDark ? '#0f172a' : '#ffffff';
-    const tooltipBorder = isDark ? '#334155' : '#e2e8f0';
-    const tooltipText = isDark ? '#f8fafc' : '#0f172a';
-    const tooltipMuted = isDark ? '#94a3b8' : '#64748b';
-    const axisBorder = isDark ? '#475569' : '#cbd5e1';
-    const gridLine = isDark ? '#334155' : '#e2e8f0';
+    const { tooltipBg, tooltipBorder, tooltipText, tooltipMuted, axisBorder, gridLine } =
+      getChartTheme(isDark);
 
     const option: echarts.EChartsCoreOption = {
       aria: {
@@ -231,7 +222,7 @@ export const TcoComparisonChart: React.FC<TcoComparisonChartProps> = ({
             : `R$ ${formatNumber(sum, 2)}/km`;
           html += `<div style="border-top: 1px solid ${tooltipBorder}; margin-top: 6px; padding-top: 4px; display: flex; justify-content: space-between; font-weight: bold;">
             <span>TCO Total</span>
-            <span style="font-family: monospace; color: #06b6d4;">${sumStr}</span>
+            <span style="font-family: monospace; color: ${tooltipText};">${sumStr}</span>
           </div>`;
           html += `</div>`;
           return html;
@@ -404,8 +395,7 @@ export const TcoComparisonChart: React.FC<TcoComparisonChartProps> = ({
   return (
     <ChartContainer
       id="tco-comparison"
-      title="Decomposição do Custo Total de Propriedade (TCO)"
-      subtitle={`Comparativo da composição de capital líquido e custos operacionais descontados em ${horizonYears} anos.`}
+      title={`Composição do TCO (${horizonYears} anos)`}
       summaryText={`${summaryText} Destaque: ${cheapestAlt}.`}
       sourceAttribution={sourceAttribution}
       tableData={tableData}
@@ -413,7 +403,7 @@ export const TcoComparisonChart: React.FC<TcoComparisonChartProps> = ({
     >
       <div
         ref={chartRef}
-        className="h-72 w-full sm:h-80 md:h-96"
+        className="h-68 w-full sm:h-76 md:h-84"
         role="img"
         aria-label="Gráfico de barras empilhadas comparando a composição do TCO entre Diesel B15, GNV, Biometano e Elétrico"
       />

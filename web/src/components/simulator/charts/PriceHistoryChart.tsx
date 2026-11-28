@@ -11,6 +11,7 @@ import {
 } from 'echarts/components';
 import { SVGRenderer } from 'echarts/renderers';
 import type { PricesHistory, PricePoint } from '../../../lib/types/prices';
+import { getChartTheme } from '../../../lib/theme/chartTheme';
 import { FUEL_THEME } from '../../../lib/theme/fuels';
 import { useDarkMode } from '../../../lib/theme/useDarkMode';
 import { escapeHtml, formatNumber } from '../../../lib/utils/format';
@@ -218,11 +219,8 @@ export const PriceHistoryChart: React.FC<PriceHistoryChartProps> = ({
           ]
         : [];
 
-    const tooltipBg = isDark ? '#0f172a' : '#ffffff';
-    const tooltipBorder = isDark ? '#334155' : '#e2e8f0';
-    const tooltipText = isDark ? '#f8fafc' : '#0f172a';
-    const axisBorder = isDark ? '#475569' : '#cbd5e1';
-    const gridLine = isDark ? '#334155' : '#e2e8f0';
+    const chartTheme = getChartTheme(isDark);
+    const { tooltipBg, tooltipBorder, tooltipText, axisBorder, gridLine } = chartTheme;
 
     const seriesList: LineSeriesOption[] = [
       {
@@ -242,13 +240,13 @@ export const PriceHistoryChart: React.FC<PriceHistoryChartProps> = ({
             ? {
                 silent: true,
                 itemStyle: {
-                  color: isDark ? 'rgba(16, 185, 129, 0.12)' : 'rgba(16, 185, 129, 0.10)',
+                  color: chartTheme.baselineAreaFill,
                 },
                 label: {
                   show: true,
                   position: 'insideTop',
                   fontSize: 10,
-                  color: isDark ? '#6ee7b7' : '#047857',
+                  color: chartTheme.baselineAreaText,
                 },
                 data: markAreaData,
               }
@@ -277,8 +275,8 @@ export const PriceHistoryChart: React.FC<PriceHistoryChartProps> = ({
         data: brentData,
         showSymbol: false,
         smooth: false,
-        lineStyle: { width: 1.8, type: 'dashed', color: '#6366f1' },
-        itemStyle: { color: '#6366f1' },
+        lineStyle: { width: 1.8, type: 'dashed', color: chartTheme.brentLine },
+        itemStyle: { color: chartTheme.brentLine },
       });
     }
 
@@ -315,7 +313,7 @@ export const PriceHistoryChart: React.FC<PriceHistoryChartProps> = ({
             </div>`;
           }
           if (hasFallback) {
-            html += `<div style="margin-top:4px; font-size:11px; color:${isDark ? '#fbbf24' : '#b45309'};">⚠ Semana com fallback nacional (BR)</div>`;
+            html += `<div style="margin-top:4px; font-size:11px; color:${chartTheme.warningText};">⚠ Semana com fallback nacional (BR)</div>`;
           }
           html += `</div>`;
           return html;
@@ -471,17 +469,17 @@ export const PriceHistoryChart: React.FC<PriceHistoryChartProps> = ({
           onClick={() => setUnitMode('nominal')}
           aria-pressed={unitMode === 'nominal'}
           className={`join-item btn btn-xs ${
-            unitMode === 'nominal' ? 'btn-neutral' : 'btn-ghost text-base-content/70'
+            unitMode === 'nominal' ? 'btn-primary' : 'btn-ghost text-base-content/70'
           }`}
         >
-          Unidade Original
+          Original
         </button>
         <button
           type="button"
           onClick={() => setUnitMode('energy')}
           aria-pressed={unitMode === 'energy'}
           className={`join-item btn btn-xs ${
-            unitMode === 'energy' ? 'btn-neutral' : 'btn-ghost text-base-content/70'
+            unitMode === 'energy' ? 'btn-primary' : 'btn-ghost text-base-content/70'
           }`}
         >
           R$/MJ
@@ -493,8 +491,7 @@ export const PriceHistoryChart: React.FC<PriceHistoryChartProps> = ({
   return (
     <ChartContainer
       id="price-history"
-      title="Histórico Semanal de Preços (Diesel S10, GNV e Brent)"
-      subtitle="Séries históricas agregadas (ANP & EIA) com destaque para a janela-base de 12 semanas."
+      title={`Histórico Semanal (${referenceUf} · ANP & EIA)`}
       summaryText={summaryText}
       sourceAttribution={sourceAttribution}
       tableData={tableData}
@@ -503,7 +500,7 @@ export const PriceHistoryChart: React.FC<PriceHistoryChartProps> = ({
       <div className="relative">
         <div
           ref={chartRef}
-          className="h-72 w-full sm:h-80 md:h-96"
+          className="h-68 w-full sm:h-76 md:h-84"
           role="img"
           aria-label="Gráfico de linhas mostrando séries históricas semanais de Diesel S10, GNV e Petróleo Brent"
         />

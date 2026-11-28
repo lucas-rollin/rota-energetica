@@ -11,6 +11,7 @@ interface ChartContainerProps {
   id: string;
   title: string;
   subtitle?: string;
+  caption?: string;
   summaryText: string;
   sourceAttribution?: React.ReactNode;
   tableData: ChartTableData;
@@ -22,6 +23,7 @@ export const ChartContainer: React.FC<ChartContainerProps> = ({
   id,
   title,
   subtitle,
+  caption,
   summaryText,
   sourceAttribution,
   tableData,
@@ -43,16 +45,16 @@ export const ChartContainer: React.FC<ChartContainerProps> = ({
 
   return (
     <div
-      className="card bg-base-100 border-base-200 overflow-hidden rounded-2xl border shadow-sm"
+      className="card bg-base-100 border-base-300/70 overflow-hidden rounded-xl border"
       role="region"
       aria-labelledby={`${id}-heading`}
     >
       {/* Header with Title and Controls */}
-      <div className="border-base-200 bg-base-200/30 flex flex-col justify-between gap-3 border-b p-4 sm:flex-row sm:items-center sm:p-5">
+      <div className="border-base-300/60 bg-base-200/35 flex flex-col justify-between gap-2.5 border-b px-4 py-3 sm:flex-row sm:items-center">
         <div>
           <h3
             id={`${id}-heading`}
-            className="text-base-content text-base font-bold sm:text-lg"
+            className="text-base-content text-sm font-bold sm:text-base"
           >
             {title}
           </h3>
@@ -98,10 +100,10 @@ export const ChartContainer: React.FC<ChartContainerProps> = ({
       </div>
 
       {/* Body: Chart and Table both maintained in DOM to preserve ECharts state */}
-      <div className="p-3 sm:p-5">
+      <div className="p-3.5 sm:p-4">
         <div className={viewMode === 'chart' ? 'block' : 'hidden'}>
           <div className="w-full">{children}</div>
-          <p className="text-base-content/75 mt-3 text-xs italic">{summaryText}</p>
+          {caption && <p className="text-base-content/75 mt-2.5 text-xs">{caption}</p>}
         </div>
 
         <div className={viewMode === 'table' ? 'block' : 'hidden'}>

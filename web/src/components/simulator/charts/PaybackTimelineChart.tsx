@@ -12,6 +12,7 @@ import { SVGRenderer } from 'echarts/renderers';
 import type { AlternativeId, SimulationParameters } from '../../../lib/types/parameters';
 import type { SimulationResults } from '../../../lib/types/scenario';
 import { calculateAnnuityDiscountFactor } from '../../../lib/calc/tco';
+import { getChartTheme } from '../../../lib/theme/chartTheme';
 import { FUEL_THEME } from '../../../lib/theme/fuels';
 import { useDarkMode } from '../../../lib/theme/useDarkMode';
 import { escapeHtml, formatCurrency, formatNumber } from '../../../lib/utils/format';
@@ -171,11 +172,8 @@ export const PaybackTimelineChart: React.FC<PaybackTimelineChartProps> = ({
       symbolSize: 6,
     }));
 
-    const tooltipBg = isDark ? '#0f172a' : '#ffffff';
-    const tooltipBorder = isDark ? '#334155' : '#e2e8f0';
-    const tooltipText = isDark ? '#f8fafc' : '#0f172a';
-    const axisBorder = isDark ? '#475569' : '#cbd5e1';
-    const gridLine = isDark ? '#334155' : '#e2e8f0';
+    const { tooltipBg, tooltipBorder, tooltipText, axisBorder, gridLine } =
+      getChartTheme(isDark);
 
     const option: echarts.EChartsCoreOption = {
       aria: {
@@ -314,15 +312,15 @@ export const PaybackTimelineChart: React.FC<PaybackTimelineChartProps> = ({
   return (
     <ChartContainer
       id="payback-timeline"
-      title="Evolução Temporal dos Custos e Ponto de Equilíbrio (Payback)"
-      subtitle="Custos acumulados (investimento inicial + custos operacionais descontados) do Ano 0 ao fim do horizonte."
+      title="Evolução dos Custos e Payback"
+      caption={paybackText}
       summaryText={paybackText}
       sourceAttribution={sourceAttribution}
       tableData={tableData}
     >
       <div
         ref={chartRef}
-        className="h-72 w-full sm:h-80 md:h-96"
+        className="h-68 w-full sm:h-76 md:h-84"
         role="img"
         aria-label="Gráfico de linhas mostrando a evolução cumulativa dos custos e ponto de cruzamento de payback"
       />
