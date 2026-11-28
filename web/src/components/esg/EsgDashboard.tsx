@@ -77,165 +77,126 @@ export const EsgDashboard: React.FC<EsgDashboardProps> = ({
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-5">
       {/* Header Stat Overview */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="bg-base-100 border-base-200 rounded-xl border p-4 shadow-xs">
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <div className="bg-base-100 border-base-300/70 rounded-xl border p-3.5">
           <div className="text-base-content/70 text-xs font-semibold">
-            Variação de GEE da Frota
+            Variação GEE (WtW)
           </div>
           <div
             className={`mt-1 font-mono text-2xl font-black ${
-              reductionPercent >= 0
-                ? 'text-emerald-700 dark:text-emerald-400'
-                : 'text-amber-700 dark:text-amber-400'
+              reductionPercent >= 0 ? 'text-success' : 'text-warning'
             }`}
           >
             {reductionPercent >= 0
               ? `-${formatNumber(reductionPercent, 1)}%`
               : `+${formatNumber(Math.abs(reductionPercent), 1)}%`}
           </div>
-          <div className="text-base-content/75 mt-1 text-[11px]">
-            vs linha de base Diesel S10 B15
-          </div>
+          <div className="text-base-content/65 mt-0.5 text-[11px]">vs. Diesel B15</div>
         </div>
 
-        <div className="bg-base-100 border-base-200 rounded-xl border p-4 shadow-xs">
-          <div className="text-base-content/75 text-xs font-semibold">
-            CO₂e Evitado por Ano
-          </div>
+        <div className="bg-base-100 border-base-300/70 rounded-xl border p-3.5">
+          <div className="text-base-content/70 text-xs font-semibold">CO₂e Evitado</div>
           <div className="text-base-content mt-1 font-mono text-2xl font-black">
             {formatNumber(tonsAvoided, 0)}{' '}
-            <span className="text-base-content/75 text-sm font-normal">t/ano</span>
+            <span className="text-base-content/65 text-xs font-normal">t/ano</span>
           </div>
-          <div className="text-base-content/75 mt-1 text-[11px]">
-            Emissões líquidas Well-to-Wheel
-          </div>
+          <div className="text-base-content/65 mt-0.5 text-[11px]">Líquido WtW</div>
         </div>
 
-        <div className="bg-base-100 border-base-200 rounded-xl border p-4 shadow-xs">
-          <div className="text-base-content/75 text-xs font-semibold">
-            Emissão Total da Frota (WtW)
+        <div className="bg-base-100 border-base-300/70 rounded-xl border p-3.5">
+          <div className="text-base-content/70 text-xs font-semibold">
+            Emissão da Frota
           </div>
           <div className="text-base-content mt-1 font-mono text-2xl font-black">
             {formatNumber(annualAltTon, 0)}{' '}
-            <span className="text-base-content/75 text-sm font-normal">tCO₂e/ano</span>
+            <span className="text-base-content/65 text-xs font-normal">tCO₂e/ano</span>
           </div>
-          <div className="text-base-content/75 mt-1 text-[11px]">
+          <div className="text-base-content/65 mt-0.5 text-[11px]">
             {formatNumber(esg.altEmissionsGPerKm, 0)} gCO₂eq/km por veículo
           </div>
         </div>
 
-        <div className="bg-base-100 border-base-200 rounded-xl border p-4 shadow-xs">
+        <div className="bg-base-100 border-base-300/70 rounded-xl border p-3.5">
           <div className="flex items-center justify-between gap-2">
-            <span className="text-base-content/75 text-xs font-semibold">
-              Sensibilidade CBIO (Hipotética)
+            <span className="text-base-content/70 text-xs font-semibold">
+              CBIO (Hipotético)
             </span>
             <input
               type="checkbox"
-              className="toggle toggle-xs toggle-success"
+              className="toggle toggle-xs toggle-primary"
               checked={showCbioSensitivity}
               onChange={(e) => setShowCbioSensitivity(e.target.checked)}
               aria-label="Incluir sensibilidade hipotética de CBIOs"
             />
           </div>
-          <div className="mt-1 font-mono text-2xl font-black text-emerald-700 dark:text-emerald-400">
+          <div
+            className={`mt-1 font-mono text-2xl font-black ${
+              showCbioSensitivity && hypotheticalCbioRevenue > 0
+                ? 'text-success'
+                : 'text-base-content/55'
+            }`}
+          >
             {showCbioSensitivity
               ? formatCurrency(hypotheticalCbioRevenue, 0)
               : 'Desativado'}
           </div>
-          <div className="text-base-content/75 mt-1 text-[11px]">
+          <div className="text-base-content/65 mt-0.5 text-[11px]">
             {showCbioSensitivity
               ? targetFuel === 'biometano'
-                ? `Cotação B3 (${formatCurrency(cbioPrice, 0)}/CBIO) — emitido ao produtor, não ao frotista`
-                : 'Não aplicável (apenas biocombustíveis no RenovaBio)'
-              : 'Opcional: CBIOs pertencem ao produtor de biocombustível'}
+                ? `${formatCurrency(cbioPrice, 0)}/CBIO · emitido ao produtor`
+                : 'Apenas biocombustíveis (RenovaBio)'
+              : 'Pertence ao produtor de biocombustível'}
           </div>
         </div>
       </div>
 
       {/* Interactive Fleet Decarbonization Tuner */}
-      <div className="bg-base-100 border-base-200 rounded-xl border p-5 shadow-xs">
-        <div className="border-base-200 mb-5 flex flex-col items-start justify-between gap-4 border-b pb-4 md:flex-row md:items-center">
-          <div>
-            <h2 className="text-base-content text-lg font-bold tracking-tight">
-              Calculadora de Descarbonização e Arbitragem ESG
-            </h2>
-            <p className="text-base-content/70 mt-0.5 text-xs">
-              Simule o impacto ambiental da conversão gradual de cavalos mecânicos diesel
-              para alternativas limpas.
-            </p>
-          </div>
+      <div className="bg-base-100 border-base-300/70 rounded-xl border p-4">
+        <div className="border-base-300/60 mb-4 flex flex-wrap items-center justify-between gap-3 border-b pb-3">
+          <span className="text-base-content text-sm font-bold">
+            Simulação de Frota Convertida
+          </span>
 
-          <div className="flex items-center gap-2">
-            <span className="text-base-content/70 text-xs font-medium">
-              Tecnologia adotada:
-            </span>
-            <div className="join">
-              <button
-                type="button"
-                onClick={() => setTargetFuel('biometano')}
-                className={`join-item btn btn-xs gap-1.5 ${
-                  targetFuel === 'biometano'
-                    ? FUEL_THEME.biometano.activeButtonClass
-                    : 'btn-outline border-base-300'
-                }`}
-              >
-                <span
-                  className={`h-2 w-2 rounded-full ${
-                    targetFuel === 'biometano'
-                      ? 'bg-white'
-                      : FUEL_THEME.biometano.dotClass
+          <div className="join">
+            {(
+              [
+                { id: 'biometano', label: 'Biometano' },
+                { id: 'eletrico', label: 'Elétrico (BEV)' },
+                { id: 'gnv', label: 'GNV' },
+              ] as const
+            ).map((opt) => {
+              const isActive = targetFuel === opt.id;
+              return (
+                <button
+                  key={opt.id}
+                  type="button"
+                  onClick={() => setTargetFuel(opt.id)}
+                  className={`join-item btn btn-xs gap-1.5 ${
+                    isActive
+                      ? FUEL_THEME[opt.id].activeButtonClass
+                      : 'btn-outline border-base-300'
                   }`}
-                  aria-hidden="true"
-                />
-                <span>Biometano (Bio-GNC)</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setTargetFuel('eletrico')}
-                className={`join-item btn btn-xs gap-1.5 ${
-                  targetFuel === 'eletrico'
-                    ? FUEL_THEME.eletrico.activeButtonClass
-                    : 'btn-outline border-base-300'
-                }`}
-              >
-                <span
-                  className={`h-2 w-2 rounded-full ${
-                    targetFuel === 'eletrico' ? 'bg-white' : FUEL_THEME.eletrico.dotClass
-                  }`}
-                  aria-hidden="true"
-                />
-                <span>Elétrico (BEV)</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setTargetFuel('gnv')}
-                className={`join-item btn btn-xs gap-1.5 ${
-                  targetFuel === 'gnv'
-                    ? FUEL_THEME.gnv.activeButtonClass
-                    : 'btn-outline border-base-300'
-                }`}
-              >
-                <span
-                  className={`h-2 w-2 rounded-full ${
-                    targetFuel === 'gnv' ? 'bg-white' : FUEL_THEME.gnv.dotClass
-                  }`}
-                  aria-hidden="true"
-                />
-                <span>Gás Natural (GNV)</span>
-              </button>
-            </div>
+                >
+                  <span
+                    className={`h-2 w-2 rounded-full ${
+                      isActive ? 'bg-white' : FUEL_THEME[opt.id].dotClass
+                    }`}
+                    aria-hidden="true"
+                  />
+                  <span>{opt.label}</span>
+                </button>
+              );
+            })}
           </div>
         </div>
 
-        <div className="grid grid-cols-1 items-center gap-6 md:grid-cols-2">
-          <div className="space-y-4">
+        <div className="grid grid-cols-1 items-center gap-5 md:grid-cols-2">
+          <div className="space-y-3.5">
             <div>
               <div className="mb-1 flex justify-between text-xs">
-                <span className="text-base-content font-semibold">
-                  Tamanho da Frota Convertida:
-                </span>
+                <span className="text-base-content font-semibold">Frota convertida</span>
                 <span className="text-primary font-mono font-bold">
                   {fleetSize} caminhões
                 </span>
@@ -248,19 +209,14 @@ export const EsgDashboard: React.FC<EsgDashboardProps> = ({
                 value={fleetSize}
                 onChange={(e) => setFleetSize(parseInt(e.target.value, 10))}
                 className="range range-xs range-primary w-full"
+                aria-label="Tamanho da frota convertida"
               />
-              <div className="text-base-content/75 mt-1 flex justify-between text-[11px]">
-                <span>1 veículo (piloto)</span>
-                <span>50 un.</span>
-                <span>120 un.</span>
-                <span>250 un. (grande frota)</span>
-              </div>
             </div>
 
             <div>
               <div className="mb-1 flex justify-between text-xs">
                 <span className="text-base-content font-semibold">
-                  Quilometragem Média Mensal:
+                  Rodagem média mensal
                 </span>
                 <span className="text-base-content font-mono font-bold">
                   {formatNumber(monthlyMileage, 0)} km/mês
@@ -273,80 +229,68 @@ export const EsgDashboard: React.FC<EsgDashboardProps> = ({
                 step="500"
                 value={monthlyMileage}
                 onChange={(e) => setMonthlyMileage(parseInt(e.target.value, 10))}
-                className="range range-xs range-secondary w-full"
+                className="range range-xs range-primary w-full"
+                aria-label="Quilometragem média mensal"
               />
-              <div className="text-base-content/75 mt-1 flex justify-between text-[11px]">
-                <span>4.000 km (urbano/regional)</span>
-                <span>10.000 km (médio)</span>
-                <span>18.000 km (safra/longo curso)</span>
-              </div>
             </div>
           </div>
 
-          <div className="bg-base-200/50 border-base-300 space-y-3 rounded-lg border p-4">
-            <h3 className="text-base-content/75 text-xs font-bold tracking-wider uppercase">
-              Balanço Operacional Anual da Frota
-            </h3>
-            <div className="grid grid-cols-2 gap-2 text-xs">
-              <div>
-                <span className="text-base-content/75 block text-[11px]">
-                  Diesel fóssil substituído:
-                </span>
-                <span className="text-base-content font-mono font-bold">
-                  {formatNumber(dieselLitersAvoided, 0)} L/ano
-                </span>
-              </div>
-              <div>
-                <span className="text-base-content/75 block text-[11px]">
-                  Emissões evitadas (WtW):
-                </span>
-                <span className="font-mono font-bold text-emerald-700 dark:text-emerald-400">
-                  {formatNumber(tonsAvoided, 0)} tCO₂e/ano
-                </span>
-              </div>
-              <div>
-                <span className="text-base-content/75 block text-[11px]">
-                  Quilômetros rodados:
-                </span>
-                <span className="text-base-content font-mono font-bold">
-                  {formatNumber((annualDistanceKm * fleetSize) / 1000000, 2)}M km/ano
-                </span>
-              </div>
-              <div>
-                <span className="text-base-content/75 block text-[11px]">
-                  Impacto Escopo 1 (Combustão):
-                </span>
-                <span
-                  className={`font-mono font-bold ${
-                    reductionScope1Percent >= 0
-                      ? 'text-emerald-700 dark:text-emerald-400'
-                      : 'text-amber-700 dark:text-amber-400'
-                  }`}
-                >
-                  {formatSignedReduction(reductionScope1Percent)}{' '}
-                  {reductionScope1Percent >= 0 ? 'direto' : 'WtW vs diesel'}
-                </span>
-              </div>
+          <div className="bg-base-200/50 border-base-300/70 grid grid-cols-2 gap-3 rounded-lg border p-3.5 text-xs">
+            <div>
+              <span className="text-base-content/65 block text-[11px]">
+                Diesel substituído
+              </span>
+              <span className="text-base-content font-mono font-bold">
+                {formatNumber(dieselLitersAvoided, 0)} L/ano
+              </span>
+            </div>
+            <div>
+              <span className="text-base-content/65 block text-[11px]">
+                Emissões evitadas (WtW)
+              </span>
+              <span
+                className={`font-mono font-bold ${
+                  tonsAvoided >= 0 ? 'text-success' : 'text-warning'
+                }`}
+              >
+                {formatNumber(tonsAvoided, 0)} tCO₂e/ano
+              </span>
+            </div>
+            <div>
+              <span className="text-base-content/65 block text-[11px]">
+                Distância total
+              </span>
+              <span className="text-base-content font-mono font-bold">
+                {formatNumber((annualDistanceKm * fleetSize) / 1000000, 2)}M km/ano
+              </span>
+            </div>
+            <div>
+              <span className="text-base-content/65 block text-[11px]">
+                Escopo 1 (direto)
+              </span>
+              <span
+                className={`font-mono font-bold ${
+                  reductionScope1Percent >= 0 ? 'text-success' : 'text-warning'
+                }`}
+              >
+                {formatSignedReduction(reductionScope1Percent)}
+              </span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Lifecycle Waterfall: WtT vs TtW */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <div className="bg-base-100 border-base-200 rounded-xl border p-5 shadow-xs">
-          <h2 className="text-base-content mb-1 text-base font-bold tracking-tight">
-            Cascata Poço-ao-Tanque (WtT) e Tanque-à-Roda (TtW)
-          </h2>
-          <p className="text-base-content/70 mb-4 text-xs">
-            Intensidade de Carbono de Ciclo de Vida Completo (WtW) em gramas de CO₂
-            equivalente por megajoule (gCO₂eq/MJ).
-          </p>
+      {/* Lifecycle Waterfall & GHG Protocol Scopes */}
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+        <div className="bg-base-100 border-base-300/70 rounded-xl border p-4">
+          <h3 className="text-base-content mb-3.5 text-sm font-bold">
+            Intensidade de Carbono WtW (gCO₂eq/MJ)
+          </h3>
 
-          <div className="space-y-4">
+          <div className="space-y-3.5">
             {/* Diesel */}
             <div>
-              <div className="mb-1 flex justify-between text-xs">
+              <div className="mb-1 flex justify-between gap-2 text-xs">
                 <span
                   className={`inline-flex items-center gap-1.5 font-semibold ${FUEL_THEME.diesel.textClass}`}
                 >
@@ -354,29 +298,25 @@ export const EsgDashboard: React.FC<EsgDashboardProps> = ({
                     className={`h-2 w-2 rounded-full ${FUEL_THEME.diesel.dotClass}`}
                     aria-hidden="true"
                   />
-                  1. Diesel Comercial B15 (Linha de Base)
+                  Diesel B15 (Base)
                 </span>
                 <span className="text-base-content font-mono font-bold">
-                  {formatNumber(dieselCi, 2)} gCO₂eq/MJ
+                  {formatNumber(dieselCi, 2)}
                 </span>
               </div>
               <div className="bg-base-200 flex h-5 w-full overflow-hidden rounded-full">
                 <div
-                  className={`${FUEL_THEME.diesel.barClass} flex h-full items-center justify-center px-2 text-[11px] font-semibold text-white`}
+                  className={`${FUEL_THEME.diesel.barClass} ${FUEL_THEME.diesel.barTextClass} flex h-full items-center justify-center px-2 text-[11px] font-semibold`}
                   style={{ width: `${Math.round((dieselCi / maxCi) * 100)}%` }}
                 >
-                  WtW {formatNumber(dieselCi, 1)} gCO₂eq/MJ
+                  {formatNumber(dieselCi, 1)} gCO₂eq/MJ
                 </div>
-              </div>
-              <div className="text-base-content/75 mt-1 text-[11px]">
-                Intensidade média ponderada do Diesel B (85% fóssil + 15% biodiesel) em
-                ciclo de vida completo.
               </div>
             </div>
 
             {/* Biometano */}
             <div>
-              <div className="mb-1 flex justify-between text-xs">
+              <div className="mb-1 flex justify-between gap-2 text-xs">
                 <span
                   className={`inline-flex flex-wrap items-center gap-1.5 font-semibold ${FUEL_THEME.biometano.textClass}`}
                 >
@@ -384,70 +324,57 @@ export const EsgDashboard: React.FC<EsgDashboardProps> = ({
                     className={`h-2 w-2 rounded-full ${FUEL_THEME.biometano.dotClass}`}
                     aria-hidden="true"
                   />
-                  <span>2. Biometano Purificado (Mandato CNPE 4/2026)</span>
+                  <span>Biometano (CNPE 4/2026)</span>
                   <SourceRef id="E01" context="Mandato CNPE 4/2026 — Biometano" />
                 </span>
                 <span className={`font-mono font-bold ${FUEL_THEME.biometano.textClass}`}>
-                  {formatNumber(biometanoCi, 2)} gCO₂eq/MJ (
-                  {formatDeltaVsDiesel(biometanoCi)})
+                  {formatNumber(biometanoCi, 2)} ({formatDeltaVsDiesel(biometanoCi)})
                 </span>
               </div>
               <div className="bg-base-200 flex h-5 w-full overflow-hidden rounded-full">
                 <div
-                  className={`${FUEL_THEME.biometano.barClass} flex h-full items-center justify-center px-2 text-[11px] font-semibold text-white`}
+                  className={`${FUEL_THEME.biometano.barClass} ${FUEL_THEME.biometano.barTextClass} flex h-full items-center justify-center px-2 text-[11px] font-semibold`}
                   style={{
-                    width: `${Math.max(8, Math.round((biometanoCi / maxCi) * 100))}%`,
+                    width: `${Math.max(10, Math.round((biometanoCi / maxCi) * 100))}%`,
                   }}
                 >
                   {formatNumber(biometanoCi, 1)}
                 </div>
               </div>
-              <div className="text-base-content/75 mt-1 text-[11px]">
-                Emissões concentradas no processamento e compressão (WtT); combustão
-                biogênica neutra no Escopo 1.
-              </div>
             </div>
 
             {/* Elétrico */}
             <div>
-              <div className="mb-1 flex justify-between text-xs">
+              <div className="mb-1 flex justify-between gap-2 text-xs">
                 <span
-                  className={`inline-flex items-center gap-1.5 font-semibold ${FUEL_THEME.eletrico.textClass}`}
+                  className={`inline-flex flex-wrap items-center gap-1.5 font-semibold ${FUEL_THEME.eletrico.textClass}`}
                 >
                   <span
                     className={`h-2 w-2 rounded-full ${FUEL_THEME.eletrico.dotClass}`}
                     aria-hidden="true"
                   />
-                  3. Caminhão Elétrico Pesado (Matriz SIN Brasil)
+                  <span>Elétrico (SIN Brasil)</span>
+                  <SourceRef id="E02" context="Fator de emissão do SIN (MCTI/SIRENE)" />
                 </span>
                 <span className={`font-mono font-bold ${FUEL_THEME.eletrico.textClass}`}>
-                  {formatNumber(eletricoCi, 2)} gCO₂eq/MJ (
-                  {formatDeltaVsDiesel(eletricoCi)})
+                  {formatNumber(eletricoCi, 2)} ({formatDeltaVsDiesel(eletricoCi)})
                 </span>
               </div>
               <div className="bg-base-200 flex h-5 w-full overflow-hidden rounded-full">
                 <div
-                  className={`${FUEL_THEME.eletrico.barClass} flex h-full items-center justify-center px-2 text-[11px] font-semibold text-white`}
+                  className={`${FUEL_THEME.eletrico.barClass} ${FUEL_THEME.eletrico.barTextClass} flex h-full items-center justify-center px-2 text-[11px] font-semibold`}
                   style={{
-                    width: `${Math.max(10, Math.round((eletricoCi / maxCi) * 100))}%`,
+                    width: `${Math.max(12, Math.round((eletricoCi / maxCi) * 100))}%`,
                   }}
                 >
                   {formatNumber(eletricoCi, 1)}
                 </div>
               </div>
-              <div className="text-base-content/75 mt-1 flex flex-wrap items-center gap-1 text-[11px]">
-                <span>
-                  Zero emissões de escapamento no ponto de uso; impacto restrito à geração
-                  da rede (MCTI/SIRENE)
-                </span>
-                <SourceRef id="E02" context="Fator de emissão do SIN (MCTI/SIRENE)" />
-                <span>.</span>
-              </div>
             </div>
 
             {/* GNV */}
             <div>
-              <div className="mb-1 flex justify-between text-xs">
+              <div className="mb-1 flex justify-between gap-2 text-xs">
                 <span
                   className={`inline-flex items-center gap-1.5 font-semibold ${FUEL_THEME.gnv.textClass}`}
                 >
@@ -455,99 +382,81 @@ export const EsgDashboard: React.FC<EsgDashboardProps> = ({
                     className={`h-2 w-2 rounded-full ${FUEL_THEME.gnv.dotClass}`}
                     aria-hidden="true"
                   />
-                  4. Gás Natural Veicular Fóssil (GNV)
+                  GNV (Gás Natural Fóssil)
                 </span>
                 <span className={`font-mono font-bold ${FUEL_THEME.gnv.textClass}`}>
-                  {formatNumber(gnvCi, 2)} gCO₂eq/MJ ({formatDeltaVsDiesel(gnvCi)})
+                  {formatNumber(gnvCi, 2)} ({formatDeltaVsDiesel(gnvCi)})
                 </span>
               </div>
               <div className="bg-base-200 flex h-5 w-full overflow-hidden rounded-full">
                 <div
-                  className={`${FUEL_THEME.gnv.barClass} flex h-full items-center justify-center px-2 text-[11px] font-semibold text-slate-950`}
+                  className={`${FUEL_THEME.gnv.barClass} ${FUEL_THEME.gnv.barTextClass} flex h-full items-center justify-center px-2 text-[11px] font-semibold`}
                   style={{ width: `${Math.round((gnvCi / maxCi) * 100)}%` }}
                 >
-                  WtW {formatNumber(gnvCi, 1)} gCO₂eq/MJ
+                  {formatNumber(gnvCi, 1)} gCO₂eq/MJ
                 </div>
-              </div>
-              <div className="text-base-content/75 mt-1 text-[11px]">
-                Combustível de transição fóssil; intensidade WtW superior à do Diesel B
-                por km, com redução de poluentes locais (NOx e MP).
               </div>
             </div>
           </div>
         </div>
 
         {/* GHG Protocol Scope Attribution */}
-        <div className="bg-base-100 border-base-200 flex flex-col justify-between rounded-xl border p-5 shadow-xs">
+        <div className="bg-base-100 border-base-300/70 flex flex-col justify-between rounded-xl border p-4">
           <div>
-            <h2 className="text-base-content mb-1 text-base font-bold tracking-tight">
-              Rastreabilidade por Escopo (GHG Protocol Brasil)
-            </h2>
-            <p className="text-base-content/75 mb-4 text-xs">
-              Atribuição corporativa de inventário de carbono para frotas próprias e
-              transportadores parceiros.
-            </p>
+            <h3 className="text-base-content mb-3.5 text-sm font-bold">
+              Inventário por Escopo (GHG Protocol Brasil)
+            </h3>
 
-            <div className="space-y-3">
-              <div className="bg-base-200/50 border-base-300 rounded-lg border p-3">
+            <div className="space-y-2.5">
+              <div className="bg-base-200/50 border-base-300/70 rounded-lg border p-3">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="text-base-content font-bold">
-                    Escopo 1 — Combustão Móvel Direta
+                  <span className="text-base-content font-semibold">
+                    Escopo 1 · Combustão Direta
                   </span>
-                  <span className="text-primary font-mono font-bold">
+                  <span className="text-base-content font-mono font-bold">
                     {formatNumber(scope1Ton, 0)} tCO₂e/ano
                   </span>
                 </div>
-                <p className="text-base-content/75 mt-1 text-[11px]">
-                  Queima direta de combustível nos cilindros da frota própria. O caminhão
-                  elétrico e o biometano zeram a parcela fóssil direta (redução WtW
-                  calculada de{' '}
-                  {targetFuel === 'biometano'
-                    ? `${formatNumber(reductionPercent, 1)}%`
-                    : targetFuel === 'eletrico'
-                      ? `${formatNumber(reductionPercent, 1)}%`
-                      : formatSignedReduction(reductionPercent)}
-                  ).
+                <p className="text-base-content/65 mt-0.5 text-[11px]">
+                  Emissões fósseis diretas no escapamento (biometano e BEV zeram esta
+                  parcela).
                 </p>
               </div>
 
-              <div className="bg-base-200/50 border-base-300 rounded-lg border p-3">
+              <div className="bg-base-200/50 border-base-300/70 rounded-lg border p-3">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="text-base-content font-bold">
-                    Escopo 2 — Eletricidade e Recarga de Bateria
+                  <span className="text-base-content font-semibold">
+                    Escopo 2 · Eletricidade (SIN)
                   </span>
-                  <span className="font-mono font-bold text-cyan-700 dark:text-cyan-400">
+                  <span className="text-base-content font-mono font-bold">
                     {formatNumber(scope2Ton, 0)} tCO₂e/ano
                   </span>
                 </div>
-                <p className="text-base-content/75 mt-1 text-[11px]">
-                  Consumo de eletricidade nas garagens e eletropostos públicos. Aplicável
-                  exclusivamente aos BEVs, mensurado pelo fator médio anual do SIN (MCTI).
+                <p className="text-base-content/65 mt-0.5 text-[11px]">
+                  Consumo elétrico de recarga (BEV), pelo fator médio do SIN.
                 </p>
               </div>
 
-              <div className="bg-base-200/50 border-base-300 rounded-lg border p-3">
+              <div className="bg-base-200/50 border-base-300/70 rounded-lg border p-3">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="text-base-content font-bold">
-                    Escopo 3 — Cadeia Upstream (WtT)
+                  <span className="text-base-content font-semibold">
+                    Escopo 3 · Cadeia Upstream (WtT)
                   </span>
-                  <span className="font-mono font-bold text-amber-700 dark:text-amber-400">
+                  <span className="text-base-content font-mono font-bold">
                     {formatNumber(scope3Ton, 0)} tCO₂e/ano
                   </span>
                 </div>
-                <p className="text-base-content/75 mt-1 text-[11px]">
-                  Emissões upstream de processamento, compressão e transporte (WtT)
-                  separadas para o biometano. Para o GNV, o fator WtW em parameters.json
-                  agrega WtT + TtW no total acima.
+                <p className="text-base-content/65 mt-0.5 text-[11px]">
+                  Processamento, compressão e entrega do biocombustível.
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="border-base-200 text-base-content/75 mt-4 flex items-center justify-between gap-2 border-t pt-3 text-xs">
-            <span>Metodologia: GHG Protocol Brasil &amp; ISO 14040/44</span>
+          <div className="border-base-300/60 text-base-content/70 mt-3 flex items-center justify-between gap-2 border-t pt-2.5 text-[11px]">
+            <span>GHG Protocol Brasil &amp; ISO 14040/44</span>
             <span className="inline-flex items-center gap-1.5">
-              <span className="badge badge-xs badge-outline">Fator SIN 2024</span>
+              <span className="badge badge-xs badge-outline">SIN 2024</span>
               <SourceRef id="E02" context="Escopo 2 — Fator SIN (MCTI/SIRENE)" />
             </span>
           </div>
@@ -555,26 +464,29 @@ export const EsgDashboard: React.FC<EsgDashboardProps> = ({
       </div>
 
       {/* Local Air Quality Pollutants (CONAMA P8 / Euro VI) */}
-      <div className="bg-base-100 border-base-200 rounded-xl border p-5 shadow-xs">
-        <div className="border-base-200 mb-4 border-b pb-3">
-          <h2 className="text-base-content text-base font-bold tracking-tight">
-            Matriz de Poluentes Locais e Qualidade do Ar (PROCONVE Fase P8 / Euro VI)
-          </h2>
-          <p className="text-base-content/70 mt-0.5 text-xs">
-            Avaliação de impacto na saúde pública e conformidade com os limites máximos
-            legais federais (Resolução CONAMA nº 490/2018).
-          </p>
+      <div className="bg-base-100 border-base-300/70 rounded-xl border p-4">
+        <div className="border-base-300/60 mb-3 flex flex-wrap items-center justify-between gap-2 border-b pb-2.5">
+          <h3 className="text-base-content text-sm font-bold">
+            Poluentes Locais (PROCONVE P8 / Euro VI)
+          </h3>
+          <span className="text-base-content/70 inline-flex items-center gap-1.5 text-[11px]">
+            <span>CONAMA 490/2018</span>
+            <SourceRef
+              id={pollutantsData.source_id}
+              context="Poluentes Locais (PROCONVE P8 / Euro VI)"
+            />
+          </span>
         </div>
 
         <div className="overflow-x-auto">
           <table className="table-xs sm:table-sm table w-full">
             <thead>
-              <tr className="border-base-200 text-base-content/70 border-b text-xs font-semibold uppercase">
+              <tr className="border-base-300/70 text-base-content/70 border-b text-xs font-semibold uppercase">
                 <th>Vetor Energético</th>
                 <th className="text-right">CO₂ Fóssil (g/km)</th>
                 <th className="text-right">NOx (g/kWh)</th>
-                <th className="text-right">MP 2.5 Fuligem (g/kWh)</th>
-                <th className="text-right">Ruído (dB)</th>
+                <th className="text-right">MP 2.5 (g/kWh)</th>
+                <th className="text-right">Ruído</th>
                 <th>Impacto Urbano</th>
               </tr>
             </thead>
@@ -585,7 +497,7 @@ export const EsgDashboard: React.FC<EsgDashboardProps> = ({
                 return (
                   <tr
                     key={key}
-                    className={`border-base-200/60 border-b ${isDiesel ? 'bg-base-200/30' : ''}`}
+                    className={`border-base-300/50 border-b ${isDiesel ? 'bg-base-200/35' : ''}`}
                   >
                     <td className="text-xs font-bold">
                       <span className="inline-flex items-center gap-2">
@@ -597,7 +509,7 @@ export const EsgDashboard: React.FC<EsgDashboardProps> = ({
                         )}
                         <span>{p.label}</span>
                         {isDiesel && (
-                          <span className="badge badge-xs badge-neutral">Base</span>
+                          <span className="badge badge-xs badge-ghost">Base</span>
                         )}
                       </span>
                     </td>
@@ -605,33 +517,23 @@ export const EsgDashboard: React.FC<EsgDashboardProps> = ({
                       {formatNumber(p.fossil_co2_g_km, 1)}
                     </td>
                     <td className="text-right font-mono text-xs">
-                      <span
-                        className={
-                          p.nox_g_kwh === 0
-                            ? 'font-bold text-emerald-700 dark:text-emerald-400'
-                            : ''
-                        }
-                      >
+                      <span className={p.nox_g_kwh === 0 ? 'text-success font-bold' : ''}>
                         {formatNumber(p.nox_g_kwh, 2)}
                       </span>
                       {p.nox_reduction_percent > 0 && (
-                        <span className="block text-[11px] text-emerald-700 dark:text-emerald-400">
+                        <span className="text-success block text-[11px]">
                           -{formatNumber(p.nox_reduction_percent, 0)}%
                         </span>
                       )}
                     </td>
                     <td className="text-right font-mono text-xs">
                       <span
-                        className={
-                          p.pm25_g_kwh === 0
-                            ? 'font-bold text-emerald-700 dark:text-emerald-400'
-                            : ''
-                        }
+                        className={p.pm25_g_kwh === 0 ? 'text-success font-bold' : ''}
                       >
                         {formatNumber(p.pm25_g_kwh, 3)}
                       </span>
                       {p.pm_reduction_percent > 0 && (
-                        <span className="block text-[11px] text-emerald-700 dark:text-emerald-400">
+                        <span className="text-success block text-[11px]">
                           -{formatNumber(p.pm_reduction_percent, 0)}%
                         </span>
                       )}
@@ -639,7 +541,7 @@ export const EsgDashboard: React.FC<EsgDashboardProps> = ({
                     <td className="text-right font-mono text-xs">
                       {formatNumber(p.noise_db, 1)} dB
                     </td>
-                    <td className="text-base-content/85 text-xs">{p.urban_impact}</td>
+                    <td className="text-base-content/80 text-xs">{p.urban_impact}</td>
                   </tr>
                 );
               })}
@@ -647,18 +549,8 @@ export const EsgDashboard: React.FC<EsgDashboardProps> = ({
           </table>
         </div>
 
-        <div className="text-base-content/75 mt-3 flex flex-wrap items-center justify-between gap-2 text-[11px]">
-          <span>
-            Limites legais Conama P8 (ciclo WHTC): NOx ≤ 0,40 g/kWh | Material Particulado
-            ≤ 0,010 g/kWh
-          </span>
-          <span className="inline-flex items-center gap-1.5">
-            <span>Fonte: CONAMA Res. 490/2018</span>
-            <SourceRef
-              id={pollutantsData.source_id}
-              context="Poluentes Locais (PROCONVE P8 / Euro VI)"
-            />
-          </span>
+        <div className="text-base-content/65 mt-2.5 text-[11px]">
+          Limites P8 (WHTC): NOx ≤ 0,40 g/kWh · MP ≤ 0,010 g/kWh
         </div>
       </div>
 

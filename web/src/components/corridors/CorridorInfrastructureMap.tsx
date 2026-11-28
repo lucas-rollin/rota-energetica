@@ -19,6 +19,7 @@ import {
   Zap,
 } from 'lucide-react';
 import type { FreightCorridor, FuelStation } from '../../lib/types/catalogs';
+import { getChartTheme } from '../../lib/theme/chartTheme';
 import { FUEL_THEME } from '../../lib/theme/fuels';
 import { useDarkMode } from '../../lib/theme/useDarkMode';
 import { escapeHtml, formatNumber } from '../../lib/utils/format';
@@ -82,11 +83,8 @@ const COLORS = {
   electric: FUEL_THEME.eletrico.hex,
   electricUnifiedFill: FUEL_THEME.eletrico.fillRgba,
   electricStroke: FUEL_THEME.eletrico.strokeRgba,
-  corridorCovered: '#059669',
-  corridorCoveredElectric: '#0891b2',
-  corridorCoveredMixed: '#2563eb',
-  corridorUncovered: '#e11d48',
-  corridorOther: 'rgba(100, 116, 139, 0.30)',
+  corridorCovered: FUEL_THEME.biometano.hex,
+  corridorCoveredElectric: FUEL_THEME.eletrico.hex,
 };
 
 function ringCoordsToSvgPath(
@@ -343,12 +341,14 @@ export const CorridorInfrastructureMap: React.FC<CorridorInfrastructureMapProps>
         coords: c.route_waypoints as [number, number][],
       }));
 
+    const chartTheme = getChartTheme(isDark);
+
     const coveredRouteColor =
       showBiomethaneCng && !showElectricHpc
         ? COLORS.corridorCovered
         : !showBiomethaneCng && showElectricHpc
           ? COLORS.corridorCoveredElectric
-          : COLORS.corridorCoveredMixed;
+          : chartTheme.corridorMixed;
 
     const coveredSegments = corridorSegments
       .filter((seg) => seg.covered)
@@ -384,9 +384,9 @@ export const CorridorInfrastructureMap: React.FC<CorridorInfrastructureMapProps>
           }))
       : [];
 
-    const areaColor = isDark ? '#1e293b' : '#f1f5f9';
-    const borderColor = isDark ? '#475569' : '#cbd5e1';
-    const emphasisAreaColor = isDark ? '#334155' : '#e2e8f0';
+    const areaColor = chartTheme.mapArea;
+    const borderColor = chartTheme.mapBorder;
+    const emphasisAreaColor = chartTheme.mapEmphasis;
 
     // Build custom coverage layer according to coverageVisualMode
     const unifiedLayers: {
@@ -444,10 +444,10 @@ export const CorridorInfrastructureMap: React.FC<CorridorInfrastructureMapProps>
       tooltip: {
         trigger: 'item',
         confine: true,
-        backgroundColor: isDark ? '#0f172a' : '#ffffff',
-        borderColor: isDark ? '#334155' : '#e2e8f0',
+        backgroundColor: chartTheme.tooltipBg,
+        borderColor: chartTheme.tooltipBorder,
         textStyle: {
-          color: isDark ? '#f8fafc' : '#0f172a',
+          color: chartTheme.tooltipText,
           fontSize: 12,
         },
         formatter: (params: unknown) => {
@@ -497,7 +497,7 @@ export const CorridorInfrastructureMap: React.FC<CorridorInfrastructureMapProps>
           zlevel: 1,
           data: otherCorridorLines,
           lineStyle: {
-            color: COLORS.corridorOther,
+            color: chartTheme.corridorOther,
             width: 1.5,
             type: 'dashed',
           },
@@ -580,7 +580,7 @@ export const CorridorInfrastructureMap: React.FC<CorridorInfrastructureMapProps>
           zlevel: 2,
           data: uncoveredSegments,
           lineStyle: {
-            color: COLORS.corridorUncovered,
+            color: chartTheme.corridorUncovered,
             width: 4.5,
             opacity: 0.95,
             type: 'dashed',
@@ -693,31 +693,24 @@ export const CorridorInfrastructureMap: React.FC<CorridorInfrastructureMapProps>
   return (
     <section
       aria-labelledby="infra-map-heading"
-      className="bg-base-100 border-base-200 space-y-5 rounded-xl border p-5 shadow-xs"
+      className="bg-base-100 border-base-300/70 space-y-4 rounded-xl border p-4"
     >
       {/* Header + Local Corridor Selector + View Mode Toggle */}
-      <div className="border-base-200 flex flex-col justify-between gap-4 border-b pb-4 lg:flex-row lg:items-center">
-        <div>
-          <h2
-            id="infra-map-heading"
-            className="text-base-content text-lg font-bold tracking-tight"
-          >
-            Mapa de Infraestrutura de Abastecimento &amp; Cobertura por Autonomia
-          </h2>
-          <p className="text-base-content/70 mt-0.5 text-xs">
-            Explore os corredores rodoviários, filtre a rede energética desejada e ajuste
-            a autonomia do caminhão para identificar trechos cobertos e desertos
-            operacionais.
-          </p>
-        </div>
+      <div className="border-base-300/60 flex flex-col justify-between gap-3 border-b pb-3 lg:flex-row lg:items-center">
+        <h3
+          id="infra-map-heading"
+          className="text-base-content text-sm font-bold sm:text-base"
+        >
+          Mapa de Infraestrutura &amp; Cobertura por Autonomia
+        </h3>
 
-        <div className="flex shrink-0 flex-col items-stretch gap-2.5 sm:flex-row sm:items-center">
+        <div className="flex shrink-0 flex-col items-stretch gap-2 sm:flex-row sm:items-center">
           <div className="flex items-center gap-2">
             <label
               htmlFor="map-corridor-select"
               className="text-base-content/70 text-xs font-semibold whitespace-nowrap"
             >
-              Eixo no Mapa:
+              Eixo
             </label>
             <select
               id="map-corridor-select"
@@ -765,51 +758,55 @@ export const CorridorInfrastructureMap: React.FC<CorridorInfrastructureMapProps>
       </div>
 
       {/* Controls Bar */}
-      <div className="bg-base-200/40 border-base-200 grid grid-cols-1 gap-4 rounded-xl border p-4 lg:grid-cols-12">
+      <div className="bg-base-200/45 border-base-300/60 grid grid-cols-1 gap-3.5 rounded-xl border p-3.5 lg:grid-cols-12">
         {/* Network & Layer Toggles */}
-        <div className="space-y-2.5 lg:col-span-5">
-          <div className="text-base-content/75 text-[11px] font-bold tracking-wider uppercase">
-            Camadas de Infraestrutura (Mapa)
+        <div className="space-y-2 lg:col-span-5">
+          <div className="text-base-content/65 text-[11px] font-bold tracking-wider uppercase">
+            Redes no Mapa
           </div>
           <div className="flex flex-wrap gap-2">
-            <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1.5 text-xs font-medium">
+            <label
+              className={`inline-flex cursor-pointer items-center gap-2 rounded-lg border px-2.5 py-1.5 text-xs font-medium ${FUEL_THEME.biometano.chipClass}`}
+            >
               <input
                 type="checkbox"
-                className="checkbox checkbox-xs checkbox-success"
+                className="checkbox checkbox-xs checkbox-primary"
                 checked={showBiomethaneCng}
                 onChange={(e) => setShowBiomethaneCng(e.target.checked)}
               />
               <Fuel
-                className="h-3.5 w-3.5 text-emerald-700 dark:text-emerald-400"
+                className={`h-3.5 w-3.5 ${FUEL_THEME.biometano.iconClass}`}
                 aria-hidden="true"
               />
               <span>GNV / Biometano</span>
             </label>
 
-            <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-cyan-500/30 bg-cyan-500/10 px-2.5 py-1.5 text-xs font-medium">
+            <label
+              className={`inline-flex cursor-pointer items-center gap-2 rounded-lg border px-2.5 py-1.5 text-xs font-medium ${FUEL_THEME.eletrico.chipClass}`}
+            >
               <input
                 type="checkbox"
-                className="checkbox checkbox-xs checkbox-info"
+                className="checkbox checkbox-xs checkbox-primary"
                 checked={showElectricHpc}
                 onChange={(e) => setShowElectricHpc(e.target.checked)}
               />
               <Zap
-                className="h-3.5 w-3.5 text-cyan-700 dark:text-cyan-400"
+                className={`h-3.5 w-3.5 ${FUEL_THEME.eletrico.iconClass}`}
                 aria-hidden="true"
               />
               <span>Eletropostos HPC (&gt;150 kW)</span>
             </label>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2 pt-1">
-            <label className="text-base-content/85 inline-flex cursor-pointer items-center gap-1.5 text-xs">
+          <div className="flex flex-wrap items-center gap-2 pt-0.5">
+            <label className="text-base-content/80 inline-flex cursor-pointer items-center gap-1.5 text-xs">
               <input
                 type="checkbox"
-                className="checkbox checkbox-xs"
+                className="checkbox checkbox-xs checkbox-primary"
                 checked={onlySelectedCorridorStations}
                 onChange={(e) => setOnlySelectedCorridorStations(e.target.checked)}
               />
-              <span>Exibir apenas pontos do eixo selecionado</span>
+              <span>Apenas pontos do eixo selecionado</span>
             </label>
           </div>
         </div>
@@ -819,9 +816,9 @@ export const CorridorInfrastructureMap: React.FC<CorridorInfrastructureMapProps>
           <div className="flex items-center justify-between text-xs">
             <label
               htmlFor="autonomy-slider"
-              className="text-base-content/75 text-[11px] font-bold tracking-wider uppercase"
+              className="text-base-content/65 text-[11px] font-bold tracking-wider uppercase"
             >
-              Autonomia do Caminhão
+              Autonomia
             </label>
             <span className="text-primary font-mono font-bold">
               {formatNumber(autonomyKm, 0)} km
@@ -851,8 +848,7 @@ export const CorridorInfrastructureMap: React.FC<CorridorInfrastructureMapProps>
                       : 'btn-outline border-base-300'
                   }`}
                 >
-                  {preset.label} ({formatNumber(preset.km, 0)} km
-                  {preset.badge === 'Ilustrativa' ? ' · Ilustrativa' : ''})
+                  {preset.label} ({formatNumber(preset.km, 0)} km)
                 </button>
                 {preset.sourceId && (
                   <SourceRef
@@ -867,8 +863,8 @@ export const CorridorInfrastructureMap: React.FC<CorridorInfrastructureMapProps>
 
         {/* Radius Mode + Visual Style + Map Framing */}
         <div className="space-y-2 lg:col-span-3">
-          <div className="text-base-content/75 text-[11px] font-bold tracking-wider uppercase">
-            Cálculo &amp; Estilo da Cobertura
+          <div className="text-base-content/65 text-[11px] font-bold tracking-wider uppercase">
+            Cobertura &amp; Enquadramento
           </div>
 
           <div
@@ -881,7 +877,7 @@ export const CorridorInfrastructureMap: React.FC<CorridorInfrastructureMapProps>
               onClick={() => setRadiusMode('half')}
               aria-pressed={radiusMode === 'half'}
               className={`join-item btn btn-xs flex-1 ${
-                radiusMode === 'half' ? 'btn-neutral' : 'btn-outline border-base-300'
+                radiusMode === 'half' ? 'btn-primary' : 'btn-outline border-base-300'
               }`}
               title="Raio = Autonomia / 2 (margem segura / ida e volta)"
             >
@@ -892,7 +888,7 @@ export const CorridorInfrastructureMap: React.FC<CorridorInfrastructureMapProps>
               onClick={() => setRadiusMode('full')}
               aria-pressed={radiusMode === 'full'}
               className={`join-item btn btn-xs flex-1 ${
-                radiusMode === 'full' ? 'btn-neutral' : 'btn-outline border-base-300'
+                radiusMode === 'full' ? 'btn-primary' : 'btn-outline border-base-300'
               }`}
               title="Raio = 1× Autonomia (salto contínuo entre postos)"
             >
@@ -957,8 +953,8 @@ export const CorridorInfrastructureMap: React.FC<CorridorInfrastructureMapProps>
                   }}
                   className={`btn btn-xs flex-1 gap-1 ${
                     viewportScope === 'corridor'
-                      ? 'btn-secondary btn-outline'
-                      : 'btn-ghost'
+                      ? 'btn-primary btn-outline'
+                      : 'btn-ghost text-base-content/70'
                   }`}
                 >
                   <Compass className="h-3 w-3" aria-hidden="true" />
@@ -968,11 +964,13 @@ export const CorridorInfrastructureMap: React.FC<CorridorInfrastructureMapProps>
                   type="button"
                   onClick={() => setViewportScope('brazil')}
                   className={`btn btn-xs flex-1 gap-1 ${
-                    viewportScope === 'brazil' ? 'btn-secondary btn-outline' : 'btn-ghost'
+                    viewportScope === 'brazil'
+                      ? 'btn-primary btn-outline'
+                      : 'btn-ghost text-base-content/70'
                   }`}
                 >
                   <Maximize2 className="h-3 w-3" aria-hidden="true" />
-                  <span>Brasil Completo</span>
+                  <span>Brasil</span>
                 </button>
               </div>
             </>
@@ -981,41 +979,41 @@ export const CorridorInfrastructureMap: React.FC<CorridorInfrastructureMapProps>
       </div>
 
       {/* Live Coverage Diagnostics Strip */}
-      <div className="grid grid-cols-1 gap-3 text-xs sm:grid-cols-3">
-        <div className="bg-base-200/40 border-base-200 flex items-center justify-between rounded-lg border p-3">
+      <div className="grid grid-cols-1 gap-2.5 text-xs sm:grid-cols-3">
+        <div className="bg-base-200/45 border-base-300/60 flex items-center justify-between rounded-lg border p-3">
           <div>
-            <span className="text-base-content/75 block text-[11px]">
-              Pontos na Rota (≤{DEFAULT_CORRIDOR_DETOUR_KM} km do eixo)
+            <span className="text-base-content/65 block text-[11px]">
+              Hubs na Rota (≤{DEFAULT_CORRIDOR_DETOUR_KM} km)
             </span>
-            <span className="text-base-content font-mono text-base font-bold">
-              {coverageStats.onRouteStationsCount} hubs elegíveis
-            </span>
-            <span className="text-base-content/75 block text-[11px]">
-              {corridorStationsCount} associados ao corredor
+            <span className="text-base-content font-mono text-sm font-bold">
+              {coverageStats.onRouteStationsCount} elegíveis{' '}
+              <span className="text-base-content/60 font-sans text-[11px] font-normal">
+                ({corridorStationsCount} no eixo)
+              </span>
             </span>
           </div>
-          <span className="text-base-content/75 font-mono text-[11px]">
-            Raio: {formatNumber(effectiveRadiusKm, 0)} km
+          <span className="text-base-content/70 font-mono text-[11px]">
+            R: {formatNumber(effectiveRadiusKm, 0)} km
           </span>
         </div>
 
-        <div className="bg-base-200/40 border-base-200 flex items-center justify-between rounded-lg border p-3">
+        <div className="bg-base-200/45 border-base-300/60 flex items-center justify-between rounded-lg border p-3">
           <div>
-            <span className="text-base-content/75 block text-[11px]">
-              Cobertura Geográfica na Rota
+            <span className="text-base-content/65 block text-[11px]">
+              Cobertura no Traçado
             </span>
-            <span className="text-base-content font-mono text-base font-bold">
-              {formatNumber(coverageStats.coveredPercent, 0)}% do traçado
+            <span className="text-base-content font-mono text-sm font-bold">
+              {formatNumber(coverageStats.coveredPercent, 0)}%
             </span>
           </div>
           <div className="bg-base-300 h-2 w-20 overflow-hidden rounded-full">
             <div
               className={`h-full ${
                 coverageStats.coveredPercent >= 90
-                  ? 'bg-emerald-500'
+                  ? 'bg-success'
                   : coverageStats.coveredPercent >= 60
-                    ? 'bg-amber-500'
-                    : 'bg-rose-500'
+                    ? 'bg-warning'
+                    : 'bg-error'
               }`}
               style={{ width: `${Math.min(100, coverageStats.coveredPercent)}%` }}
             />
@@ -1025,8 +1023,8 @@ export const CorridorInfrastructureMap: React.FC<CorridorInfrastructureMapProps>
         <div
           className={`flex items-center gap-2.5 rounded-lg border p-3 ${
             coverageStats.hasOperationalDesert
-              ? 'border-rose-500/30 bg-rose-500/10 text-rose-700 dark:text-rose-300'
-              : 'border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300'
+              ? 'border-error/35 bg-error/10 text-error'
+              : 'border-success/35 bg-success/10 text-success'
           }`}
         >
           {coverageStats.hasOperationalDesert ? (
@@ -1037,13 +1035,13 @@ export const CorridorInfrastructureMap: React.FC<CorridorInfrastructureMapProps>
           <div>
             <span className="block text-[11px] font-bold tracking-wider uppercase">
               {coverageStats.hasOperationalDesert
-                ? `Deserto Operacional (≥${OPERATIONAL_DESERT_MIN_GAP_KM} km sem cobertura)`
-                : 'Cobertura Contínua no Eixo'}
+                ? `Deserto (≥${OPERATIONAL_DESERT_MIN_GAP_KM} km)`
+                : 'Cobertura Contínua'}
             </span>
             <span className="font-mono text-xs font-semibold">
               {coverageStats.hasOperationalDesert
-                ? `Vão máximo descoberto: ~${formatNumber(coverageStats.maxUncoveredSpanKm, 0)} km`
-                : 'Sem trechos descobertos para este raio'}
+                ? `Vão máx.: ~${formatNumber(coverageStats.maxUncoveredSpanKm, 0)} km`
+                : 'Sem vãos descobertos'}
             </span>
           </div>
         </div>
@@ -1055,90 +1053,92 @@ export const CorridorInfrastructureMap: React.FC<CorridorInfrastructureMapProps>
       </div>
 
       {/* Map Container (always mounted, toggled via hidden/block to keep ECharts DOM isolated) */}
-      <div key="map-panel" className={viewMode === 'map' ? 'block space-y-3' : 'hidden'}>
-        <div className="border-base-200 bg-base-200/20 relative overflow-hidden rounded-xl border">
+      <div key="map-panel" className={viewMode === 'map' ? 'block' : 'hidden'}>
+        <div className="border-base-300/70 bg-base-200/20 relative overflow-hidden rounded-xl border">
           <div className="relative">
             <div
               ref={chartContainerRef}
-              className="h-115 w-full sm:h-135"
+              className="h-108 w-full sm:h-128"
               role="img"
               aria-label={summaryText}
             />
             {!brazilGeoJson && (
-              <div className="text-base-content/75 pointer-events-none absolute inset-0 flex items-center justify-center text-xs font-medium">
+              <div className="text-base-content/70 pointer-events-none absolute inset-0 flex items-center justify-center text-xs font-medium">
                 Carregando malha territorial...
               </div>
             )}
           </div>
 
-          {/* Floating Legend */}
-          <div className="border-base-200 bg-base-100/95 text-base-content/85 flex flex-wrap items-center gap-4 border-t px-4 py-2.5 text-[11px]">
+          {/* Legend */}
+          <div className="border-base-300/60 bg-base-100/95 text-base-content/80 flex flex-wrap items-center gap-4 border-t px-3.5 py-2 text-[11px]">
             <span className="inline-flex items-center gap-1.5">
-              <span className="inline-block h-1 w-3.5 rounded-full bg-emerald-600" />
+              <span className="bg-primary inline-block h-1 w-3.5 rounded-full" />
               <span>Trecho Coberto</span>
             </span>
             <span className="inline-flex items-center gap-1.5">
-              <span className="inline-block h-1 w-3.5 border-b-2 border-dashed border-rose-600" />
+              <span className="border-error inline-block h-1 w-3.5 border-b-2 border-dashed" />
               <span>Deserto Operacional</span>
             </span>
             <span className="inline-flex items-center gap-1.5">
-              <span className="inline-block h-2.5 w-2.5 rounded-full bg-emerald-500" />
+              <span
+                className={`inline-block h-2.5 w-2.5 rounded-full ${FUEL_THEME.biometano.dotClass}`}
+              />
               <span>GNV / Biometano</span>
             </span>
             <span className="inline-flex items-center gap-1.5">
-              <span className="inline-block h-2.5 w-2.5 rounded-full bg-cyan-500" />
-              <span>Eletroposto HPC (&gt;150 kW)</span>
+              <span
+                className={`inline-block h-2.5 w-2.5 rounded-full ${FUEL_THEME.eletrico.dotClass}`}
+              />
+              <span>Eletroposto HPC</span>
             </span>
-            <span className="text-base-content/75 ml-auto text-[11px]">
-              Passe o mouse sobre um posto para ver o anel de{' '}
-              {formatNumber(effectiveRadiusKm, 0)} km
+            <span className="text-base-content/65 ml-auto text-[11px]">
+              Passe o mouse no posto para ver o raio ({formatNumber(effectiveRadiusKm, 0)}{' '}
+              km)
             </span>
           </div>
         </div>
-
-        <p className="text-base-content/75 text-xs italic">{summaryText}</p>
       </div>
 
       {/* Accessible Table Panel */}
       <div
         key="table-panel"
-        className={viewMode === 'table' ? 'block space-y-4' : 'hidden'}
+        className={viewMode === 'table' ? 'block space-y-3' : 'hidden'}
       >
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex flex-wrap items-center gap-1.5">
-            <span className="text-base-content/75 mr-1 text-xs">Filtrar UF:</span>
+            <span className="text-base-content/70 mr-1 text-xs">UF:</span>
             {availableTableUfs.map((uf) => (
               <button
                 key={uf}
                 type="button"
                 onClick={() => setTableUfFilter(uf)}
                 className={`btn btn-xs ${
-                  tableUfFilter === uf ? 'btn-neutral' : 'btn-ghost'
+                  tableUfFilter === uf ? 'btn-primary' : 'btn-ghost'
                 }`}
               >
                 {uf}
               </button>
             ))}
           </div>
-          <span className="text-base-content/75 text-xs">
-            Exibindo {tableStations.length} pontos rodoviários
+          <span className="text-base-content/70 text-xs">
+            {tableStations.length} pontos
           </span>
         </div>
 
-        <div className="border-base-200 overflow-x-auto rounded-lg border">
+        <div className="border-base-300/70 overflow-x-auto rounded-lg border">
           <table className="table-xs sm:table-sm table-zebra table w-full">
             <caption className="sr-only">
               Lista de pontos rodoviários de abastecimento e recarga rápida
             </caption>
             <thead>
-              <tr className="border-base-200 text-base-content/80 border-b text-xs font-semibold uppercase">
+              <tr className="border-base-300/70 text-base-content/75 border-b text-xs font-semibold uppercase">
                 <th>Ponto / Hub</th>
                 <th>Tecnologia</th>
                 <th>Rodovia</th>
                 <th>Localização</th>
                 <th>Especificação</th>
                 <th>Status</th>
-                <th>Fonte / Selo</th>
+                <th>Fonte</th>
               </tr>
             </thead>
             <tbody>
@@ -1147,18 +1147,24 @@ export const CorridorInfrastructureMap: React.FC<CorridorInfrastructureMapProps>
                   <td className="text-xs font-semibold">
                     {st.name}
                     {st.operator_network && (
-                      <span className="text-base-content/75 block text-[11px] font-normal">
+                      <span className="text-base-content/65 block text-[11px] font-normal">
                         {st.operator_network}
                       </span>
                     )}
                   </td>
                   <td className="text-xs whitespace-nowrap">
                     {st.technology === 'biomethane_cng' ? (
-                      <span className="badge badge-xs badge-success">
+                      <span
+                        className={`inline-block rounded px-1.5 py-0.5 text-[11px] font-semibold ${FUEL_THEME.biometano.badgeClass}`}
+                      >
                         GNV / Biometano
                       </span>
                     ) : (
-                      <span className="badge badge-xs badge-info">HPC &gt;150 kW</span>
+                      <span
+                        className={`inline-block rounded px-1.5 py-0.5 text-[11px] font-semibold ${FUEL_THEME.eletrico.badgeClass}`}
+                      >
+                        HPC &gt;150 kW
+                      </span>
                     )}
                   </td>
                   <td className="font-mono text-xs whitespace-nowrap">
@@ -1168,7 +1174,7 @@ export const CorridorInfrastructureMap: React.FC<CorridorInfrastructureMapProps>
                   <td className="text-xs whitespace-nowrap">
                     {st.city} / <span className="font-semibold">{st.state}</span>
                   </td>
-                  <td className="text-base-content/85 text-xs">{st.capacity_spec}</td>
+                  <td className="text-base-content/80 text-xs">{st.capacity_spec}</td>
                   <td className="text-xs whitespace-nowrap">{st.status}</td>
                   <td className="text-xs whitespace-nowrap">
                     <div className="inline-flex items-center gap-1.5">
@@ -1176,7 +1182,7 @@ export const CorridorInfrastructureMap: React.FC<CorridorInfrastructureMapProps>
                         id={st.source_id}
                         context={`${st.name} (${st.highway})`}
                       />
-                      <span className="text-base-content/75 text-[11px]">
+                      <span className="text-base-content/65 text-[11px]">
                         ({st.badge})
                       </span>
                     </div>
@@ -1189,20 +1195,16 @@ export const CorridorInfrastructureMap: React.FC<CorridorInfrastructureMapProps>
       </div>
 
       {/* Attribution Footer */}
-      <div className="border-base-200 text-base-content/75 flex flex-col justify-between gap-2 border-t pt-3 text-[11px] sm:flex-row sm:items-center">
-        <span>
-          Nota: Pontos rodoviários agregados em nível de hub/entroncamento (sem exposição
-          de dados cadastrais individuais).
-        </span>
+      <div className="border-base-300/60 text-base-content/65 flex flex-col justify-between gap-2 border-t pt-2.5 text-[11px] sm:flex-row sm:items-center">
+        <span>Hubs agregados por entroncamento (sem dados individuais de postos).</span>
         <span className="leading-relaxed">
-          Fontes: IBGE Malha UF{' '}
-          <SourceRef id="I14" context="Malha Territorial UF (Mapa)" />, ANP{' '}
-          <SourceRef id="I09" context="Corredores Sustentáveis do Paraná" />, SCGÁS{' '}
-          <SourceRef id="I16" context="Rede GNV Naturgy São Paulo Sul" />, Compagás{' '}
-          <SourceRef id="I07" context="Revendedores de Combustíveis e GNV" />, Necta{' '}
-          <SourceRef id="I15" context="Rede GNV/Biometano Necta (SP)" />, Naturgy SP Sul{' '}
-          <SourceRef id="P09" context="Rede de Postos GNV/Biometano SCGÁS" /> &amp;
-          ABVE/Tupi <SourceRef id="I01" context="Mapeamento Nacional de Eletropostos" />
+          Fontes: IBGE <SourceRef id="I14" context="Malha Territorial UF (Mapa)" /> · ANP{' '}
+          <SourceRef id="I09" context="Corredores Sustentáveis do Paraná" /> · SCGÁS{' '}
+          <SourceRef id="P09" context="Rede de Postos GNV/Biometano SCGÁS" /> · Compagás{' '}
+          <SourceRef id="I07" context="Revendedores de Combustíveis e GNV" /> · Necta{' '}
+          <SourceRef id="I15" context="Rede GNV/Biometano Necta (SP)" /> · Naturgy{' '}
+          <SourceRef id="I16" context="Rede GNV Naturgy São Paulo Sul" /> · ABVE/Tupi{' '}
+          <SourceRef id="I01" context="Mapeamento Nacional de Eletropostos" />
         </span>
       </div>
     </section>
